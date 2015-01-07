@@ -28,15 +28,16 @@ class PyConcreteAdmin(object):
     def parse_arg(self):
         parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
         parser.add_argument('build_pye', nargs='?', default=None,
-                           help='parse specific folder and compile/encrypt whole py scripts')
+                            help='parse specific folder and compile/encrypt whole py scripts')
         parser.add_argument('--recursive', action='store_false',
-                           help='recursive process the folder')
+                            help='recursive process the folder')
         parser.add_argument('--verbose', action='store_true',
-                           help='verbose mode')
+                            help='verbose mode')
         parser.add_argument('--ignore-list', nargs='*', default=None,
-                           help='ignore file name list')
+                            help='ignore file name list')
         self.args = parser.parse_args()
-        print self.args
+        self.parser = parser
+        
         idx = self.args.build_pye.find('=')
         self.args.build_pye = self.args.build_pye[idx+1:]
         print 'build_pye=%s' % self.args.build_pye
@@ -47,20 +48,21 @@ class PyConcreteAdmin(object):
         if self.args.build_pye:
             self.build_pye(self.args.build_pye)
         else:
-            print 'please input correct command'
+            print 'please input correct command!'
+            self.parser.print_help()
             
     def build_pye(self, folder):
         if not exists(folder):
             raise Exception("arg: build_pye, the folder doesn't exists (%s)" % folder)
-        python_dir = dirname(sys.executable)
-        if folder.startswith(python_dir):
+        
+        if folder.startswith(sys.prefix):
             raise Exception("arg: build_pye, the folder should not under python dir(%s)" % folder)
         self.build_pye_dir(folder)
         
     def build_pye_dir(self, folder):
         print 'handle dir=%s' % folder
         for f in os.listdir(folder):
-            if f in ['.', '..', '.git', '.svn']:
+            if f in ['.', '..', '.git', '.svn', 'pyconcrete']:
                 continue
             fullpath = join(folder, f)
             if isdir(fullpath) and self.args.recursive:

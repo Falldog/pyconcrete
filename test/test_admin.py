@@ -35,10 +35,11 @@ def get_build_lib_dir():
             return join(LIB_DIR, f)
     return None
 
-class TestAdmin(unittest.TestCase):
+class TestAdminScript(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
+        
     @classmethod
     def tearDownClass(cls):
         pass
@@ -67,8 +68,7 @@ class TestAdmin(unittest.TestCase):
         shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
         
         env = os.environ.copy()
-        if 'PYTHONPATH' not in env:
-            env['PYTHONPATH'] = ''
+        env.setdefault('PYTHONPATH', '')
         env['PYTHONPATH'] += os.pathsep + get_build_lib_dir()
         env['PYTHONPATH'] += os.pathsep + SRC_DIR
         subprocess.check_call('python pyconcrete-admin.py build_pye=%s --verbose --recursive' % target_dir, env=env)

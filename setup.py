@@ -16,6 +16,7 @@
 
 import os
 import sys
+import imp
 import string
 import hashlib
 from os.path import join
@@ -25,8 +26,10 @@ from distutils.command.build import build
 DEFAULT_KEY = 'Falldog'
 
 CUR_DIR = os.path.dirname(__file__)
-SRC_DIR = join('src', 'pyconcrete_ext')
-SECRET_HEADER_PATH = join(SRC_DIR, 'secret_key.h')
+SRC_DIR = join('src')
+PY_SRC_DIR = join(SRC_DIR, 'pyconcrete')
+EXT_SRC_DIR = join(SRC_DIR, 'pyconcrete_ext')
+SECRET_HEADER_PATH = join(EXT_SRC_DIR, 'secret_key.h')
 
 def hash_key(key):
     factor = sum([ord(s) for s in key])
@@ -41,7 +44,7 @@ def hash_key(key):
     return k, factor
     
 def gen_secret_key_header(key, factor):
-    # reference from http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
+    # reference from - http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
     # encrypt the secret key in binary code
     # avoid to easy read from HEX view
     
@@ -52,6 +55,7 @@ def gen_secret_key_header(key, factor):
     
     code = """
         #define SECRET_NUM 0x%X
+        #define SECRET_KEY_LEN %d
         static const unsigned char* GetSecretKey()
         {
             unsigned int i = 0;
@@ -59,7 +63,7 @@ def gen_secret_key_header(key, factor):
             static int is_encrypt = 1/*true*/;
             if( is_encrypt )
             {
-                for(i = 0 ; i < sizeof(key) / sizeof(key[0]) - 1 ; ++i)
+                for(i = 0 ; i < SECRET_KEY_LEN ; ++i)
                 {
                     key[i] = key[i] ^ (SECRET_NUM - i);
                 }
@@ -67,7 +71,7 @@ def gen_secret_key_header(key, factor):
             }
             return key;
         }
-    """ % (factor, key_val_code)
+    """ % (factor, len(key), key_val_code)
     
     with open(SECRET_HEADER_PATH, 'w') as f:
         f.write(code)
@@ -92,7 +96,7 @@ class build_ex(build):
     def pre_build(self):
         if not self.passphrase:
             self.passphrase = raw_input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
-            if len(passphrase) == 0:
+            if len(self.passphrase) == 0:
                 self.passphrase = DEFAULT_KEY
             else:
                 passphrase2 = raw_input("please input again to confirm\n")
@@ -110,20 +114,34 @@ class build_ex(build):
         self.post_build()
         return ret
 
-        
-include_dirs = [join(SRC_DIR, 'openaes', 'inc')]
-if sys.platform == 'win32':
-    include_dirs.append(join(SRC_DIR, 'include_win'))
-    
-module = Extension('_pyconcrete',
-                    include_dirs = include_dirs, 
-                    sources = [join(SRC_DIR, 'pyconcrete.c'),
-                               join(SRC_DIR, 'openaes', 'src', 'oaes.c'),
-                               join(SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
-                               join(SRC_DIR, 'openaes', 'src', 'oaes_lib.c')])
 
-setup( name = 'PyConcrete',
-       version = '1.0',
+version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
+
+include_dirs = [join(EXT_SRC_DIR, 'openaes', 'inc')]
+if sys.platform == 'win32':
+    include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
+    
+module = Extension('pyconcrete._pyconcrete',
+                    include_dirs = include_dirs, 
+                    sources = [join(EXT_SRC_DIR, 'pyconcrete.c'),
+                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes.c'),
+                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
+                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c')],
+)
+
+setup( name = 'pyconcrete',
+       version = version.__version__,
        description = 'protect your python script',
+       
+       author  = 'Falldog',
+       author_email = 'falldog7@gmail.com',
+       url = 'https://github.com/Falldog/pyconcrete',
+       license = "Apache License 2.0",
+       
        ext_modules = [module],
-       cmdclass={"build": build_ex} )
+       cmdclass={"build": build_ex},
+       
+       packages = ['pyconcrete'],
+       package_dir = {'': SRC_DIR},
+       scripts = ['pyconcrete-admin.py'],
+)

@@ -64,7 +64,7 @@ class TestBasic(unittest.TestCase):
         import pyconcrete
         print pyconcrete.info()
     
-    def __test_encrypt_decrypt_file(self, py_code):
+    def __do_encrypt_decrypt_file(self, py_code):
         py_filename = join(self._tmp_dir, 'test.py')
         pye_filename = join(self._tmp_dir, 'test.pye')
         with open(py_filename, 'wb') as f:
@@ -77,34 +77,41 @@ class TestBasic(unittest.TestCase):
         with open(pye_filename, 'rb') as f:
             data = f.read()
         print 'decrypt_buffer'
-        result = pyconcrete.decrypt_buffer(data)
-        self.assertEqual(py_code, result)
+        return pyconcrete.decrypt_buffer(data)
     
     def test_process_py_code_empty(self):
         py_code = ''
-        self.__test_encrypt_decrypt_file(py_code)
+        res = self.__do_encrypt_decrypt_file(py_code)
+        self.assertEqual(py_code, res)
         
     def test_process_py_code_large(self):
         py_code = ''
         for i in xrange(100):
             py_code += 'print "This is testing large py file ... %d"\r\n' % i
-        self.__test_encrypt_decrypt_file(py_code)
+        res = self.__do_encrypt_decrypt_file(py_code)
+        self.assertEqual(py_code, res)
     
     def test_process_py_code_1_block(self):
         py_code = 'v=12345678901234'
-        self.assertEqual(16, len(py_code))
-        self.__test_encrypt_decrypt_file(py_code)
+        self.assertEqual(16, len(py_code))  # 1 block
+        
+        res = self.__do_encrypt_decrypt_file(py_code)
+        self.assertEqual(py_code, res)
     
     def test_process_py_code_less_1_block(self):
         py_code = 'v=123456789'
-        self.assertLess(len(py_code), 16)
-        self.__test_encrypt_decrypt_file(py_code)
+        self.assertLess(len(py_code), 16)  # less than 1 block
+        
+        res = self.__do_encrypt_decrypt_file(py_code)
+        self.assertEqual(py_code, res)
     
     def test_process_py_code_2_block(self):
-        py_code  = 'v1=123456789\r\n'
-        py_code += 'v2=123456789\r\n'
-        self.assertLess(len(py_code), 32)
-        self.__test_encrypt_decrypt_file(py_code)
+        py_code  = 'v1=12345678901\r\n'
+        py_code += 'v2=12345678901\r\n'
+        self.assertEqual(len(py_code), 32)  # 2 blocks
+        
+        res = self.__do_encrypt_decrypt_file(py_code)
+        self.assertEqual(py_code, res)
     
     def test_import_pye(self):
         py_code = "v_int=1\r\n"

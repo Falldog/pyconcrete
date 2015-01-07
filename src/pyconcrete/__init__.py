@@ -18,6 +18,14 @@ import os
 import sys
 import imp
 from os.path import join, exists, isdir
+
+EXT_PY  = '.py'
+EXT_PYC = '.pyc'
+EXT_PYD = '.pyd'
+EXT_PYE = '.pye'
+
+__all__ = ["info"]
+
 import _pyconcrete
 
 info = _pyconcrete.info
@@ -25,10 +33,6 @@ encrypt_file = _pyconcrete.encrypt_file
 decrypt_file = _pyconcrete.decrypt_file
 decrypt_buffer = _pyconcrete.decrypt_buffer
 
-EXT_PY  = '.py'
-EXT_PYC = '.pyc'
-EXT_PYD = '.pyd'
-EXT_PYE = '.pye'
 
 class LoaderBase(object):
     def __init__(self, is_package, *data):
@@ -87,7 +91,9 @@ class PyeLoader(LoaderBase):
         package_path, path, img = self.data
         
         img = decrypt_buffer(img)  # decrypt pye
-        code = marshal.loads(img[8:])  # load pyc from memory, reference http://stackoverflow.com/questions/1830727/how-to-load-compiled-python-modules-from-memory
+        
+        # load pyc from memory, reference http://stackoverflow.com/questions/1830727/how-to-load-compiled-python-modules-from-memory
+        code = marshal.loads(img[8:])
 
         m = self.new_module(fullname, path, package_path)
         sys.modules[fullname] = m
@@ -148,6 +154,6 @@ class ModuleImportHooker:
         except ImportError:
             return None
 
-            
+
 sys.path_hooks.insert(0, ModuleImportHooker)
 sys.path_importer_cache.clear()

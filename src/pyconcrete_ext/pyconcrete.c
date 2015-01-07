@@ -16,10 +16,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Python.h>
-#include "secret_key.h"
 #include "oaes_lib.h"
+#include "secret_key.h"  // auto generate at build time
 
-#define KEY_LEN 16
+// #define SECRET_KEY_LEN %d // defined in secret_key.h
 #define AES_BLOCK_SIZE 16
 
 const static unsigned int TRUE = 1;
@@ -40,7 +40,7 @@ static void KeyAlloc(OAES_CTX** key)
 {
     *key = oaes_alloc();
     oaes_key_gen_128(*key);
-    oaes_key_import_data(*key, GetSecretKey(), strlen(GetSecretKey()));
+    oaes_key_import_data(*key, GetSecretKey(), SECRET_KEY_LEN);
 }
 
 static void KeyDestroy(OAES_CTX** key)
@@ -167,7 +167,7 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
     Py_ssize_t cipher_buf_size = 0;
     Py_ssize_t plain_buf_size = 0;
     Py_ssize_t proc_size = 0;        // process of decryption size
-    int padding_size = 0;
+    int padding_size = 0;            // last block padding size
     unsigned char* cipher_buf;
     unsigned char* plain_buf;
     unsigned char* cur_cipher;
@@ -176,7 +176,10 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
     PyObject* py_plain_obj = NULL;
     OAES_CTX* key = NULL;
     
-    if (!PyArg_ParseTuple(args, "s#", &cipher_buf, &cipher_buf_size))
+    if(!PyArg_ParseTuple(args, "s#", &cipher_buf, &cipher_buf_size))
+        return NULL;
+    
+    if(cipher_buf_size % AES_BLOCK_SIZE != 0)  // file size not match, maybe not encrypted file
         return NULL;
     
     KeyAlloc(&key);
@@ -191,7 +194,7 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
         
         // printf("fn_decrypt_buffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
         
-        py_plain_obj = PyString_FromStringAndSize(NULL, plain_buf_size);
+        py_plain_obj = PyString_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
         plain_buf = PyString_AS_STRING(py_plain_obj);
         
         cur_plain = plain_buf;
