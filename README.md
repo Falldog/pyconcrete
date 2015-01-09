@@ -6,7 +6,7 @@ Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 Version
 --------------
-1.0.x Beta
+0.9.x Beta
 
 
 Protect python script work flow
