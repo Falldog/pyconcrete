@@ -48,12 +48,12 @@ static void KeyDestroy(OAES_CTX** key)
     oaes_free(key);
 }
 
-static PyObject * fn_info(PyObject *self, PyObject* null)
+static PyObject * fnInfo(PyObject *self, PyObject* null)
 {
     return Py_BuildValue("s", "PyConcrete Info() AES 128bit");
 }
 
-static PyObject * fn_encrypt_file(PyObject *self, PyObject* args)
+static PyObject * fnEncryptFile(PyObject *self, PyObject* args)
 {
     FILE* src = NULL;
     FILE* dest = NULL;
@@ -67,17 +67,24 @@ static PyObject * fn_encrypt_file(PyObject *self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss", &src_filepath, &dest_filepath))
         return NULL;
     
-    // printf("fn_encrypt_file() src=%s, dest=%s\n", src_filepath, dest_filepath);
+    // printf("fnEncryptFile() src=%s, dest=%s\n", src_filepath, dest_filepath);
     
     KeyAlloc(&key);
     {
         src = fopen(src_filepath, "rb");
-        dest = fopen(dest_filepath, "wb");
+        if(!src)
+        {
+            PyErr_Format(g_PyConcreteError, "open source file fail! (%s)", src_filepath);
+            return NULL;
+        }
         
-        // error handling
-        // if(!src || !dest)
-        // {
-        // }
+        dest = fopen(dest_filepath, "wb");
+        if(!dest)
+        {
+            fclose(src);
+            PyErr_Format(g_PyConcreteError, "open destination file fail! (%s)", dest_filepath);
+            return NULL;
+        }
         
         while(!feof(src))
         {
@@ -91,7 +98,7 @@ static PyObject * fn_encrypt_file(PyObject *self, PyObject* args)
                 is_last_block_fragment = TRUE;
                 memset(buf+s, AES_BLOCK_SIZE-s, AES_BLOCK_SIZE-s);  // fill padding number
                 oaes_encrypt_block(key, buf, AES_BLOCK_SIZE);
-                // printf("fn_encrypt_file() is_last_block_fragment=TRUE, padding num = %d\n", AES_BLOCK_SIZE-s);
+                // printf("fnEncryptFile() is_last_block_fragment=TRUE, padding num = %d\n", AES_BLOCK_SIZE-s);
             }
             fwrite(buf, 1, AES_BLOCK_SIZE, dest);
         }
@@ -100,7 +107,7 @@ static PyObject * fn_encrypt_file(PyObject *self, PyObject* args)
             memset(buf, AES_BLOCK_SIZE, AES_BLOCK_SIZE);
             oaes_encrypt_block(key, buf, AES_BLOCK_SIZE);
             fwrite(buf, 1, AES_BLOCK_SIZE, dest);
-            // printf("fn_encrypt_file() is_last_block_fragment=FALSE, padding num = %d\n", AES_BLOCK_SIZE);
+            // printf("fnEncryptFile() is_last_block_fragment=FALSE, padding num = %d\n", AES_BLOCK_SIZE);
         }
         
         fclose(src);
@@ -112,7 +119,7 @@ static PyObject * fn_encrypt_file(PyObject *self, PyObject* args)
     return Py_True;
 }
 
-static PyObject * fn_decrypt_file(PyObject *self, PyObject* args)
+static PyObject * fnDecryptFile(PyObject *self, PyObject* args)
 {
     FILE* src = NULL;
     const char* src_filepath = NULL;
@@ -162,7 +169,7 @@ static PyObject * fn_decrypt_file(PyObject *self, PyObject* args)
     return NULL;
 }
 
-static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
+static PyObject * fnDecryptBuffer(PyObject *self, PyObject* args)
 {
     Py_ssize_t cipher_buf_size = 0;
     Py_ssize_t plain_buf_size = 0;
@@ -180,7 +187,10 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
         return NULL;
     
     if(cipher_buf_size % AES_BLOCK_SIZE != 0)  // file size not match, maybe not encrypted file
+    {
+        PyErr_SetString(g_PyConcreteError, "this file content doesn't mathed");
         return NULL;
+    }
     
     KeyAlloc(&key);
     {
@@ -192,7 +202,7 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
         padding_size = last_block[AES_BLOCK_SIZE-1];
         plain_buf_size = cipher_buf_size - padding_size;
         
-        // printf("fn_decrypt_buffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
+        // printf("fnDecryptBuffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
         
         py_plain_obj = PyString_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
         plain_buf = PyString_AS_STRING(py_plain_obj);
@@ -226,10 +236,10 @@ static PyObject * fn_decrypt_buffer(PyObject *self, PyObject* args)
 }
 
 static PyMethodDef PyConcreteMethods[] = {
-    {"info", fn_info, METH_NOARGS, "Display PyConcrete info"},
-    {"encrypt_file", fn_encrypt_file, METH_VARARGS, "Encrypt whole file"},
-    {"decrypt_file", fn_decrypt_file, METH_VARARGS, "Decrypt whole file (not ready)"},
-    {"decrypt_buffer", fn_decrypt_buffer, METH_VARARGS, "Decrypt buffer"},
+    {"info", fnInfo, METH_NOARGS, "Display PyConcrete info"},
+    {"encrypt_file", fnEncryptFile, METH_VARARGS, "Encrypt whole file"},
+    {"decrypt_file", fnDecryptFile, METH_VARARGS, "Decrypt whole file (not ready)"},
+    {"decrypt_buffer", fnDecryptBuffer, METH_VARARGS, "Decrypt buffer"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -242,8 +252,8 @@ init_pyconcrete(void)
     if (m == NULL)
         return;
 
-    g_PyConcreteError = PyErr_NewException("_pyconcrete.error", NULL, NULL);
+    g_PyConcreteError = PyErr_NewException("_pyconcrete.Error", NULL, NULL);
     Py_INCREF(g_PyConcreteError);
-    PyModule_AddObject(m, "error", g_PyConcreteError);
+    PyModule_AddObject(m, "Error", g_PyConcreteError);
 }
 
