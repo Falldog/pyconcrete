@@ -38,7 +38,7 @@ class PyConcreteAdmin(object):
                             nargs=1, default=None, help='specific file to process')
         parser.add_argument('--dir', 
                             nargs=1, default=None, help='specific dir to process')
-        parser.add_argument('--verbose', 
+        parser.add_argument('-v', '--verbose', 
                             action='store_true', help='verbose mode')
         parser.add_argument('--ignore-file-list', 
                             dest='ignore_file_list', metavar='filename', nargs='+', default=tuple(), help='ignore file name list')

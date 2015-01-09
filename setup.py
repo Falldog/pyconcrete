@@ -22,6 +22,7 @@ import hashlib
 from os.path import join
 from distutils.core import setup, Extension
 from distutils.command.build import build
+from distutils.command.install import install
 
 DEFAULT_KEY = 'Falldog'
 
@@ -30,6 +31,7 @@ SRC_DIR = join('src')
 PY_SRC_DIR = join(SRC_DIR, 'pyconcrete')
 EXT_SRC_DIR = join(SRC_DIR, 'pyconcrete_ext')
 SECRET_HEADER_PATH = join(EXT_SRC_DIR, 'secret_key.h')
+
 
 def hash_key(key):
     factor = sum([ord(s) for s in key])
@@ -43,7 +45,7 @@ def hash_key(key):
     
     return k, factor
     
-def gen_secret_key_header(key, factor):
+def create_secret_key_header(key, factor):
     # reference from - http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
     # encrypt the secret key in binary code
     # avoid to easy read from HEX view
@@ -79,21 +81,9 @@ def gen_secret_key_header(key, factor):
 def remove_secret_key_header():
     os.remove(SECRET_HEADER_PATH)
 
-    
-    
-class build_ex(build):
-    '''
-    execute extra function before/after build.run()
-    '''
-    user_options = build.user_options + [
-      ('passphrase=', None, 'specify passphrase'),
-    ]
-    
-    def initialize_options(self):
-        build.initialize_options(self)
-        self.passphrase = None
 
-    def pre_build(self):
+class cmd_base:
+    def pre_process(self):
         if not self.passphrase:
             self.passphrase = raw_input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
             if len(self.passphrase) == 0:
@@ -103,17 +93,45 @@ class build_ex(build):
                 if self.passphrase != passphrase2:
                     raise Exception("Passphrase is different")
         k, f = hash_key(self.passphrase)
-        gen_secret_key_header(k, f)
+        create_secret_key_header(k, f)
         
-    def post_build(self):
+    def post_process(self):
         remove_secret_key_header()
         
+
+    
+class build_ex(cmd_base, build):
+    '''
+    execute extra function before/after build.run()
+    '''
+    user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
+    
+    def initialize_options(self):
+        build.initialize_options(self)
+        self.passphrase = None
+
     def run(self):
-        self.pre_build()
+        self.pre_process()
         ret = build.run(self)
-        self.post_build()
+        self.post_process()
         return ret
 
+class install_ex(cmd_base, install):
+    '''
+    execute extra function before/after install.run()
+    '''
+    user_options = install.user_options + [('passphrase=', None, 'specify passphrase')]
+    
+    def initialize_options(self):
+        install.initialize_options(self)
+        self.passphrase = None
+
+    def run(self):
+        self.pre_process()
+        ret = install.run(self)
+        self.post_process()
+        return ret
+        
 
 version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
@@ -139,7 +157,8 @@ setup( name = 'pyconcrete',
        license = "Apache License 2.0",
        
        ext_modules = [module],
-       cmdclass={"build": build_ex},
+       cmdclass={"build": build_ex,
+                 "install": install_ex},
        
        packages = ['pyconcrete'],
        package_dir = {'': SRC_DIR},
