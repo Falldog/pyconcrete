@@ -23,114 +23,31 @@ import subprocess
 import py_compile
 from os.path import dirname, abspath, join
 
-ROOT_DIR = abspath(join(dirname(__file__), '..'))
-LIB_DIR = join(ROOT_DIR, 'build')
-SRC_DIR = join(ROOT_DIR, 'src')
+import base
 
-def get_build_lib_dir():
-    for f in os.listdir(LIB_DIR):
-        if f.startswith('lib.'):
-            return join(LIB_DIR, f)
-    return None
-
-class TestBasic(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-    @classmethod
-    def tearDownClass(cls):
-        pass
-    
+class TestBasic(base.TestPyConcreteBase):
     def setUp(self):
-        self._ori_dir = os.getcwd()
-        self._sys_path = sys.path
-        self._tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
-        
-        os.chdir(ROOT_DIR)
-        subprocess.check_call('python setup.py build --passphrase=Falldog')
-        p = get_build_lib_dir()
-        if not p:
-            raise Excpetion("can't find build lib dir!")
-        
-        sys.path.append(p)
-        sys.path.append(SRC_DIR)
+        self.lib_create_temp_env()
         
     def tearDown(self):
-        os.chdir(self._ori_dir)
-        sys.path = self._sys_path
-        shutil.rmtree(self._tmp_dir)
+        self.lib_remove_temp_env()
     
     def test_import(self):
         import pyconcrete
         print pyconcrete.info()
-    
-    def __do_encrypt_decrypt_file(self, py_code):
-        py_filename = join(self._tmp_dir, 'test.py')
-        pye_filename = join(self._tmp_dir, 'test.pye')
-        with open(py_filename, 'wb') as f:
-            f.write(py_code)
-            
-        import pyconcrete
-        print 'py code len=%d' % len(py_code)
-        print 'encrypt_file : %s' % py_filename
-        pyconcrete.encrypt_file(py_filename, pye_filename)
-        with open(pye_filename, 'rb') as f:
-            data = f.read()
-        print 'decrypt_buffer'
-        return pyconcrete.decrypt_buffer(data)
-    
-    def test_process_py_code_empty(self):
-        py_code = ''
-        res = self.__do_encrypt_decrypt_file(py_code)
-        self.assertEqual(py_code, res)
         
-    def test_process_py_code_large(self):
-        py_code = ''
-        for i in xrange(100):
-            py_code += 'print "This is testing large py file ... %d"\r\n' % i
-        res = self.__do_encrypt_decrypt_file(py_code)
-        self.assertEqual(py_code, res)
-    
-    def test_process_py_code_1_block(self):
-        py_code = 'v=12345678901234'
-        self.assertEqual(16, len(py_code))  # 1 block
+        #print "lib dir=[%s], pyconcrete __init__=[%s]" % (self.lib_dir, pyconcrete.__file__)
+        self.assertTrue(pyconcrete.__file__.startswith(self.lib_dir))  # check import correct module
         
-        res = self.__do_encrypt_decrypt_file(py_code)
-        self.assertEqual(py_code, res)
-    
-    def test_process_py_code_less_1_block(self):
-        py_code = 'v=123456789'
-        self.assertLess(len(py_code), 16)  # less than 1 block
-        
-        res = self.__do_encrypt_decrypt_file(py_code)
-        self.assertEqual(py_code, res)
-    
-    def test_process_py_code_2_block(self):
-        py_code  = 'v1=12345678901\r\n'
-        py_code += 'v2=12345678901\r\n'
-        self.assertEqual(len(py_code), 32)  # 2 blocks
-        
-        res = self.__do_encrypt_decrypt_file(py_code)
-        self.assertEqual(py_code, res)
-    
     def test_import_pye(self):
         py_code = "v_int=1\r\n"
         py_code += "v_string='abc'\r\n"
-        py_filename = join(self._tmp_dir, 'test.py')
-        pyc_filename = join(self._tmp_dir, 'test.pyc')
-        pye_filename = join(self._tmp_dir, 'test.pye')
-        with open(py_filename, 'wb') as f:
-            f.write(py_code)
+        pye_filepath = self.lib_gen_pye(py_code, 'test.pye')
         
-        py_compile.compile(py_filename)
-        
-        import pyconcrete
-        pyconcrete.encrypt_file(pyc_filename, pye_filename)
-        os.remove(py_filename)
-        os.remove(pyc_filename)
-        
-        sys.path.insert(0, self._tmp_dir)
+        # import test.pye testing 
         import test
+        
+        self.assertEqual(pye_filepath, test.__file__)  # check import correct module
         self.assertEqual(1, test.v_int)
         self.assertEqual('abc', test.v_string)
     

@@ -19,7 +19,10 @@ import sys
 import argparse
 import py_compile
 import pyconcrete
-from os.path import join, exists, dirname, isdir
+from os.path import join, exists, dirname, isdir, isfile
+
+class PyConcreteError(Exception):
+    pass
 
 class PyConcreteAdmin(object):
     def __init__(self):
@@ -27,50 +30,68 @@ class PyConcreteAdmin(object):
     
     def parse_arg(self):
         parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
-        parser.add_argument('build_pye', nargs='?', default=None,
-                            help='parse specific folder and compile/encrypt whole py scripts')
-        parser.add_argument('--recursive', action='store_false',
-                            help='recursive process the folder')
-        parser.add_argument('--verbose', action='store_true',
-                            help='verbose mode')
-        parser.add_argument('--ignore-list', nargs='*', default=None,
-                            help='ignore file name list')
-        self.args = parser.parse_args()
+        parser.add_argument('cmd', 
+                            default='', help='compile_pye|compile_all_pye')
+        parser.add_argument('compile_all_pye', 
+                            nargs='?', default=None, help='parse specific dir and compile/encrypt whole py scripts under the dir')
+        parser.add_argument('--file', 
+                            nargs=1, default=None, help='specific file to process')
+        parser.add_argument('--dir', 
+                            nargs=1, default=None, help='specific dir to process')
+        parser.add_argument('--verbose', 
+                            action='store_true', help='verbose mode')
+        parser.add_argument('--ignore-file-list', 
+                            dest='ignore_file_list', metavar='filename', nargs='+', default=tuple(), help='ignore file name list')
+        args = parser.parse_args()
         self.parser = parser
+        self.args = args
         
-        idx = self.args.build_pye.find('=')
-        self.args.build_pye = self.args.build_pye[idx+1:]
-        print 'build_pye=%s' % self.args.build_pye
-        print 'verbose=%s' % self.args.verbose
-        print 'recursive=%s' % self.args.recursive
+        if args.cmd not in ['compile_pye', 'compile_all_pye']:
+            raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
+        args.compile_pye = bool(args.cmd == 'compile_pye')
+        args.compile_all_pye = bool(args.cmd == 'compile_all_pye')
+        if args.compile_pye:
+            if args.file is None:
+                raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
+            args.compile_pye = args.file[0]
+        elif args.compile_all_pye:
+            if args.dir is None:
+                raise PyConcreteError("arg: compile_all_pye, need provide the dir [--dir] to process")
+            args.compile_all_pye = args.dir[0]
+        
+        if args.verbose:
+            print 'compile_pye=%s' % args.compile_pye
+            print 'compile_all_pye=%s' % args.compile_all_pye
+            print 'ignore_file_list=%s' % str(args.ignore_file_list)
+            print 'verbose=%s' % args.verbose
         
     def run(self):
-        if self.args.build_pye:
-            self.build_pye(self.args.build_pye)
+        if self.args.compile_pye:
+            filepath = self.args.compile_pye
+            if not isfile(filepath):
+                raise PyConcreteError("arg: compile_pye, the file doesn't exists (%s)" % filepath)
+            self.compile_pye_file(filepath)
+        elif self.args.compile_all_pye:
+            dirpath = self.args.compile_all_pye
+            if not isdir(dirpath):
+                raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
+            self.compile_pye_dir(dirpath)
         else:
             print 'please input correct command!'
             self.parser.print_help()
             
-    def build_pye(self, folder):
-        if not exists(folder):
-            raise Exception("arg: build_pye, the folder doesn't exists (%s)" % folder)
-        
-        if folder.startswith(sys.prefix):
-            raise Exception("arg: build_pye, the folder should not under python dir(%s)" % folder)
-        self.build_pye_dir(folder)
-        
-    def build_pye_dir(self, folder):
+    def compile_pye_dir(self, folder):
         print 'handle dir=%s' % folder
         for f in os.listdir(folder):
             if f in ['.', '..', '.git', '.svn', 'pyconcrete']:
                 continue
             fullpath = join(folder, f)
             if isdir(fullpath) and self.args.recursive:
-                self.build_pye_dir(fullpath)
+                self.compile_pye_dir(fullpath)
             elif fullpath.endswith('.py'):
-                self.build_pye_file(fullpath)
+                self.compile_pye_file(fullpath)
                 
-    def build_pye_file(self, py_file):
+    def compile_pye_file(self, py_file):
         print 'handle file=%s' % py_file
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'

@@ -23,19 +23,14 @@ import subprocess
 import py_compile
 from os.path import dirname, abspath, join
 
+import base
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 LIB_DIR = join(ROOT_DIR, 'build')
 SRC_DIR = join(ROOT_DIR, 'src')
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
 
-def get_build_lib_dir():
-    for f in os.listdir(LIB_DIR):
-        if f.startswith('lib.'):
-            return join(LIB_DIR, f)
-    return None
-
-class TestAdminScript(unittest.TestCase):
+class TestAdminScript(base.TestPyConcreteBase):
     @classmethod
     def setUpClass(cls):
         pass
@@ -46,32 +41,25 @@ class TestAdminScript(unittest.TestCase):
     
     def setUp(self):
         self._ori_dir = os.getcwd()
-        self._sys_path = sys.path
-        self._tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
-        
         os.chdir(ROOT_DIR)
-        p = get_build_lib_dir()
-        if not p:
-            raise Excpetion("can't find build lib dir!")
         
-        sys.path.append(p)
-        sys.path.append(SRC_DIR)
+        self.lib_create_temp_env()
         
     def tearDown(self):
+        self.lib_remove_temp_env()
+        
         os.chdir(self._ori_dir)
-        sys.path = self._sys_path
-        shutil.rmtree(self._tmp_dir)
     
     def test_parse_folder(self):
-        target_dir = join(self._tmp_dir, 'data')
+        target_dir = join(self.tmp_dir, 'data')
         print 'src=%s, target=%s' % (SAMPLE_PACKAGE_DIR, target_dir)
         shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
         
         env = os.environ.copy()
         env.setdefault('PYTHONPATH', '')
-        env['PYTHONPATH'] += os.pathsep + get_build_lib_dir()
+        env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
         env['PYTHONPATH'] += os.pathsep + SRC_DIR
-        subprocess.check_call('python pyconcrete-admin.py build_pye=%s --verbose --recursive' % target_dir, env=env)
+        subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env)
     
 if __name__ == '__main__':
     unittest.main()
