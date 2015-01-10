@@ -86,7 +86,6 @@ class TestPyConcreteBase(unittest.TestCase):
             os.chdir(_ori_dir)
             
     def lib_create_temp_env(self, passphrase='Falldog', force=False):
-        lib_dir = self.lib_get_lib_dir()
         self._sys_path = sys.path
         
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
@@ -95,11 +94,12 @@ class TestPyConcreteBase(unittest.TestCase):
         os.chdir(ROOT_DIR)
         try:
             force_option = '--force' if force else ''
-            subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option))
-            #subprocess.check_call('python setup.py install --passphrase=%s --install-lib="%s" --install-scripts="%s"' % (passphrase, _tmp_dir, _tmp_dir))
+            subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
+            #subprocess.check_call('python setup.py install --passphrase=%s --install-lib="%s" --install-scripts="%s"' % (passphrase, _tmp_dir, _tmp_dir), shell=True)
         finally:
             os.chdir(_ori_dir)
             
+        lib_dir = self.lib_get_lib_dir()
         sys.path.insert(0, lib_dir)
         sys.path.insert(0, self.tmp_dir)
         

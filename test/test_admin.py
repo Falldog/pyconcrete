@@ -59,7 +59,7 @@ class TestAdminScript(base.TestPyConcreteBase):
         env.setdefault('PYTHONPATH', '')
         env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
         env['PYTHONPATH'] += os.pathsep + SRC_DIR
-        subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env)
+        subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env, shell=True)
     
 if __name__ == '__main__':
     unittest.main()
