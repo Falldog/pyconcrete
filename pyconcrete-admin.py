@@ -30,17 +30,19 @@ class PyConcreteAdmin(object):
     
     def parse_arg(self):
         parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
-        parser.add_argument('cmd', 
+        parser.add_argument('cmd',
                             default='', help='compile_pye|compile_all_pye')
-        parser.add_argument('compile_all_pye', 
-                            nargs='?', default=None, help='parse specific dir and compile/encrypt whole py scripts under the dir')
-        parser.add_argument('--file', 
+        parser.add_argument('--file',
                             nargs=1, default=None, help='specific file to process')
-        parser.add_argument('--dir', 
+        parser.add_argument('--dir',
                             nargs=1, default=None, help='specific dir to process')
-        parser.add_argument('-v', '--verbose', 
+        parser.add_argument('--remove-py',
+                            dest='remove_py', action='store_true', help='remove .py after compile pye')
+        parser.add_argument('--remove-pyc',
+                            dest='remove_pyc', action='store_true', help='remove .pyc after compile pye')
+        parser.add_argument('-v', '--verbose',
                             action='store_true', help='verbose mode')
-        parser.add_argument('--ignore-file-list', 
+        parser.add_argument('--ignore-file-list',
                             dest='ignore_file_list', metavar='filename', nargs='+', default=tuple(), help='ignore file name list')
         args = parser.parse_args()
         self.parser = parser
@@ -71,28 +73,28 @@ class PyConcreteAdmin(object):
             if not isfile(filepath):
                 raise PyConcreteError("arg: compile_pye, the file doesn't exists (%s)" % filepath)
             self.compile_pye_file(filepath)
+            
         elif self.args.compile_all_pye:
             dirpath = self.args.compile_all_pye
             if not isdir(dirpath):
                 raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
             self.compile_pye_dir(dirpath)
+            
         else:
             print 'please input correct command!'
             self.parser.print_help()
             
     def compile_pye_dir(self, folder):
-        print 'handle dir=%s' % folder
         for f in os.listdir(folder):
             if f in ['.', '..', '.git', '.svn', 'pyconcrete']:
                 continue
             fullpath = join(folder, f)
-            if isdir(fullpath) and self.args.recursive:
+            if isdir(fullpath):
                 self.compile_pye_dir(fullpath)
             elif fullpath.endswith('.py'):
                 self.compile_pye_file(fullpath)
                 
     def compile_pye_file(self, py_file):
-        print 'handle file=%s' % py_file
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'
         pyc_exists = exists(pyc_file)
@@ -107,8 +109,10 @@ class PyConcreteAdmin(object):
                 print '* skip %s' % pye_file
         
         # .pyc doesn't exists at begining, remove it after .pye created
-        if not pyc_exists:
+        if not pyc_exists or self.args.remove_pyc:
             os.remove(pyc_file)
+        if self.args.remove_py:
+            os.remove(py_file)
         
 if __name__ == '__main__':
     admin = PyConcreteAdmin()

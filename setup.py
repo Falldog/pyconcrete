@@ -20,13 +20,14 @@ import imp
 import string
 import hashlib
 from os.path import join
-from distutils.core import setup, Extension
+from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
 
 DEFAULT_KEY = 'Falldog'
 
 CUR_DIR = os.path.dirname(__file__)
+TEST_DIR = 'test'
 SRC_DIR = join('src')
 PY_SRC_DIR = join(SRC_DIR, 'pyconcrete')
 EXT_SRC_DIR = join(SRC_DIR, 'pyconcrete_ext')
@@ -132,6 +133,18 @@ class install_ex(cmd_base, install):
         self.post_process()
         return ret
         
+class test_ex(Command):
+    description = "Running all unit test for pyconcrete"
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        import unittest
+        suite = unittest.TestLoader().discover(TEST_DIR)
+        unittest.TextTestRunner(verbosity=2).run(suite)
+
 
 version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
@@ -158,7 +171,8 @@ setup( name = 'pyconcrete',
        
        ext_modules = [module],
        cmdclass={"build": build_ex,
-                 "install": install_ex},
+                 "install": install_ex,
+                 "test": test_ex},
        
        packages = ['pyconcrete'],
        package_dir = {'': SRC_DIR},
