@@ -36,8 +36,8 @@ $ git clone <pyconcrete repo> <pyconcre dir>
 ```sh
 $ python setup.py install
 ```
-  need to input your passphrase create secret key and encrypt script
-  same secret key will generate the same secret key
+  * need to input your passphrase create secret key for encrypt python script.
+  * same passphrase will generate the same secret key
 
 * convert your script to `*.pye`
 ```sh
