@@ -1,0 +1,111 @@
+#!/usr/bin/env python
+#
+# Copyright 2015 Falldog Hsieh <falldog7@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import sys
+import time
+import shutil
+import unittest
+import tempfile
+import subprocess
+import py_compile
+from zipfile import ZipFile
+from multiprocessing import Process, Queue
+from os.path import dirname, abspath, join
+
+import base
+
+CUR_DIR = abspath(dirname(__file__))
+ROOT_DIR = abspath(join(CUR_DIR, '..'))
+DATA_DIR = join(CUR_DIR, 'data')
+REQUEST_ZIP = join(DATA_DIR, 'requests-2.5.1.zip')
+REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
+PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
+RUN_COUNT = 100
+
+def main_requests(need_concrete, q):
+    if need_concrete:
+        import pyconcrete
+    
+    t = time.time()
+    import requests
+
+    from requests.adapters import HTTPAdapter
+    from requests.auth import HTTPDigestAuth, _basic_auth_str
+    from requests.compat import (Morsel, cookielib, getproxies, str, urljoin, urlparse, is_py3, builtin_str)
+    from requests.cookies import cookiejar_from_dict, morsel_to_cookie
+    from requests.exceptions import (ConnectionError, ConnectTimeout,
+                                     InvalidSchema, InvalidURL, MissingSchema,
+                                     ReadTimeout, Timeout, RetryError)
+    from requests.models import PreparedRequest
+    from requests.structures import CaseInsensitiveDict
+    from requests.sessions import SessionRedirectMixin
+    from requests.models import urlencode
+    from requests.hooks import default_hooks
+    
+    t = time.time() - t
+    q.put(requests.__file__)
+    q.put(t)
+    
+
+class TestPerformance(base.TestPyConcreteBase):
+    
+    def setUp(self):
+        self.lib_create_temp_env()
+        
+        zip = ZipFile(REQUEST_ZIP)
+        zip.extractall(self.tmp_dir)
+        zip.close()
+        
+        self.req_dir = join(self.tmp_dir, 'requests')
+        with open(join(self.req_dir, '__init__.py'), 'w') as f:
+            pass
+        
+    def tearDown(self):
+        self.lib_remove_temp_env()
+        pass
+    
+    def _test_requests(self, need_concrete):
+        if need_concrete:
+            self.lib_compile_pye(self.req_dir)
+        
+        sys.path.insert(0, self.req_dir)
+        
+        q = Queue()
+        p = Process(target=main_requests, args=(need_concrete,q))
+        
+        p.start()
+        path = q.get(timeout=5)
+        t = q.get(timeout=2)
+        p.join()
+
+        self.assertTrue(path.startswith(self.req_dir), "wrong import path of requests = %s" % path)
+        return t
+    
+    def test_requests_pye(self):
+        t = 0.0
+        for i in xrange(RUN_COUNT):
+            t += self._test_requests(True)
+        print 'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+    
+    def test_requests_py(self):
+        t = 0.0
+        for i in xrange(RUN_COUNT):
+            t += self._test_requests(False)
+        print 'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        
+if __name__ == '__main__':
+    unittest.main()
