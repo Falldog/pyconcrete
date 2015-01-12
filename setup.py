@@ -85,20 +85,23 @@ def remove_secret_key_header():
 
 class cmd_base:
     def pre_process(self):
-        if not self.passphrase:
-            self.passphrase = raw_input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
-            if len(self.passphrase) == 0:
-                self.passphrase = DEFAULT_KEY
-            else:
-                passphrase2 = raw_input("please input again to confirm\n")
-                if self.passphrase != passphrase2:
-                    raise Exception("Passphrase is different")
-        k, f = hash_key(self.passphrase)
-        create_secret_key_header(k, f)
+        self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
+        if self.manual_create_secrete_key_file:
+            if not self.passphrase:
+                self.passphrase = raw_input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
+                if len(self.passphrase) == 0:
+                    self.passphrase = DEFAULT_KEY
+                else:
+                    passphrase2 = raw_input("please input again to confirm\n")
+                    if self.passphrase != passphrase2:
+                        raise Exception("Passphrase is different")
+        
+            k, f = hash_key(self.passphrase)
+            create_secret_key_header(k, f)
         
     def post_process(self):
-        remove_secret_key_header()
-        
+        if self.manual_create_secrete_key_file:
+            remove_secret_key_header()
 
     
 class build_ex(cmd_base, build):
@@ -163,18 +166,15 @@ module = Extension('pyconcrete._pyconcrete',
 setup( name = 'pyconcrete',
        version = version.__version__,
        description = 'protect your python script',
-       
        author  = 'Falldog',
        author_email = 'falldog7@gmail.com',
        url = 'https://github.com/Falldog/pyconcrete',
        license = "Apache License 2.0",
-       
        ext_modules = [module],
-       cmdclass={"build": build_ex,
+       cmdclass = {"build": build_ex,
                  "install": install_ex,
                  "test": test_ex},
-       
+       scripts = ['pyconcrete-admin.py'],
        packages = ['pyconcrete'],
        package_dir = {'': SRC_DIR},
-       scripts = ['pyconcrete-admin.py'],
 )

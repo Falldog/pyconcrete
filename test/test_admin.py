@@ -27,7 +27,6 @@ import base
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 LIB_DIR = join(ROOT_DIR, 'build')
-SRC_DIR = join(ROOT_DIR, 'src')
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
 
 class TestAdminScript(base.TestPyConcreteBase):
@@ -58,7 +57,6 @@ class TestAdminScript(base.TestPyConcreteBase):
         env = os.environ.copy()
         env.setdefault('PYTHONPATH', '')
         env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
-        env['PYTHONPATH'] += os.pathsep + SRC_DIR
         subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env, shell=True)
     
 if __name__ == '__main__':

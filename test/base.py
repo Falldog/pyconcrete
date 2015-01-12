@@ -25,7 +25,6 @@ from os.path import dirname, abspath, join, exists
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 LIB_DIR = join(ROOT_DIR, 'build')
-SRC_DIR = join(ROOT_DIR, 'src')
 
 # testing ... not complete
 def __long_str(x):
@@ -175,3 +174,11 @@ class TestPyConcreteBase(unittest.TestCase):
         
         return pye_filepath
         
+    def lib_compile_pye(self, folder):
+        env = os.environ.copy()
+        env.setdefault('PYTHONPATH', '')
+        env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
+        
+        admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
+        subprocess.check_call('python %s compile_all_pye --dir=%s' % (admin_path, folder), env=env, shell=True)
+    
