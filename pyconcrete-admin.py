@@ -31,7 +31,7 @@ class PyConcreteAdmin(object):
     def parse_arg(self):
         parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
         parser.add_argument('cmd',
-                            default='', help='compile_pye|compile_all_pye')
+                            default='', help='compile_pye|compile_all_pye|compile_all_pyc')
         parser.add_argument('--file',
                             nargs=1, default=None, help='specific file to process')
         parser.add_argument('--dir',
@@ -48,10 +48,9 @@ class PyConcreteAdmin(object):
         self.parser = parser
         self.args = args
         
-        if args.cmd not in ['compile_pye', 'compile_all_pye']:
-            raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
         args.compile_pye = bool(args.cmd == 'compile_pye')
         args.compile_all_pye = bool(args.cmd == 'compile_all_pye')
+        args.compile_all_pyc = bool(args.cmd == 'compile_all_pyc')
         if args.compile_pye:
             if args.file is None:
                 raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
@@ -60,10 +59,17 @@ class PyConcreteAdmin(object):
             if args.dir is None:
                 raise PyConcreteError("arg: compile_all_pye, need provide the dir [--dir] to process")
             args.compile_all_pye = args.dir[0]
+        elif args.compile_all_pyc:
+            if args.dir is None:
+                raise PyConcreteError("arg: compile_all_pyc, need provide the dir [--dir] to process")
+            args.compile_all_pyc = args.dir[0]
+        else:
+            raise PyConcreteError("please provide correct command")
         
         if args.verbose:
             print 'compile_pye=%s' % args.compile_pye
             print 'compile_all_pye=%s' % args.compile_all_pye
+            print 'compile_all_pyc=%s' % args.compile_all_pyc
             print 'ignore_file_list=%s' % str(args.ignore_file_list)
             print 'verbose=%s' % args.verbose
         
@@ -78,22 +84,45 @@ class PyConcreteAdmin(object):
             dirpath = self.args.compile_all_pye
             if not isdir(dirpath):
                 raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
-            self.compile_pye_dir(dirpath)
+            self.compile_dir(dirpath)
+            
+        elif self.args.compile_all_pyc:
+            dirpath = self.args.compile_all_pyc
+            if not isdir(dirpath):
+                raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
+            self.compile_dir(dirpath)
             
         else:
             print 'please input correct command!'
             self.parser.print_help()
             
-    def compile_pye_dir(self, folder):
+    def compile_dir(self, folder):
         for f in os.listdir(folder):
-            if f in ['.', '..', '.git', '.svn', 'pyconcrete']:
+            if f in ['.', '..', '.git', '.svn', 'pyconcrete'] or f in self.args.ignore_file_list:
                 continue
             fullpath = join(folder, f)
             if isdir(fullpath):
-                self.compile_pye_dir(fullpath)
+                self.compile_dir(fullpath)
             elif fullpath.endswith('.py'):
-                self.compile_pye_file(fullpath)
+                if self.args.compile_all_pyc:
+                    self.compile_pyc_file(fullpath)
+                else:
+                    self.compile_pye_file(fullpath)
                 
+    def compile_pyc_file(self, py_file):
+        pyc_file = py_file + 'c'
+        pyc_exists = exists(pyc_file)
+        if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
+            py_compile.compile(py_file)
+            if self.args.verbose:
+                print '* create %s' % pyc_file
+        else:
+            if self.args.verbose:
+                print '* skip %s' % pyc_file
+        
+        if self.args.remove_py:
+            os.remove(py_file)
+            
     def compile_pye_file(self, py_file):
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'

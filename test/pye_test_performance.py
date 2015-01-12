@@ -79,9 +79,6 @@ class TestPerformance(base.TestPyConcreteBase):
         pass
     
     def _test_requests(self, need_concrete):
-        if need_concrete:
-            self.lib_compile_pye(self.req_dir)
-        
         sys.path.insert(0, self.req_dir)
         
         q = Queue()
@@ -96,10 +93,18 @@ class TestPerformance(base.TestPyConcreteBase):
         return t
     
     def test_requests_pye(self):
+        self.lib_compile_pye(self.req_dir, remove_py=True, remove_pyc=True)
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(True)
         print 'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        
+    def test_requests_pyc(self):
+        self.lib_compile_pyc(self.req_dir, remove_py=True)
+        t = 0.0
+        for i in xrange(RUN_COUNT):
+            t += self._test_requests(False)
+        print 'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
     
     def test_requests_py(self):
         t = 0.0
