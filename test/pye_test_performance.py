@@ -36,8 +36,8 @@ REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
 PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
 RUN_COUNT = 100
 
-def main_requests(need_concrete, q):
-    if need_concrete:
+def main_requests(import_concrete, q):
+    if import_concrete:
         import pyconcrete
     
     t = time.time()
@@ -78,11 +78,11 @@ class TestPerformance(base.TestPyConcreteBase):
         self.lib_remove_temp_env()
         pass
     
-    def _test_requests(self, need_concrete):
+    def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
         
         q = Queue()
-        p = Process(target=main_requests, args=(need_concrete,q))
+        p = Process(target=main_requests, args=(import_concrete,q))
         
         p.start()
         path = q.get(timeout=5)
@@ -106,11 +106,24 @@ class TestPerformance(base.TestPyConcreteBase):
             t += self._test_requests(False)
         print 'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
     
+    def test_requests_pyc_with_import_hooker(self):
+        self.lib_compile_pyc(self.req_dir, remove_py=True)
+        t = 0.0
+        for i in xrange(RUN_COUNT):
+            t += self._test_requests(True)
+        print 'test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+    
     def test_requests_py(self):
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(False)
         print 'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
         
+    def test_requests_py_with_import_hooker(self):
+        t = 0.0
+        for i in xrange(RUN_COUNT):
+            t += self._test_requests(True)
+        print 'test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+                
 if __name__ == '__main__':
     unittest.main()

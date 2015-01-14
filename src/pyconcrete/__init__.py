@@ -17,6 +17,9 @@
 import os
 import sys
 import imp
+import string
+import marshal
+import __builtin__
 from os.path import join, exists, isdir
 
 EXT_PY  = '.py'
@@ -54,7 +57,7 @@ class DefaultLoader(object):
         self.data = data
 
     def load_module(self, fullname):
-        if fullname in sys.modules:
+        if fullname in sys.modules:  # skip reload by now ...
             return sys.modules[fullname]
         m = imp.load_module(fullname, *self.data)
         sys.modules[fullname] = m
@@ -62,17 +65,15 @@ class DefaultLoader(object):
 
 class PyLoader(LoaderBase):
     def load_module(self, fullname):
-        if fullname in sys.modules:
+        if fullname in sys.modules:  # skip reload by now ...
             return sys.modules[fullname]
 
-        import string
         package_path, path, codestring = self.data
-        codestring = string.replace(codestring, '\r\n', '\n')
+        #codestring = string.replace(codestring, '\r\n', '\n')
 
         if codestring and codestring[-1] != '\n':
             codestring += '\n'
         try:
-            import __builtin__
             codeobject = __builtin__.compile(codestring, path, 'exec')
         except Exception, err:
             return None
@@ -85,9 +86,8 @@ class PyLoader(LoaderBase):
         
 class PyeLoader(LoaderBase):
     def load_module(self, fullname):
-        if fullname in sys.modules:
+        if fullname in sys.modules:  # skip reload by now ...
             return sys.modules[fullname]
-        import marshal
         package_path, path, img = self.data
         
         img = decrypt_buffer(img)  # decrypt pye
@@ -110,7 +110,7 @@ class ModuleImportHooker:
         subname = fullname.split('.')[-1]
 
         fullpath = join(self.path, subname)
-        maybe_pkg = isdir(join(self.path, subname))
+        maybe_pkg = isdir(fullpath)
         
         try:
             # pye file
@@ -125,31 +125,26 @@ class ModuleImportHooker:
                 img = file(trypath, 'rb').read()
                 return PyeLoader(True, fullpath, trypath, img)
 
-            # pyd import from the path
-            trypath = fullpath + EXT_PYD
-            if exists(trypath):
-                return DefaultLoader(False, None, trypath, ('', 'rb', imp.C_EXTENSION))
-
             path = self.path and [self.path] or path
 
             find = False
             if maybe_pkg:
                 for suffix, mode, type in imp.get_suffixes():
-                    path2 = join(path[0], subname, '__init__' + suffix)
-                    if exists(path2):
+                    p = join(path[0], subname, '__init__' + suffix)
+                    if exists(p):
                         find = True
                         break
             if not find:
                 for suffix, mode, type in imp.get_suffixes():
-                    path1 = join(path[0], subname + suffix)
-                    if exists(path1):
+                    p = join(path[0], subname + suffix)
+                    if exists(p):
                         find = True
                         break
-            if not find:
+            if find:
+                data = imp.find_module(subname, path)
+                return DefaultLoader(False, *data)
+            else:
                 return None
-
-            data = imp.find_module(subname, path)
-            return DefaultLoader(False, *data)
             
         except ImportError:
             return None
