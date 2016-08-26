@@ -21,8 +21,10 @@ import py_compile
 import pyconcrete
 from os.path import join, exists, dirname, isdir, isfile
 
+
 class PyConcreteError(Exception):
     pass
+
 
 class PyConcreteAdmin(object):
     def __init__(self):
@@ -142,7 +144,9 @@ class PyConcreteAdmin(object):
             os.remove(pyc_file)
         if self.args.remove_py:
             os.remove(py_file)
-        
+
+
 if __name__ == '__main__':
     admin = PyConcreteAdmin()
     admin.run()
+

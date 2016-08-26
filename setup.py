@@ -45,7 +45,8 @@ def hash_key(key):
     k = m.digest()
     
     return k, factor
-    
+
+
 def create_secret_key_header(key, factor):
     # reference from - http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
     # encrypt the secret key in binary code
@@ -78,12 +79,13 @@ def create_secret_key_header(key, factor):
     
     with open(SECRET_HEADER_PATH, 'w') as f:
         f.write(code)
-    
+
+
 def remove_secret_key_header():
     os.remove(SECRET_HEADER_PATH)
 
 
-class cmd_base:
+class CmdBase:
     def pre_process(self):
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
         if self.manual_create_secrete_key_file:
@@ -104,10 +106,10 @@ class cmd_base:
             remove_secret_key_header()
 
     
-class build_ex(cmd_base, build):
-    '''
+class BuildEx(CmdBase, build):
+    """
     execute extra function before/after build.run()
-    '''
+    """
     user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
     
     def initialize_options(self):
@@ -120,10 +122,11 @@ class build_ex(cmd_base, build):
         self.post_process()
         return ret
 
-class install_ex(cmd_base, install):
-    '''
+
+class InstallEx(CmdBase, install):
+    """
     execute extra function before/after install.run()
-    '''
+    """
     user_options = install.user_options + [('passphrase=', None, 'specify passphrase')]
     
     def initialize_options(self):
@@ -135,14 +138,18 @@ class install_ex(cmd_base, install):
         ret = install.run(self)
         self.post_process()
         return ret
-        
-class test_ex(Command):
+
+
+class TestEx(Command):
     description = "Running all unit test for pyconcrete"
     user_options = []
+
     def initialize_options(self):
         pass
+
     def finalize_options(self):
         pass
+
     def run(self):
         import unittest
         suite = unittest.TestLoader().discover(TEST_DIR)
@@ -155,26 +162,38 @@ include_dirs = [join(EXT_SRC_DIR, 'openaes', 'inc')]
 if sys.platform == 'win32':
     include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
     
-module = Extension('pyconcrete._pyconcrete',
-                    include_dirs = include_dirs, 
-                    sources = [join(EXT_SRC_DIR, 'pyconcrete.c'),
-                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes.c'),
-                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
-                               join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c')],
+module = Extension(
+    'pyconcrete._pyconcrete',
+    include_dirs=include_dirs,
+    sources=[
+        join(EXT_SRC_DIR, 'pyconcrete.c'),
+        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes.c'),
+        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
+        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
+    ],
 )
 
-setup( name = 'pyconcrete',
-       version = version.__version__,
-       description = 'protect your python script',
-       author  = 'Falldog',
-       author_email = 'falldog7@gmail.com',
-       url = 'https://github.com/Falldog/pyconcrete',
-       license = "Apache License 2.0",
-       ext_modules = [module],
-       cmdclass = {"build": build_ex,
-                 "install": install_ex,
-                 "test": test_ex},
-       scripts = ['pyconcrete-admin.py'],
-       packages = ['pyconcrete'],
-       package_dir = {'': SRC_DIR},
+setup(
+    name='pyconcrete',
+    version=version.__version__,
+    description='protect your python script',
+    author='Falldog',
+    author_email='falldog7@gmail.com',
+    url='https://github.com/Falldog/pyconcrete',
+    license="Apache License 2.0",
+    ext_modules=[module],
+    cmdclass={
+        "build": BuildEx,
+        "install": InstallEx,
+        "test": TestEx,
+    },
+    scripts=[
+        'pyconcrete-admin.py',
+    ],
+    packages=[
+        'pyconcrete',
+    ],
+    package_dir={
+        '': SRC_DIR
+    },
 )

@@ -15,12 +15,9 @@
 # limitations under the License.
 
 import os
-import sys
 import shutil
 import unittest
-import tempfile
 import subprocess
-import py_compile
 from os.path import dirname, abspath, join
 
 import base
@@ -28,6 +25,7 @@ import base
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 LIB_DIR = join(ROOT_DIR, 'build')
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
+
 
 class TestAdminScript(base.TestPyConcreteBase):
     @classmethod
@@ -58,6 +56,7 @@ class TestAdminScript(base.TestPyConcreteBase):
         env.setdefault('PYTHONPATH', '')
         env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
         subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env, shell=True)
-    
+
+
 if __name__ == '__main__':
     unittest.main()

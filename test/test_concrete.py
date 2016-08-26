@@ -14,16 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import shutil
-import unittest
-import tempfile
-import subprocess
-import py_compile
-from os.path import dirname, abspath, join
-
 import base
+import unittest
+
 
 class TestConcrete(base.TestPyConcreteBase):
     
@@ -80,7 +73,7 @@ class TestConcrete(base.TestPyConcreteBase):
         self.assertEqual(py_code, res)
     
     def test_process_py_code_2_block(self):
-        py_code  = 'v1=12345678901\r\n'
+        py_code = 'v1=12345678901\r\n'
         py_code += 'v2=12345678901\r\n'
         self.assertEqual(len(py_code), 32)  # 2 blocks
         

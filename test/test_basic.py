@@ -14,16 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import shutil
-import unittest
-import tempfile
-import subprocess
-import py_compile
-from os.path import dirname, abspath, join
-
 import base
+import unittest
+
 
 class TestBasic(base.TestPyConcreteBase):
     def setUp(self):
@@ -50,6 +43,7 @@ class TestBasic(base.TestPyConcreteBase):
         self.assertEqual(pye_filepath, test.__file__)  # check import correct module
         self.assertEqual(1, test.v_int)
         self.assertEqual('abc', test.v_string)
-    
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -26,36 +26,38 @@ from os.path import dirname, abspath, join, exists
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 LIB_DIR = join(ROOT_DIR, 'build')
 
-# testing ... not complete
-def __long_str(x):
-    return ((chr( x        & 0xff)) +
-            (chr((x >> 8)  & 0xff)) +
-            (chr((x >> 16) & 0xff)) +
-            (chr((x >> 24) & 0xff)))
 
-# testing ... not complete
-def __compile_pyc(codestring, doraise=True):
-    import __builtin__
-    import marshal
-    #with open(file, 'U') as f:
-    #    try:
-    #        timestamp = long(os.fstat(f.fileno()).st_mtime)
-    #    except AttributeError:
-    #        timestamp = long(os.stat(file).st_mtime)
-    #    codestring = f.read()
-    timestamp = 0
-    file = ''
-    try:
-        codeobject = __builtin__.compile(codestring, file,'exec')
-    except Exception,err:
-        py_exc = py_compile.PyCompileError(err.__class__, err, file)
-        if doraise:
-            raise py_exc
-        else:
-            sys.stderr.write(py_exc.msg + '\n')
-            return
-    pyc_data = marshal.dumps(py_compile.MAGIC + long_str(timestamp) + str(codeobject))
-    return pyc_data
+# # testing ... not complete
+# def long_str(x):
+#     return ((chr( x        & 0xff)) +
+#             (chr((x >> 8)  & 0xff)) +
+#             (chr((x >> 16) & 0xff)) +
+#             (chr((x >> 24) & 0xff)))
+#
+#
+# # testing ... not complete
+# def compile_pyc(codestring, doraise=True):
+#     import __builtin__
+#     import marshal
+#     #with open(file, 'U') as f:
+#     #    try:
+#     #        timestamp = long(os.fstat(f.fileno()).st_mtime)
+#     #    except AttributeError:
+#     #        timestamp = long(os.stat(file).st_mtime)
+#     #    codestring = f.read()
+#     timestamp = 0
+#     file = ''
+#     try:
+#         codeobject = __builtin__.compile(codestring, file, 'exec')
+#     except Exception,err:
+#         py_exc = py_compile.PyCompileError(err.__class__, err, file)
+#         if doraise:
+#             raise py_exc
+#         else:
+#             sys.stderr.write(py_exc.msg + '\n')
+#             return
+#     pyc_data = marshal.dumps(py_compile.MAGIC + long_str(timestamp) + str(codeobject))
+#     return pyc_data
 
 
 class TestPyConcreteBase(unittest.TestCase):
@@ -114,7 +116,7 @@ class TestPyConcreteBase(unittest.TestCase):
             self._sys_path = None
     
     def lib_gen_py(self, py_code, py_filename, folder=None):
-        ''' folder = None -> use @_tmp_dir '''
+        """ folder = None -> use @_tmp_dir """
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(py_filename.endswith('.py'))
@@ -124,7 +126,7 @@ class TestPyConcreteBase(unittest.TestCase):
         return py_filepath
         
     def lib_gen_pyc(self, py_code, pyc_filename, folder=None, keep_py=False):
-        ''' folder = None -> use @_tmp_dir '''
+        """ folder = None -> use @_tmp_dir """
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(pyc_filename.endswith('.pyc'))
@@ -146,7 +148,7 @@ class TestPyConcreteBase(unittest.TestCase):
         return pyc_filepath
         
     def lib_gen_pye(self, py_code, pye_filename, folder=None, keep_py=False, keep_pyc=False):
-        ''' folder = None -> use @_tmp_dir '''
+        """ folder = None -> use @_tmp_dir """
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(pye_filename.endswith('.pye'))
@@ -192,4 +194,5 @@ class TestPyConcreteBase(unittest.TestCase):
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
         subprocess.check_call('python %s compile_all_pye --dir=%s %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=env, shell=True)
-    
+
+

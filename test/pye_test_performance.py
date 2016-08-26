@@ -17,11 +17,7 @@
 import os
 import sys
 import time
-import shutil
 import unittest
-import tempfile
-import subprocess
-import py_compile
 from zipfile import ZipFile
 from multiprocessing import Process, Queue
 from os.path import dirname, abspath, join
@@ -34,9 +30,14 @@ DATA_DIR = join(CUR_DIR, 'data')
 REQUEST_ZIP = join(DATA_DIR, 'requests-2.5.1.zip')
 REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
 PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
-RUN_COUNT = 100
+RUN_COUNT = int(os.environ.get('PYE_TEST_PERFORMANCE_COUNT', '100'))
+
 
 def main_requests(import_concrete, q):
+    """
+    testing main function for multiprocessing
+    purpose: testing import without exception
+    """
     if import_concrete:
         import pyconcrete
     
@@ -47,9 +48,9 @@ def main_requests(import_concrete, q):
     from requests.auth import HTTPDigestAuth, _basic_auth_str
     from requests.compat import (Morsel, cookielib, getproxies, str, urljoin, urlparse, is_py3, builtin_str)
     from requests.cookies import cookiejar_from_dict, morsel_to_cookie
-    from requests.exceptions import (ConnectionError, ConnectTimeout,
-                                     InvalidSchema, InvalidURL, MissingSchema,
-                                     ReadTimeout, Timeout, RetryError)
+    from requests.exceptions import (
+        ConnectionError, ConnectTimeout, InvalidSchema, InvalidURL, MissingSchema, ReadTimeout, Timeout, RetryError
+    )
     from requests.models import PreparedRequest
     from requests.structures import CaseInsensitiveDict
     from requests.sessions import SessionRedirectMixin
@@ -82,7 +83,7 @@ class TestPerformance(base.TestPyConcreteBase):
         sys.path.insert(0, self.req_dir)
         
         q = Queue()
-        p = Process(target=main_requests, args=(import_concrete,q))
+        p = Process(target=main_requests, args=(import_concrete, q))
         
         p.start()
         path = q.get(timeout=5)
@@ -124,6 +125,7 @@ class TestPerformance(base.TestPyConcreteBase):
         for i in xrange(RUN_COUNT):
             t += self._test_requests(True)
         print 'test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
-                
+
+
 if __name__ == '__main__':
     unittest.main()
