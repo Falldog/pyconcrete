@@ -15,11 +15,14 @@
 # limitations under the License.
 
 import os
-import sys
 import argparse
 import py_compile
+import subprocess
 import pyconcrete
-from os.path import join, exists, dirname, isdir, isfile
+from os.path import abspath, dirname, join, exists, isdir, isfile
+
+CUR_DIR = dirname(abspath(__file__))
+VALID_CMD = ['compile_pye', 'compile_all_pye', 'compile_all_pyc', 'test']
 
 
 class PyConcreteError(Exception):
@@ -28,12 +31,14 @@ class PyConcreteError(Exception):
 
 class PyConcreteAdmin(object):
     def __init__(self):
+        self.parser = None
+        self.args = None
         self.parse_arg()
-    
+
     def parse_arg(self):
         parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
         parser.add_argument('cmd',
-                            default='', help='compile_pye|compile_all_pye|compile_all_pyc')
+                            default='', help=' | '.join(VALID_CMD))
         parser.add_argument('--file',
                             nargs=1, default=None, help='specific file to process')
         parser.add_argument('--dir',
@@ -49,10 +54,14 @@ class PyConcreteAdmin(object):
         args = parser.parse_args()
         self.parser = parser
         self.args = args
-        
+
+        if args.cmd not in VALID_CMD:
+            raise PyConcreteError("please provide correct command")
+
         args.compile_pye = bool(args.cmd == 'compile_pye')
         args.compile_all_pye = bool(args.cmd == 'compile_all_pye')
         args.compile_all_pyc = bool(args.cmd == 'compile_all_pyc')
+        args.test = bool(args.cmd == 'test')
         if args.compile_pye:
             if args.file is None:
                 raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
@@ -65,16 +74,14 @@ class PyConcreteAdmin(object):
             if args.dir is None:
                 raise PyConcreteError("arg: compile_all_pyc, need provide the dir [--dir] to process")
             args.compile_all_pyc = args.dir[0]
-        else:
-            raise PyConcreteError("please provide correct command")
-        
+
         if args.verbose:
             print 'compile_pye=%s' % args.compile_pye
             print 'compile_all_pye=%s' % args.compile_all_pye
             print 'compile_all_pyc=%s' % args.compile_all_pyc
             print 'ignore_file_list=%s' % str(args.ignore_file_list)
             print 'verbose=%s' % args.verbose
-        
+
     def run(self):
         if self.args.compile_pye:
             filepath = self.args.compile_pye
@@ -93,11 +100,14 @@ class PyConcreteAdmin(object):
             if not isdir(dirpath):
                 raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
             self.compile_dir(dirpath)
-            
+
+        elif self.args.test:
+            self.test()
+
         else:
             print 'please input correct command!'
             self.parser.print_help()
-            
+
     def compile_dir(self, folder):
         for f in os.listdir(folder):
             if f in ['.', '..', '.git', '.svn', 'pyconcrete'] or f in self.args.ignore_file_list:
@@ -110,7 +120,7 @@ class PyConcreteAdmin(object):
                     self.compile_pyc_file(fullpath)
                 else:
                     self.compile_pye_file(fullpath)
-                
+
     def compile_pyc_file(self, py_file):
         pyc_file = py_file + 'c'
         pyc_exists = exists(pyc_file)
@@ -124,7 +134,7 @@ class PyConcreteAdmin(object):
         
         if self.args.remove_py:
             os.remove(py_file)
-            
+
     def compile_pye_file(self, py_file):
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'
@@ -144,6 +154,13 @@ class PyConcreteAdmin(object):
             os.remove(pyc_file)
         if self.args.remove_py:
             os.remove(py_file)
+
+    def test(self):
+        cmd = 'python -m unittest discover -s {path} {verbose}'.format(
+            path=join(CUR_DIR, 'test'),
+            verbose='-v' if self.args.verbose else '',
+        )
+        subprocess.check_call(cmd, shell=True)
 
 
 if __name__ == '__main__':

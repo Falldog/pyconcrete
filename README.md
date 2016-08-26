@@ -71,3 +71,18 @@ main.py       # import pyconcrete and your lib
 pyconcrete/*  # put pyconcrete lib in root, keep it as original files
 src/*.pye     # your libs
 ```
+
+
+Test
+--------------
+* test all case
+```sh
+$ ./pyconcrete-admin.py test
+```
+
+
+* test all case, setup `TEST_PYE_PERFORMANCE_COUNT` env to reduce testing time
+```sh
+$ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
+```
+
