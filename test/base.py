@@ -183,7 +183,7 @@ class TestPyConcreteBase(unittest.TestCase):
         
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
-        subprocess.check_call('python %s compile_all_pyc --dir=%s %s' % (admin_path, folder, arg_remove_py), env=env, shell=True)
+        subprocess.check_call('python %s compile --source=%s --pyc %s' % (admin_path, folder, arg_remove_py), env=env, shell=True)
     
     def lib_compile_pye(self, folder, remove_py=False, remove_pyc=False):
         env = os.environ.copy()
@@ -193,6 +193,6 @@ class TestPyConcreteBase(unittest.TestCase):
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
-        subprocess.check_call('python %s compile_all_pye --dir=%s %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=env, shell=True)
+        subprocess.check_call('python %s compile --source=%s --pye %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=env, shell=True)
 
 

@@ -18,7 +18,7 @@ import os
 import shutil
 import unittest
 import subprocess
-from os.path import dirname, abspath, join
+from os.path import dirname, abspath, join, exists
 
 import base
 
@@ -31,32 +31,57 @@ class TestAdminScript(base.TestPyConcreteBase):
     @classmethod
     def setUpClass(cls):
         pass
-        
+
     @classmethod
     def tearDownClass(cls):
         pass
-    
+
     def setUp(self):
         self._ori_dir = os.getcwd()
         os.chdir(ROOT_DIR)
-        
+
         self.lib_create_temp_env()
-        
+
     def tearDown(self):
         self.lib_remove_temp_env()
-        
+
         os.chdir(self._ori_dir)
-    
-    def test_parse_folder(self):
-        target_dir = join(self.tmp_dir, 'data')
-        print 'src=%s, target=%s' % (SAMPLE_PACKAGE_DIR, target_dir)
-        shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
-        
+
+    def get_concrete_env(self):
         env = os.environ.copy()
         env.setdefault('PYTHONPATH', '')
         env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
-        subprocess.check_call('python pyconcrete-admin.py compile_all_pye --dir=%s --verbose' % target_dir, env=env, shell=True)
 
+    def test_parse_file(self):
+        target_dir = join(self.tmp_dir, 'data')
+        shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
+        target_file = join(target_dir, 'main.py')
+        expect_file = join(target_dir, 'main.pye')
+
+        subprocess.check_call(
+            'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_file,
+            env=self.get_concrete_env(),
+            shell=True,
+        )
+
+        self.assertTrue(exists(expect_file))
+
+    def test_parse_folder(self):
+        target_dir = join(self.tmp_dir, 'data')
+        # print 'src=%s, target=%s' % (SAMPLE_PACKAGE_DIR, target_dir)
+        shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
+        expect_file1 = join(target_dir, '__init__.pye')
+        expect_file2 = join(target_dir, 'main.pye')
+        
+        subprocess.check_call(
+            'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_dir,
+            env=self.get_concrete_env(),
+            shell=True,
+        )
+
+        self.assertTrue(exists(expect_file1))
+        self.assertTrue(exists(expect_file2))
 
 if __name__ == '__main__':
     unittest.main()
+

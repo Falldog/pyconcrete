@@ -22,7 +22,7 @@ import pyconcrete
 from os.path import abspath, dirname, join, exists, isdir, isfile
 
 CUR_DIR = dirname(abspath(__file__))
-VALID_CMD = ['compile_pye', 'compile_all_pye', 'compile_all_pyc', 'test']
+VALID_CMD = ['compile', 'test']
 
 
 class PyConcreteError(Exception):
@@ -36,13 +36,23 @@ class PyConcreteAdmin(object):
         self.parse_arg()
 
     def parse_arg(self):
-        parser = argparse.ArgumentParser(description='PyConcreteAdmin.')
+        """
+        Example:
+            compile file/dir to .pye
+            pyconcrete-admin.py compile --source={file} --pye
+
+            compile file/dir to .pyc
+            pyconcrete-admin.py compile --source={file} --pyc
+        """
+        parser = argparse.ArgumentParser(description='PyConcreteAdmin')
         parser.add_argument('cmd',
                             default='', help=' | '.join(VALID_CMD))
-        parser.add_argument('--file',
-                            nargs=1, default=None, help='specific file to process')
-        parser.add_argument('--dir',
-                            nargs=1, default=None, help='specific dir to process')
+        parser.add_argument('--pye',
+                            dest='pye', action='store_true', help='process on .pye')
+        parser.add_argument('--pyc',
+                            dest='pyc', action='store_true', help='process on .pyc')
+        parser.add_argument('-s', '--source',
+                            dest='source', default=None, help='specific the source to process, source could be file/dir')
         parser.add_argument('--remove-py',
                             dest='remove_py', action='store_true', help='remove .py after compile pye')
         parser.add_argument('--remove-pyc',
@@ -58,55 +68,42 @@ class PyConcreteAdmin(object):
         if args.cmd not in VALID_CMD:
             raise PyConcreteError("please provide correct command")
 
-        args.compile_pye = bool(args.cmd == 'compile_pye')
-        args.compile_all_pye = bool(args.cmd == 'compile_all_pye')
-        args.compile_all_pyc = bool(args.cmd == 'compile_all_pyc')
+        args.compile = bool(args.cmd == 'compile')
         args.test = bool(args.cmd == 'test')
-        if args.compile_pye:
-            if args.file is None:
-                raise PyConcreteError("arg: compile_pye, need provide the file [--file] to process")
-            args.compile_pye = args.file[0]
-        elif args.compile_all_pye:
-            if args.dir is None:
-                raise PyConcreteError("arg: compile_all_pye, need provide the dir [--dir] to process")
-            args.compile_all_pye = args.dir[0]
-        elif args.compile_all_pyc:
-            if args.dir is None:
-                raise PyConcreteError("arg: compile_all_pyc, need provide the dir [--dir] to process")
-            args.compile_all_pyc = args.dir[0]
+        if args.compile:
+            if args.source is None:
+                raise PyConcreteError("arg: compile, need assign --source={file/dir} to process")
+            if not args.pye and not args.pyc:
+                raise PyConcreteError("arg: compile, need assign the type for compile to `pye` or `pyc`")
 
         if args.verbose:
-            print 'compile_pye=%s' % args.compile_pye
-            print 'compile_all_pye=%s' % args.compile_all_pye
-            print 'compile_all_pyc=%s' % args.compile_all_pyc
-            print 'ignore_file_list=%s' % str(args.ignore_file_list)
+            print 'compile on "%s"' % args.source
+            print 'ignore-file-list=%s' % str(args.ignore_file_list)
             print 'verbose=%s' % args.verbose
 
     def run(self):
-        if self.args.compile_pye:
-            filepath = self.args.compile_pye
-            if not isfile(filepath):
-                raise PyConcreteError("arg: compile_pye, the file doesn't exists (%s)" % filepath)
-            self.compile_pye_file(filepath)
-            
-        elif self.args.compile_all_pye:
-            dirpath = self.args.compile_all_pye
-            if not isdir(dirpath):
-                raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
-            self.compile_dir(dirpath)
-            
-        elif self.args.compile_all_pyc:
-            dirpath = self.args.compile_all_pyc
-            if not isdir(dirpath):
-                raise PyConcreteError("arg: compile_all_pye, the dir doesn't exists (%s)" % dirpath)
-            self.compile_dir(dirpath)
-
-        elif self.args.test:
+        args = self.args
+        if args.compile:
+            self.compile()
+        elif args.test:
             self.test()
-
         else:
             print 'please input correct command!'
             self.parser.print_help()
+
+    def compile(self):
+        args = self.args
+        if isfile(args.source):
+            if not args.source.endswith('.py'):
+                raise PyConcreteError("source file should end with .py")
+
+            if args.pye:
+                self.compile_pye_file(args.source)
+            elif args.pyc:
+                self.compile_pyc_file(args.source)
+
+        elif isdir(args.source):
+            self.compile_dir(args.source)
 
     def compile_dir(self, folder):
         for f in os.listdir(folder):
@@ -116,10 +113,10 @@ class PyConcreteAdmin(object):
             if isdir(fullpath):
                 self.compile_dir(fullpath)
             elif fullpath.endswith('.py'):
-                if self.args.compile_all_pyc:
-                    self.compile_pyc_file(fullpath)
-                else:
+                if self.args.pye:
                     self.compile_pye_file(fullpath)
+                elif self.args.pyc:
+                    self.compile_pyc_file(fullpath)
 
     def compile_pyc_file(self, py_file):
         pyc_file = py_file + 'c'
@@ -131,11 +128,15 @@ class PyConcreteAdmin(object):
         else:
             if self.args.verbose:
                 print '* skip %s' % pyc_file
-        
+
         if self.args.remove_py:
             os.remove(py_file)
 
     def compile_pye_file(self, py_file):
+        """
+        if there is no .pyc file, compile .pyc first
+        then compile .pye
+        """
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'
         pyc_exists = exists(pyc_file)
@@ -148,7 +149,7 @@ class PyConcreteAdmin(object):
         else:
             if self.args.verbose:
                 print '* skip %s' % pye_file
-        
+
         # .pyc doesn't exists at begining, remove it after .pye created
         if not pyc_exists or self.args.remove_pyc:
             os.remove(pyc_file)

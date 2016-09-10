@@ -41,8 +41,8 @@ $ python setup.py install
 
 * convert your script to `*.pye`
 ```sh
-$ pyconcrete-admin.py compile_pye --file=<your py script>
-$ pyconcrete-admin.py compile_all_pye --dir=<your py module dir>
+$ pyconcrete-admin.py compile --source=<your py script>  --pye
+$ pyconcrete-admin.py compile --source=<your py module dir> --pye
 ```
 
 * remove `*.py` or copy `*.pye` to other folder
