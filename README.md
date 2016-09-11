@@ -1,5 +1,5 @@
 pyconcrete
-=======
+==============
 Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 --------------
@@ -38,6 +38,7 @@ $ python setup.py install
 ```
   * need to input your passphrase create secret key for encrypt python script.
   * same passphrase will generate the same secret key
+  * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
 
 * convert your script to `*.pye`
 ```sh
@@ -45,12 +46,13 @@ $ pyconcrete-admin.py compile --source=<your py script>  --pye
 $ pyconcrete-admin.py compile --source=<your py module dir> --pye
 ```
 
-* remove `*.py` or copy `*.pye` to other folder
+* remove `*.py` `*.pyc` or copy `*.pye` to other folder
 
-* import pyconcrete in your main script
+* main script
   * recommendation project layout
+  * python execute main script as *.pye will cause exception, so main script can't be encrypted
 ```sh
-main.py  # import pyconcrete and your lib
+main.py  # your main scirpt, must can't be encrypted
 src/*.pye  # your libs
 ```
 

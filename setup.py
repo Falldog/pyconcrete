@@ -20,6 +20,7 @@ import imp
 import string
 import hashlib
 from os.path import join
+from distutils import sysconfig
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
@@ -196,4 +197,10 @@ setup(
     package_dir={
         '': SRC_DIR
     },
+
+    # add pyconcrete.pth to site-packages
+    # for automatic import pyconcrete after python launched
+    data_files=[
+        (sysconfig.get_python_lib(), ['pyconcrete.pth']),
+    ],
 )

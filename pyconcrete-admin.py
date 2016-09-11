@@ -150,7 +150,7 @@ class PyConcreteAdmin(object):
             if self.args.verbose:
                 print '* skip %s' % pye_file
 
-        # .pyc doesn't exists at begining, remove it after .pye created
+        # .pyc doesn't exists at beginning, remove it after .pye created
         if not pyc_exists or self.args.remove_pyc:
             os.remove(pyc_file)
         if self.args.remove_py:
@@ -167,4 +167,3 @@ class PyConcreteAdmin(object):
 if __name__ == '__main__':
     admin = PyConcreteAdmin()
     admin.run()
-
