@@ -20,7 +20,6 @@ import imp
 import string
 import hashlib
 from os.path import join
-from distutils import sysconfig
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
@@ -106,7 +105,7 @@ class CmdBase:
         if self.manual_create_secrete_key_file:
             remove_secret_key_header()
 
-    
+
 class BuildEx(CmdBase, build):
     """
     execute extra function before/after build.run()
@@ -138,7 +137,25 @@ class InstallEx(CmdBase, install):
         self.pre_process()
         ret = install.run(self)
         self.post_process()
+        self.create_pth()
         return ret
+
+    def create_pth(self):
+        """
+        create pyconcrete.pth for automatic import pyconcrete after python launched
+        """
+        # setup(
+        #     data_files=(sysconfig.get_python_lib(), 'pyconcrete.pth'),
+        #     ...
+        # )
+        # it will got wrong result in ubuntu, get_python_lib got /usr/lib
+        # but pyconcrete installed in /usr/local/lib
+        #
+        # get install_libbase to avoid this issue
+        filename = join(self.install_libbase, 'pyconcrete.pth')
+        with open(filename, 'w') as f:
+            f.write('import pyconcrete')
+        print 'creating %s' % filename
 
 
 class TestEx(Command):
@@ -195,12 +212,6 @@ setup(
         'pyconcrete',
     ],
     package_dir={
-        '': SRC_DIR
+        '': SRC_DIR,
     },
-
-    # add pyconcrete.pth to site-packages
-    # for automatic import pyconcrete after python launched
-    data_files=[
-        (sysconfig.get_python_lib(), ['pyconcrete.pth']),
-    ],
 )
