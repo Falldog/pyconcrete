@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 #
 # Copyright 2015 Falldog Hsieh <falldog7@gmail.com>
 #
@@ -52,38 +52,7 @@ class LoaderBase(object):
         m.__loader__ = self
         return m
         
-class DefaultLoader(object):
-    def __init__(self, is_package, *data):
-        self.data = data
-
-    def load_module(self, fullname):
-        if fullname in sys.modules:  # skip reload by now ...
-            return sys.modules[fullname]
-        m = imp.load_module(fullname, *self.data)
-        sys.modules[fullname] = m
-        return m
-
-class PyLoader(LoaderBase):
-    def load_module(self, fullname):
-        if fullname in sys.modules:  # skip reload by now ...
-            return sys.modules[fullname]
-
-        package_path, path, codestring = self.data
-        #codestring = string.replace(codestring, '\r\n', '\n')
-
-        if codestring and codestring[-1] != '\n':
-            codestring += '\n'
-        try:
-            codeobject = __builtin__.compile(codestring, path, 'exec')
-        except Exception, err:
-            return None
-
-        code = codeobject
-        m = self.new_module(fullname, path, package_path)
-        sys.modules[fullname] = m
-        exec code in m.__dict__
-        return m
-        
+       
 class PyeLoader(LoaderBase):
     def load_module(self, fullname):
         if fullname in sys.modules:  # skip reload by now ...
@@ -99,56 +68,36 @@ class PyeLoader(LoaderBase):
         sys.modules[fullname] = m
         exec code in m.__dict__
         return m
-        
+
+
 class ModuleImportHooker:
-    def __init__(self, path):
-        if not isdir(path):
-            raise ImportError
-        self.path = path
+    def __init__(self):
+        pass
 
     def find_module(self, fullname, path=None):
         subname = fullname.split('.')[-1]
 
-        fullpath = join(self.path, subname)
-        maybe_pkg = isdir(fullpath)
+        pathlist = sys.path
+        if path:
+            pathlist = path
+
+        for onepath in pathlist:
+            fullpath = join(onepath, subname)
+            maybe_pkg = isdir(fullpath)
+
+            
+            try:
+                # pye file
+                trypath = fullpath + EXT_PYE
+                if exists(trypath):
+                    img = file(trypath, 'rb').read()
+                    return PyeLoader(False, onepath, trypath, img)
+                
+            except ImportError:
+                pass
         
-        try:
-            # pye file
-            trypath = fullpath + EXT_PYE
-            if exists(trypath):
-                img = file(trypath, 'rb').read()
-                return PyeLoader(False, self.path, trypath, img)
-            
-            # package
-            trypath = join(fullpath, '__init__' + EXT_PYE)
-            if maybe_pkg and exists(trypath):
-                img = file(trypath, 'rb').read()
-                return PyeLoader(True, fullpath, trypath, img)
 
-            path = self.path and [self.path] or path
-
-            find = False
-            if maybe_pkg:
-                for suffix, mode, type in imp.get_suffixes():
-                    p = join(path[0], subname, '__init__' + suffix)
-                    if exists(p):
-                        find = True
-                        break
-            if not find:
-                for suffix, mode, type in imp.get_suffixes():
-                    p = join(path[0], subname + suffix)
-                    if exists(p):
-                        find = True
-                        break
-            if find:
-                data = imp.find_module(subname, path)
-                return DefaultLoader(False, *data)
-            else:
-                return None
-            
-        except ImportError:
-            return None
+        return None
 
 
-sys.path_hooks.insert(0, ModuleImportHooker)
-sys.path_importer_cache.clear()
+sys.meta_path.append(ModuleImportHooker())
