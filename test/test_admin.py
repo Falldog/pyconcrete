@@ -23,34 +23,18 @@ from os.path import dirname, abspath, join, exists
 import base
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
-LIB_DIR = join(ROOT_DIR, 'build')
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
 
 
 class TestAdminScript(base.TestPyConcreteBase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
     def setUp(self):
+        super(TestAdminScript, self).setUp()
         self._ori_dir = os.getcwd()
         os.chdir(ROOT_DIR)
 
-        self.lib_create_temp_env()
-
     def tearDown(self):
-        self.lib_remove_temp_env()
-
+        super(TestAdminScript, self).tearDown()
         os.chdir(self._ori_dir)
-
-    def get_concrete_env(self):
-        env = os.environ.copy()
-        env.setdefault('PYTHONPATH', '')
-        env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
 
     def test_parse_file(self):
         target_dir = join(self.tmp_dir, 'data')
@@ -60,7 +44,7 @@ class TestAdminScript(base.TestPyConcreteBase):
 
         subprocess.check_call(
             'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_file,
-            env=self.get_concrete_env(),
+            env=base.get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -75,7 +59,7 @@ class TestAdminScript(base.TestPyConcreteBase):
         
         subprocess.check_call(
             'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_dir,
-            env=self.get_concrete_env(),
+            env=base.get_pyconcrete_env_path(),
             shell=True,
         )
 

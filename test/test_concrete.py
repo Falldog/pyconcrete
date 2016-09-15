@@ -19,13 +19,6 @@ import unittest
 
 
 class TestConcrete(base.TestPyConcreteBase):
-    
-    def setUp(self):
-        self.lib_create_temp_env()
-        
-    def tearDown(self):
-        self.lib_remove_temp_env()
-    
     def test_decrypt_exception(self):
         import pyconcrete
         print pyconcrete.__file__
@@ -34,7 +27,7 @@ class TestConcrete(base.TestPyConcreteBase):
         
         with self.assertRaises(pyconcrete._pyconcrete.Error):
             pyconcrete.decrypt_buffer(data)
-    
+
     def __do_encrypt_decrypt_file(self, py_code):
         py_filepath = self.lib_gen_py(py_code, 'test.py')
         pye_filepath = py_filepath + 'e'
@@ -45,33 +38,33 @@ class TestConcrete(base.TestPyConcreteBase):
         with open(pye_filepath, 'rb') as f:
             data = f.read()
         return pyconcrete.decrypt_buffer(data)
-    
+
     def test_process_py_code_empty(self):
         py_code = ''
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
-        
+
     def test_process_py_code_large(self):
         py_code = ''
         for i in xrange(100):
             py_code += 'print "This is testing large py file ... %d"\r\n' % i
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
-    
+
     def test_process_py_code_1_block(self):
         py_code = 'v=12345678901234'
         self.assertEqual(16, len(py_code))  # 1 block
         
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
-    
+
     def test_process_py_code_less_1_block(self):
         py_code = 'v=123456789'
         self.assertLess(len(py_code), 16)  # less than 1 block
         
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
-    
+
     def test_process_py_code_2_block(self):
         py_code = 'v1=12345678901\r\n'
         py_code += 'v2=12345678901\r\n'
@@ -79,6 +72,6 @@ class TestConcrete(base.TestPyConcreteBase):
         
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
-        
+
 if __name__ == '__main__':
     unittest.main()

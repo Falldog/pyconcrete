@@ -17,6 +17,7 @@
 import os
 import sys
 import shutil
+import atexit
 import unittest
 import tempfile
 import subprocess
@@ -24,7 +25,6 @@ import py_compile
 from os.path import dirname, abspath, join, exists
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
-LIB_DIR = join(ROOT_DIR, 'build')
 
 
 # # testing ... not complete
@@ -60,61 +60,100 @@ LIB_DIR = join(ROOT_DIR, 'build')
 #     return pyc_data
 
 
+tmp_pyconcrete_dir = None
+
+
+def build_tmp_pyconcrete(passphrase):
+    global tmp_pyconcrete_dir
+    if tmp_pyconcrete_dir:
+        return tmp_pyconcrete_dir
+
+    tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_lib_')
+
+    _ori_dir = os.getcwd()
+    os.chdir(ROOT_DIR)
+    try:
+        # just build
+        # force_option = '--force' if force else ''
+        # subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
+
+        cmd = (
+            'python',
+            'setup.py',
+            'install',
+            '--passphrase=%s' % passphrase,
+            '--install-base=%s' % tmp_dir,
+            '--install-purelib=%s' % tmp_dir,
+            '--install-platlib=%s' % tmp_dir,
+            '--install-scripts=%s' % join(tmp_dir, 'scripts'),
+            '--install-headers=%s' % join(tmp_dir, 'headers'),
+            '--install-data=%s' % join(tmp_dir, 'data'),
+            '--quiet',
+        )
+        subprocess.check_call(' '.join(cmd), shell=True)
+        tmp_pyconcrete_dir = tmp_dir
+        print 'build tmp pyconcrete at "%s"' % tmp_dir
+    finally:
+        os.chdir(_ori_dir)
+
+    return tmp_pyconcrete_dir
+
+
+def remove_tmp_pyconcrete():
+    global tmp_pyconcrete_dir
+    if tmp_pyconcrete_dir:
+        shutil.rmtree(tmp_pyconcrete_dir)
+        print 'remove tmp pyconcrete at "%s"' % tmp_pyconcrete_dir
+        tmp_pyconcrete_dir = None
+atexit.register(remove_tmp_pyconcrete)
+
+
+def get_pyconcrete_env_path():
+    """
+    append tmp_pyconcrete_dir path into PYTHONPATH
+    for subprocess execute script and import the pyconcrete we just builded
+    """
+    global tmp_pyconcrete_dir
+    env = os.environ.copy()
+    env.setdefault('PYTHONPATH', '')
+    env['PYTHONPATH'] += os.pathsep + tmp_pyconcrete_dir
+    return env
+
+
+# ==================================== TestPyConcreteBase ==================================== #
+
+
 class TestPyConcreteBase(unittest.TestCase):
     passphrase = 'Falldog'
-    
+    force_build = True
+
     def __init__(self, *argv, **argd):
         unittest.TestCase.__init__(self, *argv, **argd)
-        self.lib_dir = None
-        self.tmp_dir = None
-    
-    def lib_get_lib_dir(self):
-        if self.lib_dir:
-            return self.lib_dir
-        for f in os.listdir(LIB_DIR):
-            if f.startswith('lib.'):
-                self.lib_dir = join(LIB_DIR, f)
-                return self.lib_dir
-        return None
-        
-    def lib_build(self, passphrase='Falldog', force=False):
-        _ori_dir = os.getcwd()
-        os.chdir(ROOT_DIR)
-        try:
-            force_option = '--force' if force else ''
-            subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option))
-        finally:
-            os.chdir(_ori_dir)
-            
-    def lib_create_temp_env(self, passphrase='Falldog', force=False):
-        self._sys_path = sys.path
-        
+
+    @classmethod
+    def setUpClass(cls):
+        cls.lib_dir = build_tmp_pyconcrete(cls.passphrase)
+        cls._cls_sys_path = sys.path[:]
+        sys.path.insert(0, cls.lib_dir)
+        import pyconcrete
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls._cls_sys_path:
+            sys.path = cls._cls_sys_path
+            cls._cls_sys_path = None
+
+    def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
-        
-        _ori_dir = os.getcwd()
-        os.chdir(ROOT_DIR)
-        try:
-            force_option = '--force' if force else ''
-            subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
-            #subprocess.check_call('python setup.py install --passphrase=%s --install-lib="%s" --install-scripts="%s"' % (passphrase, _tmp_dir, _tmp_dir), shell=True)
-        finally:
-            os.chdir(_ori_dir)
-            
-        lib_dir = self.lib_get_lib_dir()
-        sys.path.insert(0, lib_dir)
+        self._sys_path = sys.path[:]
         sys.path.insert(0, self.tmp_dir)
-        
-        return self.tmp_dir
-    
-    def lib_remove_temp_env(self):
-        if self.tmp_dir and exists(self.tmp_dir):
-            shutil.rmtree(self.tmp_dir)
-        self.tmp_dir = None
-        
+
+    def tearDown(self):
         if self._sys_path:
             sys.path = self._sys_path
             self._sys_path = None
-    
+        shutil.rmtree(self.tmp_dir)
+
     def lib_gen_py(self, py_code, py_filename, folder=None):
         """ folder = None -> use @_tmp_dir """
         if not folder:
@@ -124,7 +163,7 @@ class TestPyConcreteBase(unittest.TestCase):
         with open(py_filepath, 'wb') as f:
             f.write(py_code)
         return py_filepath
-        
+
     def lib_gen_pyc(self, py_code, pyc_filename, folder=None, keep_py=False):
         """ folder = None -> use @_tmp_dir """
         if not folder:
@@ -146,7 +185,7 @@ class TestPyConcreteBase(unittest.TestCase):
             os.remove(py_filepath)
         
         return pyc_filepath
-        
+
     def lib_gen_pye(self, py_code, pye_filename, folder=None, keep_py=False, keep_pyc=False):
         """ folder = None -> use @_tmp_dir """
         if not folder:
@@ -175,24 +214,16 @@ class TestPyConcreteBase(unittest.TestCase):
             os.remove(pyc_filepath)
         
         return pye_filepath
-        
+
     def lib_compile_pyc(self, folder, remove_py=False):
-        env = os.environ.copy()
-        env.setdefault('PYTHONPATH', '')
-        env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
-        
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
-        subprocess.check_call('python %s compile --source=%s --pyc %s' % (admin_path, folder, arg_remove_py), env=env, shell=True)
-    
+        subprocess.check_call('python %s compile --source=%s --pyc %s' % (admin_path, folder, arg_remove_py), env=get_pyconcrete_env_path(), shell=True)
+
     def lib_compile_pye(self, folder, remove_py=False, remove_pyc=False):
-        env = os.environ.copy()
-        env.setdefault('PYTHONPATH', '')
-        env['PYTHONPATH'] += os.pathsep + self.lib_get_lib_dir()
-        
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
-        subprocess.check_call('python %s compile --source=%s --pye %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=env, shell=True)
+        subprocess.check_call('python %s compile --source=%s --pye %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=get_pyconcrete_env_path(), shell=True)
 
 

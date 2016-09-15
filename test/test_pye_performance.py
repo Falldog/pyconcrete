@@ -30,7 +30,7 @@ DATA_DIR = join(CUR_DIR, 'data')
 REQUEST_ZIP = join(DATA_DIR, 'requests-2.5.1.zip')
 REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
 PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
-RUN_COUNT = int(os.environ.get('TEST_PYE_PERFORMANCE_COUNT', '100'))
+RUN_COUNT = int(os.environ.get('TEST_PYE_PERFORMANCE_COUNT', '5'))
 
 
 def main_requests(import_concrete, q):
@@ -65,8 +65,8 @@ def main_requests(import_concrete, q):
 class TestPerformance(base.TestPyConcreteBase):
     
     def setUp(self):
-        self.lib_create_temp_env()
-        
+        super(TestPerformance, self).setUp()
+
         zip = ZipFile(REQUEST_ZIP)
         zip.extractall(self.tmp_dir)
         zip.close()
@@ -74,11 +74,7 @@ class TestPerformance(base.TestPyConcreteBase):
         self.req_dir = join(self.tmp_dir, 'requests')
         with open(join(self.req_dir, '__init__.py'), 'w') as f:
             pass
-        
-    def tearDown(self):
-        self.lib_remove_temp_env()
-        pass
-    
+
     def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
         
@@ -92,34 +88,34 @@ class TestPerformance(base.TestPyConcreteBase):
 
         self.assertTrue(path.startswith(self.req_dir), "wrong import path of requests = %s" % path)
         return t
-    
+
     def test_requests_pye(self):
         self.lib_compile_pye(self.req_dir, remove_py=True, remove_pyc=True)
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(True)
         print 'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
-        
+
     def test_requests_pyc(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(False)
         print 'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
-    
+
     def test_requests_pyc_with_import_hooker(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(True)
         print 'test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
-    
+
     def test_requests_py(self):
         t = 0.0
         for i in xrange(RUN_COUNT):
             t += self._test_requests(False)
         print 'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
-        
+
     def test_requests_py_with_import_hooker(self):
         t = 0.0
         for i in xrange(RUN_COUNT):

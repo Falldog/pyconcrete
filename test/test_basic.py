@@ -19,31 +19,26 @@ import unittest
 
 
 class TestBasic(base.TestPyConcreteBase):
-    def setUp(self):
-        self.lib_create_temp_env()
-        
-    def tearDown(self):
-        self.lib_remove_temp_env()
-    
     def test_import(self):
         import pyconcrete
         print pyconcrete.info()
-        
-        #print "lib dir=[%s], pyconcrete __init__=[%s]" % (self.lib_dir, pyconcrete.__file__)
+
+        # print "lib dir=[%s], pyconcrete __init__=[%s]" % (self.lib_dir, pyconcrete.__file__)
         self.assertTrue(pyconcrete.__file__.startswith(self.lib_dir))  # check import correct module
-        
+
     def test_import_pye(self):
         py_code = "v_int=1\r\n"
         py_code += "v_string='abc'\r\n"
-        pye_filepath = self.lib_gen_pye(py_code, 'test.pye')
-        
-        # import test.pye testing 
-        import test
-        
-        self.assertEqual(pye_filepath, test.__file__)  # check import correct module
-        self.assertEqual(1, test.v_int)
-        self.assertEqual('abc', test.v_string)
+        pye_filepath = self.lib_gen_pye(py_code, 'test_module.pye')
+
+        # import test.pye testing
+        import test_module
+
+        self.assertEqual(pye_filepath, test_module.__file__)  # check import correct module
+        self.assertEqual(1, test_module.v_int)
+        self.assertEqual('abc', test_module.v_string)
 
 
 if __name__ == '__main__':
     unittest.main()
+

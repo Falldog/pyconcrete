@@ -18,7 +18,6 @@ import os
 import argparse
 import py_compile
 import subprocess
-import pyconcrete
 from os.path import abspath, dirname, join, exists, isdir, isfile
 
 CUR_DIR = dirname(abspath(__file__))
@@ -137,6 +136,7 @@ class PyConcreteAdmin(object):
         if there is no .pyc file, compile .pyc first
         then compile .pye
         """
+        import pyconcrete
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'
         pyc_exists = exists(pyc_file)
