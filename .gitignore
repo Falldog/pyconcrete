@@ -2,3 +2,5 @@
 *.pye
 .idea/*
 build/*
+
+src/pyconcrete/_pyconcrete.so

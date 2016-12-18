@@ -63,6 +63,10 @@ ROOT_DIR = abspath(join(dirname(__file__), '..'))
 tmp_pyconcrete_dir = None
 
 
+def touch(file_path):
+    open(file_path, 'a').close()
+
+
 def build_tmp_pyconcrete(passphrase):
     global tmp_pyconcrete_dir
     if tmp_pyconcrete_dir:
@@ -132,7 +136,12 @@ class TestPyConcreteBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.lib_dir = build_tmp_pyconcrete(cls.passphrase)
+        build_dir = build_tmp_pyconcrete(cls.passphrase)
+
+        # only copy _pyconcrete.so into src
+        # for debugging on current code & so
+        shutil.copyfile(join(build_dir, 'pyconcrete', '_pyconcrete.so'), join(ROOT_DIR, 'src', 'pyconcrete', '_pyconcrete.so'))
+        cls.lib_dir = join(ROOT_DIR, 'src')
         cls._cls_sys_path = sys.path[:]
         sys.path.insert(0, cls.lib_dir)
         import pyconcrete

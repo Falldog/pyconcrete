@@ -40,7 +40,7 @@ def main_requests(import_concrete, q):
     """
     if import_concrete:
         import pyconcrete
-    
+
     t = time.time()
     import requests
 
@@ -56,7 +56,7 @@ def main_requests(import_concrete, q):
     from requests.sessions import SessionRedirectMixin
     from requests.models import urlencode
     from requests.hooks import default_hooks
-    
+
     t = time.time() - t
     q.put(requests.__file__)
     q.put(t)
@@ -72,8 +72,7 @@ class TestPerformance(base.TestPyConcreteBase):
         zip.close()
         
         self.req_dir = join(self.tmp_dir, 'requests')
-        with open(join(self.req_dir, '__init__.py'), 'w') as f:
-            pass
+        base.touch(join(self.req_dir, '__init__.py'))
 
     def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
