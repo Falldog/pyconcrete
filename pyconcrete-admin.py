@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import unittest
 import argparse
 import py_compile
 import subprocess
@@ -58,6 +59,8 @@ class PyConcreteAdmin(object):
                             dest='remove_pyc', action='store_true', help='remove .pyc after compile pye')
         parser.add_argument('-v', '--verbose',
                             action='store_true', help='verbose mode')
+        parser.add_argument('--test-module',
+                            dest='test_module', default=None, help='test on single module')
         parser.add_argument('--ignore-file-list',
                             dest='ignore_file_list', metavar='filename', nargs='+', default=tuple(), help='ignore file name list')
         args = parser.parse_args()
@@ -157,11 +160,14 @@ class PyConcreteAdmin(object):
             os.remove(py_file)
 
     def test(self):
-        cmd = 'python -m unittest discover -s {path} {verbose}'.format(
-            path=join(CUR_DIR, 'test'),
-            verbose='-v' if self.args.verbose else '',
-        )
-        subprocess.check_call(cmd, shell=True)
+        if self.args.test_module:
+            suite = unittest.TestLoader().loadTestsFromName(self.args.test_module)
+        else:
+            test_dir = join(CUR_DIR, 'test')
+            suite = unittest.TestLoader().discover(test_dir)
+
+        verbosity = 2 if self.args.verbose else 1
+        unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
 
 if __name__ == '__main__':
