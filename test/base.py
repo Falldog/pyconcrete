@@ -96,7 +96,7 @@ def build_tmp_pyconcrete(passphrase):
         )
         subprocess.check_call(' '.join(cmd), shell=True)
         tmp_pyconcrete_dir = tmp_dir
-        print 'build tmp pyconcrete at "%s"' % tmp_dir
+        print('build tmp pyconcrete at "%s"' % tmp_dir)
     finally:
         os.chdir(_ori_dir)
 
@@ -107,7 +107,7 @@ def remove_tmp_pyconcrete():
     global tmp_pyconcrete_dir
     if tmp_pyconcrete_dir:
         shutil.rmtree(tmp_pyconcrete_dir)
-        print 'remove tmp pyconcrete at "%s"' % tmp_pyconcrete_dir
+        print('remove tmp pyconcrete at "%s"' % tmp_pyconcrete_dir)
         tmp_pyconcrete_dir = None
 atexit.register(remove_tmp_pyconcrete)
 

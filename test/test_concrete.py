@@ -21,7 +21,7 @@ import unittest
 class TestConcrete(base.TestPyConcreteBase):
     def test_decrypt_exception(self):
         import pyconcrete
-        print pyconcrete.__file__
+        print(pyconcrete.__file__)
         data = 'abc'
         self.assertLess(len(data), 16)
         

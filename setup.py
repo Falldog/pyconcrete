@@ -155,7 +155,7 @@ class InstallEx(CmdBase, install):
         filename = join(self.install_libbase, 'pyconcrete.pth')
         with open(filename, 'w') as f:
             f.write('import pyconcrete')
-        print 'creating %s' % filename
+        print('creating %s' % filename)
 
 
 class TestEx(Command):

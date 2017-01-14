@@ -91,35 +91,35 @@ class TestPerformance(base.TestPyConcreteBase):
     def test_requests_pye(self):
         self.lib_compile_pye(self.req_dir, remove_py=True, remove_pyc=True)
         t = 0.0
-        for i in xrange(RUN_COUNT):
+        for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print 'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        print('test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_pyc(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
-        for i in xrange(RUN_COUNT):
+        for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        print 'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        print('test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_pyc_with_import_hooker(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
-        for i in xrange(RUN_COUNT):
+        for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print 'test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        print('test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_py(self):
         t = 0.0
-        for i in xrange(RUN_COUNT):
+        for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        print 'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        print('test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_py_with_import_hooker(self):
         t = 0.0
-        for i in xrange(RUN_COUNT):
+        for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print 'test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT)
+        print('test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
 
 if __name__ == '__main__':

@@ -65,7 +65,7 @@ class PyeLoader(object):
 
         m = self.new_module(fullname, self.full_path, self.pkg_path)
         sys.modules[fullname] = m
-        exec code in m.__dict__
+        exec(code, m.__dict__)
         return m
 
 

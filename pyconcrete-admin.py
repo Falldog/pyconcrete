@@ -79,9 +79,9 @@ class PyConcreteAdmin(object):
                 raise PyConcreteError("arg: compile, need assign the type for compile to `pye` or `pyc`")
 
         if args.verbose:
-            print 'compile on "%s"' % args.source
-            print 'ignore-file-list=%s' % str(args.ignore_file_list)
-            print 'verbose=%s' % args.verbose
+            print('compile on "%s"' % args.source)
+            print('ignore-file-list=%s' % str(args.ignore_file_list))
+            print('verbose=%s' % args.verbose)
 
     def run(self):
         args = self.args
@@ -90,7 +90,7 @@ class PyConcreteAdmin(object):
         elif args.test:
             self.test()
         else:
-            print 'please input correct command!'
+            print('please input correct command!')
             self.parser.print_help()
 
     def compile(self):
@@ -126,10 +126,10 @@ class PyConcreteAdmin(object):
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
             py_compile.compile(py_file)
             if self.args.verbose:
-                print '* create %s' % pyc_file
+                print('* create %s' % pyc_file)
         else:
             if self.args.verbose:
-                print '* skip %s' % pyc_file
+                print('* skip %s' % pyc_file)
 
         if self.args.remove_py:
             os.remove(py_file)
@@ -148,10 +148,10 @@ class PyConcreteAdmin(object):
         if not exists(pye_file) or os.stat(py_file).st_mtime != os.stat(pye_file).st_mtime:
             pyconcrete.encrypt_file(pyc_file, pye_file)
             if self.args.verbose:
-                print '* create %s' % pye_file
+                print('* create %s' % pye_file)
         else:
             if self.args.verbose:
-                print '* skip %s' % pye_file
+                print('* skip %s' % pye_file)
 
         # .pyc doesn't exists at beginning, remove it after .pye created
         if not pyc_exists or self.args.remove_pyc:
