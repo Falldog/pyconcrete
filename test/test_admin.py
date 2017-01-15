@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import sys
 import shutil
 import unittest
 import subprocess
@@ -43,7 +44,7 @@ class TestAdminScript(base.TestPyConcreteBase):
         expect_file = join(target_dir, 'main.pye')
 
         subprocess.check_call(
-            'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_file,
+            '%s pyconcrete-admin.py compile --source=%s --pye --verbose' % (sys.executable, target_file),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -58,7 +59,7 @@ class TestAdminScript(base.TestPyConcreteBase):
         expect_file2 = join(target_dir, 'main.pye')
         
         subprocess.check_call(
-            'python pyconcrete-admin.py compile --source=%s --pye --verbose' % target_dir,
+            '%s pyconcrete-admin.py compile --source=%s --pye --verbose' % (sys.executable, target_dir),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )

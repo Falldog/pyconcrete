@@ -26,7 +26,7 @@ EXT_PYE = '.pye'
 
 __all__ = ["info"]
 
-import _pyconcrete
+from . import _pyconcrete
 
 info = _pyconcrete.info
 encrypt_file = _pyconcrete.encrypt_file
@@ -60,12 +60,20 @@ class PyeLoader(object):
 
         data = decrypt_buffer(self.data)  # decrypt pye
         
-        # load pyc from memory, reference http://stackoverflow.com/questions/1830727/how-to-load-compiled-python-modules-from-memory
-        code = marshal.loads(data[8:])
+        if sys.version_info >= (3, 4):
+            # reference python source code
+            # python/Lib/importlib/_bootstrap_external.py _code_to_bytecode()
+            magic = 12
+        else:
+            # load pyc from memory
+            # reference http://stackoverflow.com/questions/1830727/how-to-load-compiled-python-modules-from-memory
+            magic = 8
+
+        code = marshal.loads(data[magic:])
 
         m = self.new_module(fullname, self.full_path, self.pkg_path)
         sys.modules[fullname] = m
-        exec code in m.__dict__
+        exec(code, m.__dict__)
         return m
 
 

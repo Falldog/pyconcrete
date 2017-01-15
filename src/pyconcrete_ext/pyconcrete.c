@@ -16,11 +16,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Python.h>
+#include <bytesobject.h>
 #include "oaes_lib.h"
 #include "secret_key.h"  // auto generate at build time
 
 // #define SECRET_KEY_LEN %d // defined in secret_key.h
 #define AES_BLOCK_SIZE 16
+
+#if PY_MAJOR_VERSION >= 3
+#define IS_PY3K
+#endif
 
 const static unsigned int TRUE = 1;
 const static unsigned int FALSE = 0;
@@ -204,8 +209,8 @@ static PyObject * fnDecryptBuffer(PyObject *self, PyObject* args)
         
         // printf("fnDecryptBuffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
         
-        py_plain_obj = PyString_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
-        plain_buf = PyString_AS_STRING(py_plain_obj);
+        py_plain_obj = PyBytes_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
+        plain_buf = PyBytes_AS_STRING(py_plain_obj);
         
         cur_plain = plain_buf;
         cur_cipher = cipher_buf;
@@ -243,17 +248,47 @@ static PyMethodDef PyConcreteMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef PyConcreteMethodDef = {
+        PyModuleDef_HEAD_INIT,
+        "_pyconcrete",       /* m_name */
+        NULL,                /* m_doc */
+        -1,                  /* m_size */
+        PyConcreteMethods,   /* m_methods */
+        NULL,                /* m_reload */
+        NULL,                /* m_traverse */
+        NULL,                /* m_clear */
+        NULL,                /* m_free */
+};
+#define INITERROR return NULL
+#else
+#define INITERROR return
+#endif
+
+
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC
+PyInit__pyconcrete(void)
+#else
 PyMODINIT_FUNC
 init_pyconcrete(void)
+#endif
 {
     PyObject* m = NULL;
-
+#if PY_MAJOR_VERSION >= 3
+    m = PyModule_Create(&PyConcreteMethodDef);
+#else
     m = Py_InitModule("_pyconcrete", PyConcreteMethods);
+#endif
     if (m == NULL)
-        return;
+        INITERROR;
 
     g_PyConcreteError = PyErr_NewException("_pyconcrete.Error", NULL, NULL);
     Py_INCREF(g_PyConcreteError);
     PyModule_AddObject(m, "Error", g_PyConcreteError);
+
+#if PY_MAJOR_VERSION >= 3
+    return m;
+#endif
 }
 
