@@ -6,7 +6,7 @@ Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 Version
 --------------
-0.9.x Beta
+0.10.0 Beta
 
 
 Protect python script work flow
@@ -70,7 +70,7 @@ $ python setup.py install \
   * recommendation project layout
 ```sh
 main.py       # import pyconcrete and your lib
-pyconcrete/*  # put pyconcrete lib in root, keep it as original files
+pyconcrete/*  # put pyconcrete lib in project root, keep it as original files
 src/*.pye     # your libs
 ```
 
@@ -87,4 +87,9 @@ $ ./pyconcrete-admin.py test
 ```sh
 $ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
 ```
+
+
+Announcement
+--------------
+pyconcrete is an experimental project, there is always a way to decrypt .pye files, but pyconcrete just make it harder.
 
