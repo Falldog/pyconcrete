@@ -87,7 +87,7 @@ def build_tmp_pyconcrete(passphrase):
         # subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
 
         cmd = (
-            'python',
+            sys.executable,
             'setup.py',
             'install',
             '--passphrase=%s' % passphrase,
@@ -145,7 +145,7 @@ class TestPyConcreteBase(unittest.TestCase):
 
         # only copy _pyconcrete.so into src
         # for debugging on current code & so
-        shutil.copyfile(join(build_dir, 'pyconcrete', '_pyconcrete.so'), join(ROOT_DIR, 'src', 'pyconcrete', '_pyconcrete.so'))
+        subprocess.check_output('cp %s %s' % (join(build_dir, 'pyconcrete', '_pyconcrete*.so'), join(ROOT_DIR, 'src', 'pyconcrete')), shell=True)
         cls.lib_dir = join(ROOT_DIR, 'src')
         cls._cls_sys_path = sys.path[:]
         sys.path.insert(0, cls.lib_dir)
@@ -237,12 +237,12 @@ class TestPyConcreteBase(unittest.TestCase):
     def lib_compile_pyc(self, folder, remove_py=False):
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
-        subprocess.check_call('python %s compile --source=%s --pyc %s' % (admin_path, folder, arg_remove_py), env=get_pyconcrete_env_path(), shell=True)
+        subprocess.check_call('%s %s compile --source=%s --pyc %s' % (sys.executable, admin_path, folder, arg_remove_py), env=get_pyconcrete_env_path(), shell=True)
 
     def lib_compile_pye(self, folder, remove_py=False, remove_pyc=False):
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
-        subprocess.check_call('python %s compile --source=%s --pye %s %s' % (admin_path, folder, arg_remove_py, arg_remove_pyc), env=get_pyconcrete_env_path(), shell=True)
+        subprocess.check_call('%s %s compile --source=%s --pye %s %s' % (sys.executable, admin_path, folder, arg_remove_py, arg_remove_pyc), env=get_pyconcrete_env_path(), shell=True)
 
 
