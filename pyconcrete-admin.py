@@ -124,7 +124,7 @@ class PyConcreteAdmin(object):
         pyc_file = py_file + 'c'
         pyc_exists = exists(pyc_file)
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
-            py_compile.compile(py_file)
+            py_compile.compile(py_file, cfile=pyc_file)
             if self.args.verbose:
                 print('* create %s' % pyc_file)
         else:
@@ -144,7 +144,7 @@ class PyConcreteAdmin(object):
         pye_file = py_file + 'e'
         pyc_exists = exists(pyc_file)
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
-            py_compile.compile(py_file)
+            py_compile.compile(py_file, cfile=pyc_file)
         if not exists(pye_file) or os.stat(py_file).st_mtime != os.stat(pye_file).st_mtime:
             pyconcrete.encrypt_file(pyc_file, pye_file)
             if self.args.verbose:

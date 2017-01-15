@@ -185,9 +185,9 @@ class TestPyConcreteBase(unittest.TestCase):
         # create .py
         with open(py_filepath, 'wb') as f:
             f.write(py_code)
-            
+
         # create .pyc
-        py_compile.compile(py_filepath)
+        py_compile.compile(py_filepath, cfile=pyc_filepath)
         
         # remove files
         if not keep_py:
@@ -210,7 +210,7 @@ class TestPyConcreteBase(unittest.TestCase):
             f.write(py_code)
         
         # create .pyc
-        py_compile.compile(py_filepath)
+        py_compile.compile(py_filepath, cfile=pyc_filepath)
         
         # create .pye & remove .py & .pyc
         import pyconcrete
