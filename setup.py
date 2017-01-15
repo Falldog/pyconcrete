@@ -24,6 +24,7 @@ from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
 
+PY2 = sys.version_info[0] < 3
 DEFAULT_KEY = 'Falldog'
 
 CUR_DIR = os.path.dirname(__file__)
@@ -35,7 +36,10 @@ SECRET_HEADER_PATH = join(EXT_SRC_DIR, 'secret_key.h')
 
 
 def hash_key(key):
-    factor = sum([ord(s) for s in key])
+    if PY2:
+        factor = sum([ord(s) for s in key])
+    else:
+        factor = sum([s for s in key])
     factor %= 128
     if factor < 16:
         factor += 16
@@ -54,7 +58,8 @@ def create_secret_key_header(key, factor):
     
     key_val_lst = []
     for i, k in enumerate(key):
-        key_val_lst.append("(0x%X ^ (0x%X - %d))" % (ord(k), factor, i))
+        n = ord(k) if PY2 else k
+        key_val_lst.append("(0x%X ^ (0x%X - %d))" % (n, factor, i))
     key_val_code = string.join(key_val_lst, ', ')
     
     code = """
@@ -90,15 +95,15 @@ class CmdBase:
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
         if self.manual_create_secrete_key_file:
             if not self.passphrase:
-                self.passphrase = raw_input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
+                self.passphrase = input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
                 if len(self.passphrase) == 0:
                     self.passphrase = DEFAULT_KEY
                 else:
-                    passphrase2 = raw_input("please input again to confirm\n")
+                    passphrase2 = input("please input again to confirm\n")
                     if self.passphrase != passphrase2:
                         raise Exception("Passphrase is different")
         
-            k, f = hash_key(self.passphrase)
+            k, f = hash_key(self.passphrase.encode('utf8'))
             create_secret_key_header(k, f)
         
     def post_process(self):
