@@ -23,6 +23,11 @@ import tempfile
 import subprocess
 import py_compile
 from os.path import dirname, abspath, join, exists
+try:
+    from importlib import reload
+except ImportError:
+    pass
+
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 
@@ -144,7 +149,12 @@ class TestPyConcreteBase(unittest.TestCase):
         cls.lib_dir = join(ROOT_DIR, 'src')
         cls._cls_sys_path = sys.path[:]
         sys.path.insert(0, cls.lib_dir)
+
         import pyconcrete
+
+        # force to reload it, avoid to load installed module
+        if not pyconcrete.__file__.startswith(cls.lib_dir):
+            reload(pyconcrete)
 
     @classmethod
     def tearDownClass(cls):
