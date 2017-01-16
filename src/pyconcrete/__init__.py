@@ -60,7 +60,7 @@ class PyeLoader(object):
 
         data = decrypt_buffer(self.data)  # decrypt pye
         
-        if sys.version_info >= (3, 4):
+        if sys.version_info >= (3, 3):
             # reference python source code
             # python/Lib/importlib/_bootstrap_external.py _code_to_bytecode()
             magic = 12
