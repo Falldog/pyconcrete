@@ -5,7 +5,7 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "3.6"
+  #- "3.6"
 
 before_install:
   - sudo apt-get install -y python-software-properties
@@ -15,7 +15,7 @@ before_install:
   - sudo apt-get install -y python3.3 python3.3-dev
   - sudo apt-get install -y python3.4 python3.4-dev
   - sudo apt-get install -y python3.5 python3.5-dev
-  - sudo apt-get install -y python3.6 python3.6-dev
+  #- sudo apt-get install -y python3.6 python3.6-dev
 
 #install: 
 #  - pip install -r requirements.txt
@@ -25,5 +25,5 @@ script:
   - python3.3 pyconcrete-admin.py test
   - python3.4 pyconcrete-admin.py test
   - python3.5 pyconcrete-admin.py test
-  - python3.6 pyconcrete-admin.py test
+  #- python3.6 pyconcrete-admin.py test
 
