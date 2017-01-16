@@ -1,4 +1,6 @@
 language: python
+dist: trusty  # 14.04
+sudo: required
 
 python:
   - "2.7"
