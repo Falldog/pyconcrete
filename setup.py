@@ -17,22 +17,14 @@
 import os
 import sys
 import imp
-import string
 import hashlib
 from os.path import join
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
+from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, SECRET_HEADER_PATH
 
 PY2 = sys.version_info[0] < 3
-DEFAULT_KEY = 'Falldog'
-
-CUR_DIR = os.path.dirname(__file__)
-TEST_DIR = 'test'
-SRC_DIR = join('src')
-PY_SRC_DIR = join(SRC_DIR, 'pyconcrete')
-EXT_SRC_DIR = join(SRC_DIR, 'pyconcrete_ext')
-SECRET_HEADER_PATH = join(EXT_SRC_DIR, 'secret_key.h')
 
 
 def hash_key(key):
@@ -60,7 +52,7 @@ def create_secret_key_header(key, factor):
     for i, k in enumerate(key):
         n = ord(k) if PY2 else k
         key_val_lst.append("(0x%X ^ (0x%X - %d))" % (n, factor, i))
-    key_val_code = string.join(key_val_lst, ', ')
+    key_val_code = ", ".join(key_val_lst)
     
     code = """
         #define SECRET_NUM 0x%X
@@ -87,7 +79,8 @@ def create_secret_key_header(key, factor):
 
 
 def remove_secret_key_header():
-    os.remove(SECRET_HEADER_PATH)
+    if os.path.exists(SECRET_HEADER_PATH):
+        os.remove(SECRET_HEADER_PATH)
 
 
 class CmdBase:

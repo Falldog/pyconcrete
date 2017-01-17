@@ -23,6 +23,7 @@ import tempfile
 import subprocess
 import py_compile
 from os.path import dirname, abspath, join, exists
+from src.config import SECRET_HEADER_PATH
 try:
     from importlib import reload
 except ImportError:
@@ -76,6 +77,10 @@ def build_tmp_pyconcrete(passphrase):
     global tmp_pyconcrete_dir
     if tmp_pyconcrete_dir:
         return tmp_pyconcrete_dir
+
+    # remove secret key header, for testing on generate secret-key file
+    if os.path.exists(SECRET_HEADER_PATH):
+        os.remove(SECRET_HEADER_PATH)
 
     tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_lib_')
 
