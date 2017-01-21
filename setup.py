@@ -26,6 +26,11 @@ from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, 
 
 PY2 = sys.version_info[0] < 3
 
+try:
+   input = raw_input
+except NameError:
+   pass
+
 
 def hash_key(key):
     if PY2:
