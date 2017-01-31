@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import sys
 import unittest
 import argparse
 import py_compile
@@ -160,10 +161,12 @@ class PyConcreteAdmin(object):
             os.remove(py_file)
 
     def test(self):
+        test_dir = join(CUR_DIR, 'test')
+        sys.path.insert(0, test_dir)  # for loadTestsFromName
+
         if self.args.test_module:
             suite = unittest.TestLoader().loadTestsFromName(self.args.test_module)
         else:
-            test_dir = join(CUR_DIR, 'test')
             suite = unittest.TestLoader().discover(test_dir)
 
         verbosity = 2 if self.args.verbose else 1
