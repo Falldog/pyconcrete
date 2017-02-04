@@ -105,6 +105,17 @@ def build_tmp_pyconcrete(passphrase):
             '--quiet',
         )
         subprocess.check_call(' '.join(cmd), shell=True)
+
+        # only copy _pyconcrete.so into src
+        # for debugging on current code & so
+        subprocess.check_output(
+            'cp {src} {dest}'.format(
+                src=join(tmp_dir, 'pyconcrete', '_pyconcrete*.so'),
+                dest=join(ROOT_DIR, 'src', 'pyconcrete'),
+            ),
+            shell=True
+        )
+
         tmp_pyconcrete_dir = tmp_dir
         print('build tmp pyconcrete at "%s"' % tmp_dir)
     finally:
@@ -146,11 +157,8 @@ class TestPyConcreteBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        build_dir = build_tmp_pyconcrete(cls.passphrase)
+        build_tmp_pyconcrete(cls.passphrase)
 
-        # only copy _pyconcrete.so into src
-        # for debugging on current code & so
-        subprocess.check_output('cp %s %s' % (join(build_dir, 'pyconcrete', '_pyconcrete*.so'), join(ROOT_DIR, 'src', 'pyconcrete')), shell=True)
         cls.lib_dir = join(ROOT_DIR, 'src')
         cls._cls_sys_path = sys.path[:]
         sys.path.insert(0, cls.lib_dir)

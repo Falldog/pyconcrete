@@ -180,20 +180,20 @@ static PyObject * fnDecryptBuffer(PyObject *self, PyObject* args)
     Py_ssize_t plain_buf_size = 0;
     Py_ssize_t proc_size = 0;        // process of decryption size
     int padding_size = 0;            // last block padding size
-    unsigned char* cipher_buf;
-    unsigned char* plain_buf;
-    unsigned char* cur_cipher;
-    unsigned char* cur_plain;
+    unsigned char* cipher_buf = NULL;
+    unsigned char* plain_buf = NULL;
+    unsigned char* cur_cipher = NULL;
+    unsigned char* cur_plain = NULL;
     unsigned char last_block[AES_BLOCK_SIZE];
     PyObject* py_plain_obj = NULL;
     OAES_CTX* key = NULL;
-    
+
     if(!PyArg_ParseTuple(args, "s#", &cipher_buf, &cipher_buf_size))
         return NULL;
     
     if(cipher_buf_size % AES_BLOCK_SIZE != 0)  // file size not match, maybe not encrypted file
     {
-        PyErr_SetString(g_PyConcreteError, "this file content doesn't mathed");
+        PyErr_SetString(g_PyConcreteError, "this file content doesn't matched");
         return NULL;
     }
     
