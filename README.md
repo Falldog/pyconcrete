@@ -1,5 +1,7 @@
 pyconcrete
 ==============
+[![Build Status](https://travis-ci.org/Falldog/pyconcrete.svg?branch=master)](https://travis-ci.org/Falldog/pyconcrete)
+
 Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 --------------
