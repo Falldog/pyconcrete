@@ -2,5 +2,6 @@
 *.pye
 .idea/*
 build/*
+vagrant/.vagrant/*
 
 src/pyconcrete/_pyconcrete.so
