@@ -1,7 +1,10 @@
+.pypirc
 *.pyc
 *.pye
+*.so
 .idea/*
 build/*
+dist/*
 vagrant/.vagrant/*
 
 src/pyconcrete/_pyconcrete.so

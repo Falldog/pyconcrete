@@ -26,6 +26,15 @@ from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, 
 
 PY2 = sys.version_info[0] < 3
 
+
+# .rst should created by pyconcrete-admin
+if os.path.exists('README.rst'):
+    readme_path = 'README.rst'
+else:
+    readme_path = 'README.md'
+with open(readme_path, 'r') as f:
+    readme = f.read()
+
 try:
    input = raw_input
 except NameError:
@@ -197,7 +206,9 @@ module = Extension(
 setup(
     name='pyconcrete',
     version=version.__version__,
-    description='protect your python script',
+    description='Protect your python script, encrypt it as .pye and decrypt when import it',
+    long_description=readme,
+    keywords='python source encryption obfuscation',
     author='Falldog',
     author_email='falldog7@gmail.com',
     url='https://github.com/Falldog/pyconcrete',
@@ -217,4 +228,21 @@ setup(
     package_dir={
         '': SRC_DIR,
     },
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Topic :: Software Development :: Build Tools',
+        'Topic :: Security',
+        'Topic :: Security :: Cryptography',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'License :: OSI Approved :: Apache Software License',
+    ],
 )

@@ -62,6 +62,7 @@ def main_requests(import_concrete, q):
     q.put(t)
     
 
+@unittest.skipIf(not os.path.exists(REQUEST_ZIP), "requests zip file doesn't exists")
 class TestPerformance(base.TestPyConcreteBase):
     
     def setUp(self):

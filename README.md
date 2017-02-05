@@ -1,14 +1,13 @@
 pyconcrete
 ==============
 [![Build Status](https://travis-ci.org/Falldog/pyconcrete.svg?branch=master)](https://travis-ci.org/Falldog/pyconcrete)
+[![PyPI Version](https://img.shields.io/pypi/v/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
+[![PyPI PyVersion](https://img.shields.io/pypi/pyversions/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
+[![PyPI License](https://img.shields.io/pypi/l/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
 
 Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 --------------
-
-Version
---------------
-0.10.0 Beta
 
 
 Protect python script work flow
@@ -27,8 +26,22 @@ Encryption
 * encrypt & decrypt by library OpenAES
 
 
-Usage
+Installation
 --------------
+  * need to input your passphrase create secret key for encrypt python script.
+  * same passphrase will generate the same secret key
+  * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
+  
+### pip
+```sh
+$ pip install pyconcrete
+```
+  > `pip install` will not display any prompt(via stdout) from pyconcrete. 
+  > Installation will be `blocked` and `waiting for user input passphrase twice`.
+  > You must input passphrase for installation continuously.
+  > Hard to control pip to redirect pyconcrete stdout to console currently.
+
+### source
 * get the pyconcrete source code
 ```sh
 $ git clone <pyconcrete repo> <pyconcre dir>
@@ -38,10 +51,10 @@ $ git clone <pyconcrete repo> <pyconcre dir>
 ```sh
 $ python setup.py install
 ```
-  * need to input your passphrase create secret key for encrypt python script.
-  * same passphrase will generate the same secret key
-  * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
 
+
+Usage
+--------------
 * convert your script to `*.pye`
 ```sh
 $ pyconcrete-admin.py compile --source=<your py script>  --pye
@@ -61,7 +74,7 @@ src/*.pye  # your libs
 
 Usage (pyconcrete as lib)
 --------------
-* install pyconcrete as lib
+* download pyconcrete source and install by setup.py
 ```sh
 $ python setup.py install \
   --install-lib=<your project path> \

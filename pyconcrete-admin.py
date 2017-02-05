@@ -23,7 +23,7 @@ import subprocess
 from os.path import abspath, dirname, join, exists, isdir, isfile
 
 CUR_DIR = dirname(abspath(__file__))
-VALID_CMD = ['compile', 'test']
+VALID_CMD = ['compile', 'test', 'release']
 
 
 class PyConcreteError(Exception):
@@ -73,6 +73,7 @@ class PyConcreteAdmin(object):
 
         args.compile = bool(args.cmd == 'compile')
         args.test = bool(args.cmd == 'test')
+        args.release = bool(args.cmd == 'release')
         if args.compile:
             if args.source is None:
                 raise PyConcreteError("arg: compile, need assign --source={file/dir} to process")
@@ -90,6 +91,8 @@ class PyConcreteAdmin(object):
             self.compile()
         elif args.test:
             self.test()
+        elif args.release:
+            self.release()
         else:
             print('please input correct command!')
             self.parser.print_help()
@@ -172,6 +175,20 @@ class PyConcreteAdmin(object):
         verbosity = 2 if self.args.verbose else 1
         unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
+    def release(self):
+        try:
+            import pypandoc
+            readme = pypandoc.convert('README.md', 'rst')
+            with open('README.rst', 'wb') as f:
+                f.write(readme)
+        except ImportError:
+            print('you need to install pypandoc before release pyconcrete')
+
+        subprocess.call('python setup.py sdist', shell=True)  # ignore can't found README error
+        subprocess.check_output('twine upload dist/*', shell=True)
+        subprocess.check_output('rm README.rst', shell=True)
+        subprocess.check_output('rm -rf build', shell=True)
+        subprocess.check_output('rm -rf dist', shell=True)
 
 if __name__ == '__main__':
     admin = PyConcreteAdmin()
