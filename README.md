@@ -31,16 +31,20 @@ Installation
   * need to input your passphrase create secret key for encrypt python script.
   * same passphrase will generate the same secret key
   * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
-  
+
 ### pip
 ```sh
 $ pip install pyconcrete
 ```
-  > `pip install` will not display any prompt(via stdout) from pyconcrete. 
+  > If you only execute `pip install` will not display any prompt(via stdout) from pyconcrete. 
   > Installation will be `blocked` and `waiting for user input passphrase twice`.
   > You must input passphrase for installation continuously.
-  > Hard to control pip to redirect pyconcrete stdout to console currently.
 
+```sh
+$ pip install pyconcrete --egg --install-option="--passphrase=<your passphrase>"
+```
+  > pyconcrete installed as egg, if you want to uninstall pyconcrete will need to manually delete `pyconcrete.pth`.
+  
 ### source
 * get the pyconcrete source code
 ```sh
