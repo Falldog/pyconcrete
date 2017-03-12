@@ -59,7 +59,7 @@ class PyeLoader(object):
             return sys.modules[fullname]
 
         data = decrypt_buffer(self.data)  # decrypt pye
-        
+
         if sys.version_info >= (3, 3):
             # reference python source code
             # python/Lib/importlib/_bootstrap_external.py _code_to_bytecode()
@@ -75,6 +75,9 @@ class PyeLoader(object):
         sys.modules[fullname] = m
         exec(code, m.__dict__)
         return m
+
+    def is_package(self, fullname):
+        return self.is_pkg
 
 
 class PyeMetaPathFinder(object):
@@ -97,4 +100,3 @@ class PyeMetaPathFinder(object):
 
 
 sys.meta_path.insert(0, PyeMetaPathFinder())
-
