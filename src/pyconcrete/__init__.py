@@ -22,7 +22,7 @@ from os.path import join, exists, isdir
 EXT_PY  = '.py'
 EXT_PYC = '.pyc'
 EXT_PYD = '.pyd'
-EXT_PYE = '.enc'
+EXT_PYE = '.pye'
 
 __all__ = ["info"]
 
