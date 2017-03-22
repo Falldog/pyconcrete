@@ -23,6 +23,7 @@ from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
 from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, SECRET_HEADER_PATH
+from mingw32 import mingw32
 
 PY2 = sys.version_info[0] < 3
 
@@ -49,11 +50,11 @@ def hash_key(key):
     factor %= 128
     if factor < 16:
         factor += 16
-    
+
     m = hashlib.md5()
     m.update(key)
     k = m.digest()
-    
+
     return k, factor
 
 
@@ -61,13 +62,13 @@ def create_secret_key_header(key, factor):
     # reference from - http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
     # encrypt the secret key in binary code
     # avoid to easy read from HEX view
-    
+
     key_val_lst = []
     for i, k in enumerate(key):
         n = ord(k) if PY2 else k
         key_val_lst.append("(0x%X ^ (0x%X - %d))" % (n, factor, i))
     key_val_code = ", ".join(key_val_lst)
-    
+
     code = """
         #define SECRET_NUM 0x%X
         #define SECRET_KEY_LEN %d
@@ -87,7 +88,7 @@ def create_secret_key_header(key, factor):
             return key;
         }
     """ % (factor, len(key), key_val_code)
-    
+
     with open(SECRET_HEADER_PATH, 'w') as f:
         f.write(code)
 
@@ -109,10 +110,10 @@ class CmdBase:
                     passphrase2 = input("please input again to confirm\n")
                     if self.passphrase != passphrase2:
                         raise Exception("Passphrase is different")
-        
+
             k, f = hash_key(self.passphrase.encode('utf8'))
             create_secret_key_header(k, f)
-        
+
     def post_process(self):
         if self.manual_create_secrete_key_file:
             remove_secret_key_header()
@@ -123,7 +124,7 @@ class BuildEx(CmdBase, build):
     execute extra function before/after build.run()
     """
     user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
-    
+
     def initialize_options(self):
         build.initialize_options(self)
         self.passphrase = None
@@ -140,7 +141,7 @@ class InstallEx(CmdBase, install):
     execute extra function before/after install.run()
     """
     user_options = install.user_options + [('passphrase=', None, 'specify passphrase')]
-    
+
     def initialize_options(self):
         install.initialize_options(self)
         self.passphrase = None
@@ -189,9 +190,9 @@ class TestEx(Command):
 version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
 include_dirs = [join(EXT_SRC_DIR, 'openaes', 'inc')]
-if sys.platform == 'win32':
+if sys.platform == 'win32' and not mingw32():
     include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
-    
+
 module = Extension(
     'pyconcrete._pyconcrete',
     include_dirs=include_dirs,
