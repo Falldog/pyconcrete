@@ -23,7 +23,6 @@ from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.install import install
 from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, SECRET_HEADER_PATH
-from mingw32 import mingw32
 
 PY2 = sys.version_info[0] < 3
 
@@ -40,6 +39,22 @@ try:
    input = raw_input
 except NameError:
    pass
+
+
+def is_mingw():
+    """Compiler is mingw."""
+    from distutils.dist import Distribution
+    dst = Distribution()
+    dst.parse_config_files()
+    if 'build' not in dst.command_options:
+        return False
+    _build = dst.command_options['build']
+    if 'compiler' not in _build:
+        return False
+    compiler = _build['compiler']
+    if compiler[1].startswith('mingw'):
+        return True
+    return False
 
 
 def hash_key(key):
@@ -190,7 +205,7 @@ class TestEx(Command):
 version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
 include_dirs = [join(EXT_SRC_DIR, 'openaes', 'inc')]
-if sys.platform == 'win32' and not mingw32():
+if sys.platform == 'win32' and not is_mingw():
     include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
 
 module = Extension(
