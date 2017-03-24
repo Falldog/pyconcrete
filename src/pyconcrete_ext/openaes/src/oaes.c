@@ -1,19 +1,19 @@
-/* 
+/*
  * ---------------------------------------------------------------------------
  * OpenAES License
  * ---------------------------------------------------------------------------
  * Copyright (c) 2013, Nabil S. Al Ramli, www.nalramli.com
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   - Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   - Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -99,12 +99,12 @@ void join_thread(uintptr_t id)
 	#define __min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif // __min
 
-#if defined(_WIN32) && !defined(__SYMBIAN32__)
-#else
-	#ifndef _fprintf_p
-		#define _fprintf_p fprintf
-	#endif // _fprintf_p
-#endif
+// #if defined(_WIN32) && !defined(__SYMBIAN32__)
+// #else
+#ifndef _fprintf_p
+	#define _fprintf_p fprintf
+#endif // _fprintf_p
+// #endif
 
 #define OAES_BASE64_LEN_ENC 3072
 #define OAES_BASE64_LEN_DEC 4096
@@ -117,7 +117,7 @@ static void usage( const char * exe_name )
 {
 	if( NULL == exe_name )
 		return;
-	
+
 	_fprintf_p( stderr,
 			"Usage:\n"
 			"  %1$s gen-key < 128 | 192 | 256 > <key_file>\n"
@@ -269,7 +269,7 @@ static OAES_RET _do_aes_encrypt(do_block *b)
 
 	if( OAES_RET_SUCCESS !=  oaes_free(&ctx) )
 		fprintf(stderr, "Error: Failed to uninitialize OAES.\n");
-	
+
 	return _rc;
 }
 
@@ -317,7 +317,7 @@ static OAES_RET _do_aes_decrypt(do_block *b)
 
 	if( OAES_RET_SUCCESS !=  oaes_free(&ctx) )
 		fprintf(stderr, "Error: Failed to uninitialize OAES.\n");
-	
+
 	return _rc;
 }
 
@@ -329,7 +329,7 @@ int main(int argc, char** argv)
 	int _op = 0;
 	FILE *_f_in = stdin, *_f_out = stdout, *_f_k = NULL;
 	do_block _b[OAES_THREADS];
-	
+
 	fprintf( stderr, "\n"
 		"*******************************************************************************\n"
 		"* OpenAES %-10s                                                          *\n"
@@ -457,7 +457,7 @@ int main(int argc, char** argv)
 			_found = 1;
 			_is_ecb = 1;
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "--key" ) )
 		{
 			uint8_t *_buf = NULL;
@@ -506,7 +506,7 @@ int main(int argc, char** argv)
 			}
 			free(_buf);
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "--key-file" ) )
 		{
 			OAES_CTX *_ctx = NULL;
@@ -556,7 +556,7 @@ int main(int argc, char** argv)
 			}
 			oaes_free(&_ctx);
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "--in" ) )
 		{
 			_found = 1;
@@ -570,7 +570,7 @@ int main(int argc, char** argv)
 			}
 			_file_in = argv[_i];
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "--out" ) )
 		{
 			_found = 1;
@@ -584,13 +584,13 @@ int main(int argc, char** argv)
 			}
 			_file_out = argv[_i];
 		}
-		
+
 		if( 0 == _found )
 		{
 			fprintf(stderr, "Error: Invalid option '%s'.\n", argv[_i]);
 			usage( argv[0] );
 			return EXIT_FAILURE;
-		}			
+		}
 	}
 
 	switch(_op)
