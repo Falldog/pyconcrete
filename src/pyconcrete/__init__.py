@@ -60,13 +60,17 @@ class PyeLoader(object):
 
         data = decrypt_buffer(self.data)  # decrypt pye
 
+        self._validate_version(data)
+
         if sys.version_info >= (3, 3):
             # reference python source code
             # python/Lib/importlib/_bootstrap_external.py _code_to_bytecode()
+            # MAGIC + TIMESTAMP + FILE_SIZE
             magic = 12
         else:
             # load pyc from memory
             # reference http://stackoverflow.com/questions/1830727/how-to-load-compiled-python-modules-from-memory
+            # MAGIC + TIMESTAMP
             magic = 8
 
         code = marshal.loads(data[magic:])
@@ -78,6 +82,17 @@ class PyeLoader(object):
 
     def is_package(self, fullname):
         return self.is_pkg
+
+    @staticmethod
+    def _validate_version(data):
+        magic = imp.get_magic()
+        ml = len(magic)
+        if data[:ml] != magic:
+            import struct
+            # convert little-endian byte string to unsigned short
+            py_magic = struct.unpack('<H', magic[:2])[0]
+            pye_magic = struct.unpack('<H', data[:2])[0]
+            raise ValueError("Python version doesn't match with magic: python(%d) != pye(%d)" % (py_magic, pye_magic))
 
 
 class PyeMetaPathFinder(object):
