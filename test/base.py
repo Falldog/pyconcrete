@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import re
 import sys
 import shutil
 import atexit
@@ -106,15 +107,7 @@ def build_tmp_pyconcrete(passphrase):
         )
         subprocess.check_call(' '.join(cmd), shell=True)
 
-        # only copy _pyconcrete.so into src
-        # for debugging on current code & so
-        subprocess.check_output(
-            'cp {src} {dest}'.format(
-                src=join(tmp_dir, 'pyconcrete', '_pyconcrete*.so'),
-                dest=join(ROOT_DIR, 'src', 'pyconcrete'),
-            ),
-            shell=True
-        )
+        copy_pyconcrete_ext(tmp_dir)
 
         tmp_pyconcrete_dir = tmp_dir
         print('build tmp pyconcrete at "%s"' % tmp_dir)
@@ -122,6 +115,17 @@ def build_tmp_pyconcrete(passphrase):
         os.chdir(_ori_dir)
 
     return tmp_pyconcrete_dir
+
+
+def copy_pyconcrete_ext(tmp_dir):
+    tmp_pyconcrete = join(tmp_dir, 'pyconcrete')
+    for f in os.listdir(tmp_pyconcrete):
+        if re.match('^_pyconcrete.*\.(so|dll|pyd)$', f):
+            shutil.copy(
+                join(tmp_pyconcrete, f),
+                join(ROOT_DIR, 'src', 'pyconcrete')
+            )
+            break
 
 
 def remove_tmp_pyconcrete():
