@@ -30,7 +30,7 @@
 const static unsigned int TRUE = 1;
 const static unsigned int FALSE = 0;
 
-static PyObject* g_PyConcreteError = NULL;
+PyObject* g_PyConcreteError = NULL;
 
 static void print_buffer(unsigned char* buf, int size)
 {
@@ -53,12 +53,7 @@ static void KeyDestroy(OAES_CTX** key)
     oaes_free(key);
 }
 
-static PyObject * fnInfo(PyObject *self, PyObject* null)
-{
-    return Py_BuildValue("s", "PyConcrete Info() AES 128bit");
-}
-
-static PyObject * fnEncryptFile(PyObject *self, PyObject* args)
+PyObject * fnEncryptFile(PyObject* self, PyObject* args)
 {
     FILE* src = NULL;
     FILE* dest = NULL;
@@ -124,7 +119,7 @@ static PyObject * fnEncryptFile(PyObject *self, PyObject* args)
     return Py_True;
 }
 
-static PyObject * fnDecryptFile(PyObject *self, PyObject* args)
+PyObject * fnDecryptFile(PyObject* self, PyObject* args)
 {
     FILE* src = NULL;
     const char* src_filepath = NULL;
@@ -174,7 +169,7 @@ static PyObject * fnDecryptFile(PyObject *self, PyObject* args)
     return NULL;
 }
 
-static PyObject * fnDecryptBuffer(PyObject *self, PyObject* args)
+PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
 {
     Py_ssize_t cipher_buf_size = 0;
     Py_ssize_t plain_buf_size = 0;
@@ -238,57 +233,5 @@ static PyObject * fnDecryptBuffer(PyObject *self, PyObject* args)
     }
     KeyDestroy(&key);
     return py_plain_obj;
-}
-
-static PyMethodDef PyConcreteMethods[] = {
-    {"info", fnInfo, METH_NOARGS, "Display PyConcrete info"},
-    {"encrypt_file", fnEncryptFile, METH_VARARGS, "Encrypt whole file"},
-    {"decrypt_file", fnDecryptFile, METH_VARARGS, "Decrypt whole file (not ready)"},
-    {"decrypt_buffer", fnDecryptBuffer, METH_VARARGS, "Decrypt buffer"},
-    {NULL, NULL, 0, NULL}        /* Sentinel */
-};
-
-#if PY_MAJOR_VERSION >= 3
-static struct PyModuleDef PyConcreteMethodDef = {
-        PyModuleDef_HEAD_INIT,
-        "_pyconcrete",       /* m_name */
-        NULL,                /* m_doc */
-        -1,                  /* m_size */
-        PyConcreteMethods,   /* m_methods */
-        NULL,                /* m_reload */
-        NULL,                /* m_traverse */
-        NULL,                /* m_clear */
-        NULL,                /* m_free */
-};
-#define INITERROR return NULL
-#else
-#define INITERROR return
-#endif
-
-
-#if PY_MAJOR_VERSION >= 3
-PyMODINIT_FUNC
-PyInit__pyconcrete(void)
-#else
-PyMODINIT_FUNC
-init_pyconcrete(void)
-#endif
-{
-    PyObject* m = NULL;
-#if PY_MAJOR_VERSION >= 3
-    m = PyModule_Create(&PyConcreteMethodDef);
-#else
-    m = Py_InitModule("_pyconcrete", PyConcreteMethods);
-#endif
-    if (m == NULL)
-        INITERROR;
-
-    g_PyConcreteError = PyErr_NewException("_pyconcrete.Error", NULL, NULL);
-    Py_INCREF(g_PyConcreteError);
-    PyModule_AddObject(m, "Error", g_PyConcreteError);
-
-#if PY_MAJOR_VERSION >= 3
-    return m;
-#endif
 }
 

@@ -213,6 +213,7 @@ module = Extension(
     include_dirs=include_dirs,
     sources=[
         join(EXT_SRC_DIR, 'pyconcrete.c'),
+        join(EXT_SRC_DIR, 'pyconcrete_module.c'),
         join(EXT_SRC_DIR, 'openaes', 'src', 'oaes.c'),
         join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
         join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
