@@ -18,11 +18,14 @@ import os
 import sys
 import imp
 import hashlib
+import sysconfig
 from os.path import join
 from distutils.core import setup, Extension, Command
+from distutils.dist import Distribution
 from distutils.command.build import build
+from distutils.command.build_ext import build_ext
 from distutils.command.install import install
-from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, SECRET_HEADER_PATH
+from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, EXE_SRC_DIR, SECRET_HEADER_PATH
 
 PY2 = sys.version_info[0] < 3
 
@@ -43,7 +46,6 @@ except NameError:
 
 def is_mingw():
     """Compiler is mingw."""
-    from distutils.dist import Distribution
     dst = Distribution()
     dst.parse_config_files()
     if 'build' not in dst.command_options:
@@ -113,6 +115,13 @@ def remove_secret_key_header():
         os.remove(SECRET_HEADER_PATH)
 
 
+class ExeDistribution(Distribution):
+    exe_modules = ()
+
+    def has_exe_modules(self):
+        return self.exe_modules and len(self.exe_modules) > 0
+
+
 class CmdBase:
     def pre_process(self):
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
@@ -149,6 +158,48 @@ class BuildEx(CmdBase, build):
         ret = build.run(self)
         self.post_process()
         return ret
+
+
+class BuildExe(CmdBase, build_ext):
+    """
+    execute extra function before/after build.run()
+    """
+    user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
+
+    def finalize_options(self):
+        build_ext.finalize_options(self)
+        self.extensions = self.distribution.exe_modules
+
+    def run(self):
+        self.pre_process()
+        build_ext.run(self)
+        self.post_process()
+
+    def build_extensions(self):
+        """
+        copy from distutils/command/build_ext.py build_ext.build_extensions
+        just override build_extensions for covert the compiler setup from build_ext.run()
+        """
+        ext = self.extensions[0]  # only one exe extension
+
+        objects = self.compiler.compile(
+            list(ext.sources),
+            output_dir=self.build_temp,
+            include_dirs=ext.include_dirs,
+            debug=self.debug,
+            depends=ext.depends)
+
+        self._built_objects = objects[:]
+
+        # link for executable file
+        self.compiler.link_executable(
+            objects,
+            ext.name,
+            libraries=self.get_libraries(ext),
+            library_dirs=ext.library_dirs,
+            runtime_library_dirs=ext.runtime_library_dirs,
+            extra_postargs=ext.extra_link_args,
+            debug=self.debug)
 
 
 class InstallEx(CmdBase, install):
@@ -204,17 +255,31 @@ class TestEx(Command):
 
 version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
-include_dirs = [join(EXT_SRC_DIR, 'openaes', 'inc')]
+include_dirs = [
+    join(EXT_SRC_DIR),
+    join(EXT_SRC_DIR, 'openaes', 'inc'),
+]
 if sys.platform == 'win32' and not is_mingw():
     include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
 
-module = Extension(
+ext_module = Extension(
     'pyconcrete._pyconcrete',
     include_dirs=include_dirs,
     sources=[
         join(EXT_SRC_DIR, 'pyconcrete.c'),
         join(EXT_SRC_DIR, 'pyconcrete_module.c'),
-        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes.c'),
+        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
+        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
+    ],
+)
+
+exe_module = Extension(
+    'pyconcrete.exe',
+    include_dirs=include_dirs,
+    extra_link_args=['-lpython' + sysconfig.get_python_version()],
+    sources=[
+        join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
+        join(EXT_SRC_DIR, 'pyconcrete.c'),
         join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
         join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
     ],
@@ -230,9 +295,11 @@ setup(
     author_email='falldog7@gmail.com',
     url='https://github.com/Falldog/pyconcrete',
     license="Apache License 2.0",
-    ext_modules=[module],
+    ext_modules=[ext_module],
+    exe_modules=[exe_module],
     cmdclass={
         "build": BuildEx,
+        "build_exe": BuildExe,
         "install": InstallEx,
         "test": TestEx,
     },
@@ -262,4 +329,5 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'License :: OSI Approved :: Apache Software License',
     ],
+    distclass=ExeDistribution,
 )
