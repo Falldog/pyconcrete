@@ -184,32 +184,35 @@ PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
     OAES_CTX* key = NULL;
 
     if(!PyArg_ParseTuple(args, "s#", &cipher_buf, &cipher_buf_size))
+    {
+        PyErr_SetString(g_PyConcreteError, "argument parse error");
         return NULL;
-    
+    }
+
     if(cipher_buf_size % AES_BLOCK_SIZE != 0)  // file size not match, maybe not encrypted file
     {
         PyErr_SetString(g_PyConcreteError, "this file content doesn't matched");
         return NULL;
     }
-    
+
     KeyAlloc(&key);
     {
         // decrypt last block first
         memcpy(last_block, cipher_buf+cipher_buf_size-AES_BLOCK_SIZE, AES_BLOCK_SIZE);
-        
+
         oaes_decrypt_block(key, last_block, AES_BLOCK_SIZE);
         //print_buffer(last_block, AES_BLOCK_SIZE);
         padding_size = last_block[AES_BLOCK_SIZE-1];
         plain_buf_size = cipher_buf_size - padding_size;
-        
+
         // printf("fnDecryptBuffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
-        
+
         py_plain_obj = PyBytes_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
         plain_buf = PyBytes_AS_STRING(py_plain_obj);
-        
+
         cur_plain = plain_buf;
         cur_cipher = cipher_buf;
-        
+
         while(proc_size < plain_buf_size)
         {
             if(proc_size + AES_BLOCK_SIZE > plain_buf_size)
@@ -226,7 +229,7 @@ PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
                 proc_size += AES_BLOCK_SIZE;
             }
         }
-        
+
         // fill last fragment block
         if(padding_size < AES_BLOCK_SIZE)
             memcpy(cur_plain, last_block, AES_BLOCK_SIZE-padding_size);

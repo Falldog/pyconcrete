@@ -166,6 +166,10 @@ class BuildExe(CmdBase, build_ext):
     """
     user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
 
+    def initialize_options(self):
+        build_ext.initialize_options(self)
+        self.passphrase = None
+
     def finalize_options(self):
         build_ext.finalize_options(self)
         self.extensions = self.distribution.exe_modules
