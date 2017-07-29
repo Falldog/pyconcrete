@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include "pyconcrete.h"
 
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
+    #define MAGIC_OFFSET 12
+#else
+    #define MAGIC_OFFSET 8
+#endif
+
 
 void execPycContent(PyObject* pyc_content);
 void runFile(const char* filepath);
@@ -13,7 +19,10 @@ int main(int argc, char *argv[])
     Py_Initialize();
     PySys_SetArgv(argc, argv);
 
-    runFile(argv[1]);
+    if(argc >= 2)
+    {
+        runFile(argv[1]);
+    }
 
     Py_Finalize();
     return 0;
@@ -29,11 +38,6 @@ void execPycContent(PyObject* pyc_content)
     PyObject* local = PyDict_New();
     Py_ssize_t content_size = 0;
     char* content = NULL;
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
-    int magic_offset = 12;
-#else
-    int magic_offset = 8;
-#endif
 
     // load compiled source from .pyc content
     py_marshal = PyImport_ImportModule("marshal");
@@ -42,7 +46,7 @@ void execPycContent(PyObject* pyc_content)
     content = PyBytes_AS_STRING(pyc_content);
     content_size = PyBytes_Size(pyc_content);
 
-    pyc_content_wo_magic = PyBytes_FromStringAndSize(content+magic_offset, content_size-magic_offset);
+    pyc_content_wo_magic = PyBytes_FromStringAndSize(content+MAGIC_OFFSET, content_size-MAGIC_OFFSET);
     py_code = PyObject_CallFunctionObjArgs(py_marshal_loads, pyc_content_wo_magic, NULL);
 
     // setup global and exec loaded py_code
