@@ -257,37 +257,49 @@ class TestEx(Command):
         unittest.TextTestRunner(verbosity=2).run(suite)
 
 
-version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
+# ================================================= extension ================================================= #
 
-include_dirs = [
+openaes_include_dirs = [
     join(EXT_SRC_DIR),
     join(EXT_SRC_DIR, 'openaes', 'inc'),
 ]
 if sys.platform == 'win32' and not is_mingw():
-    include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
+    openaes_include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
+
+openaes_sources = [
+    join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
+    join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
+]
+
+if PY2:
+    link_py = 'python{version}'
+else:
+    link_py = 'python{version}m'
+link_py = link_py.format(version=sysconfig.get_python_version())
+
 
 ext_module = Extension(
     'pyconcrete._pyconcrete',
-    include_dirs=include_dirs,
+    include_dirs=openaes_include_dirs,
     sources=[
         join(EXT_SRC_DIR, 'pyconcrete.c'),
         join(EXT_SRC_DIR, 'pyconcrete_module.c'),
-        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
-        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
-    ],
+    ] + openaes_sources,
 )
 
 exe_module = Extension(
-    'pyconcrete.exe',
-    include_dirs=include_dirs,
-    extra_link_args=['-lpython' + sysconfig.get_python_version()],
+    'pyconcrete',
+    include_dirs=openaes_include_dirs,
+    extra_link_args=['-l'+link_py],
     sources=[
         join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
         join(EXT_SRC_DIR, 'pyconcrete.c'),
-        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
-        join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
-    ],
+    ] + openaes_sources,
 )
+
+# ================================================= setup ================================================= #
+
+version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
 setup(
     name='pyconcrete',
