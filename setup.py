@@ -122,6 +122,9 @@ class ExeDistribution(Distribution):
         return self.exe_modules and len(self.exe_modules) > 0
 
 
+# ================================================= command ================================================= #
+
+
 class CmdBase:
     def pre_process(self):
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
@@ -169,9 +172,12 @@ class BuildExe(CmdBase, build_ext):
     def initialize_options(self):
         build_ext.initialize_options(self)
         self.passphrase = None
+        self.build_scripts = None
 
     def finalize_options(self):
         build_ext.finalize_options(self)
+        self.set_undefined_options('build',
+                                   ('build_scripts', 'build_scripts'))
         self.extensions = self.distribution.exe_modules
 
     def run(self):
@@ -203,6 +209,7 @@ class BuildExe(CmdBase, build_ext):
             library_dirs=ext.library_dirs,
             runtime_library_dirs=ext.runtime_library_dirs,
             extra_postargs=ext.extra_link_args,
+            output_dir=self.build_scripts,  # should not use build_lib, it will be copied to python site-packages
             debug=self.debug)
 
 
@@ -211,14 +218,22 @@ class InstallEx(CmdBase, install):
     execute extra function before/after install.run()
     """
     user_options = install.user_options + [('passphrase=', None, 'specify passphrase')]
+    sub_commands = install.sub_commands + [('build_exe', lambda self: True)]
 
     def initialize_options(self):
         install.initialize_options(self)
         self.passphrase = None
+        self.build_scripts = None
+
+    def finalize_options(self):
+        install.finalize_options(self)
+        self.set_undefined_options('build',
+                                   ('build_scripts', 'build_scripts'))
 
     def run(self):
         self.pre_process()
         ret = install.run(self)
+        self.install_exe()
         self.post_process()
         self.create_pth()
         return ret
@@ -239,6 +254,13 @@ class InstallEx(CmdBase, install):
         with open(filename, 'w') as f:
             f.write('import pyconcrete')
         print('creating %s' % filename)
+
+    def install_exe(self):
+        # install `pyconcrete` to /usr/local/bin
+        self.copy_file(os.path.join(self.build_scripts, 'pyconcrete'),
+                       os.path.join(self.install_scripts, 'pyconcrete'))
+
+# ================================================= test command ================================================= #
 
 
 class TestEx(Command):

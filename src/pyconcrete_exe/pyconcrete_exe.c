@@ -17,10 +17,10 @@ int main(int argc, char *argv[])
 {
     Py_SetProgramName(argv[0]);  /* optional but recommended */
     Py_Initialize();
-    PySys_SetArgv(argc, argv);
 
     if(argc >= 2)
     {
+        PySys_SetArgv(argc-1, argv+1);
         runFile(argv[1]);
     }
 
@@ -72,6 +72,12 @@ void runFile(const char* filepath)
     PyObject* py_args = NULL;
 
     src = fopen(filepath, "rb");
+    if(src == NULL)
+    {
+        return;
+    }
+
+    // read & parse file
     {
         fseek(src, 0, SEEK_END);
         size = ftell(src);
