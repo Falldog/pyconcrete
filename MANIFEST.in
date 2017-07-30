@@ -3,6 +3,7 @@ include README.md
 
 include src/__init__.py
 include src/config.py
+recursive-include src/pyconcrete_exe *.h *.c
 recursive-include src/pyconcrete_ext *.h *.c
 
 include test/*.py
