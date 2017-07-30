@@ -32,42 +32,8 @@ except ImportError:
 
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
-
-
-# # testing ... not complete
-# def long_str(x):
-#     return ((chr( x        & 0xff)) +
-#             (chr((x >> 8)  & 0xff)) +
-#             (chr((x >> 16) & 0xff)) +
-#             (chr((x >> 24) & 0xff)))
-#
-#
-# # testing ... not complete
-# def compile_pyc(codestring, doraise=True):
-#     import __builtin__
-#     import marshal
-#     #with open(file, 'U') as f:
-#     #    try:
-#     #        timestamp = long(os.fstat(f.fileno()).st_mtime)
-#     #    except AttributeError:
-#     #        timestamp = long(os.stat(file).st_mtime)
-#     #    codestring = f.read()
-#     timestamp = 0
-#     file = ''
-#     try:
-#         codeobject = __builtin__.compile(codestring, file, 'exec')
-#     except Exception,err:
-#         py_exc = py_compile.PyCompileError(err.__class__, err, file)
-#         if doraise:
-#             raise py_exc
-#         else:
-#             sys.stderr.write(py_exc.msg + '\n')
-#             return
-#     pyc_data = marshal.dumps(py_compile.MAGIC + long_str(timestamp) + str(codeobject))
-#     return pyc_data
-
-
 tmp_pyconcrete_dir = None
+tmp_pyconcrete_exe = None
 
 
 def touch(file_path):
@@ -75,7 +41,7 @@ def touch(file_path):
 
 
 def build_tmp_pyconcrete(passphrase):
-    global tmp_pyconcrete_dir
+    global tmp_pyconcrete_dir, tmp_pyconcrete_exe
     if tmp_pyconcrete_dir:
         return tmp_pyconcrete_dir
 
@@ -109,8 +75,12 @@ def build_tmp_pyconcrete(passphrase):
 
         copy_pyconcrete_ext(tmp_dir)
 
+        tmp_pyconcrete_exe = join(tmp_dir, 'scripts', 'pyconcrete')
         tmp_pyconcrete_dir = tmp_dir
         print('build tmp pyconcrete at "%s"' % tmp_dir)
+
+        if not exists(tmp_pyconcrete_exe):
+            raise ValueError("can't find pyconcrete exe!")
     finally:
         os.chdir(_ori_dir)
 
@@ -180,9 +150,11 @@ class TestPyConcreteBase(unittest.TestCase):
             cls._cls_sys_path = None
 
     def setUp(self):
+        global tmp_pyconcrete_exe
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
         self._sys_path = sys.path[:]
         sys.path.insert(0, self.tmp_dir)
+        self._pyconcrete_exe = tmp_pyconcrete_exe
 
     def tearDown(self):
         if self._sys_path:

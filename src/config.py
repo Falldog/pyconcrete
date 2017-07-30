@@ -13,5 +13,6 @@ TEST_DIR = 'test'
 SRC_DIR = join('src')
 PY_SRC_DIR = join(SRC_DIR, 'pyconcrete')
 EXT_SRC_DIR = join(SRC_DIR, 'pyconcrete_ext')
+EXE_SRC_DIR = join(SRC_DIR, 'pyconcrete_exe')
 SECRET_HEADER_PATH = join(EXT_SRC_DIR, 'secret_key.h')
 

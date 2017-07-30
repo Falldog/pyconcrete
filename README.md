@@ -59,30 +59,31 @@ $ python setup.py install
 
 Usage
 --------------
-* convert your script to `*.pye`
+
+### Full encrypted
+* convert all of your `.py` to `*.pye`
 ```sh
 $ pyconcrete-admin.py compile --source=<your py script>  --pye
 $ pyconcrete-admin.py compile --source=<your py module dir> --pye
 ```
 
 * remove `*.py` `*.pyc` or copy `*.pye` to other folder
+* *main*.py encrypted as *main*.pye, it can't be executed by normal `python`. 
+You must use `pyconcrete` to process the *main*.pye script. 
+`pyconcrete`(*exe*) will be installed in your system path (ex: /usr/local/bin)
 
-* main script
-  * recommendation project layout
-  * python execute main script as *.pye will cause exception, so main script can't be encrypted
 ```sh
-main.py  # your main scirpt, must can't be encrypted
+pyconcrete main.pye
 src/*.pye  # your libs
 ```
 
 
-Usage (pyconcrete as lib)
---------------
+### Partial encrypted (pyconcrete as lib)
 * download pyconcrete source and install by setup.py
 ```sh
 $ python setup.py install \
   --install-lib=<your project path> \
-  --install-scripts=<where you want to execute pyconcrete-admin.py>
+  --install-scripts=<where you want to execute pyconcrete-admin.py and pyconcrete(exe)>
 ```
 
 * import pyconcrete in your main script
@@ -106,6 +107,12 @@ $ ./pyconcrete-admin.py test
 ```sh
 $ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
 ```
+
+
+Building on Windows
+--------------
+https://matthew-brett.github.io/pydagogue/python_msvc.html
+https://github.com/cython/cython/wiki/CythonExtensionsOnWindows
 
 
 Announcement
