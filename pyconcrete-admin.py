@@ -155,7 +155,9 @@ class PyConcreteAdmin(object):
             suite = unittest.TestLoader().discover(test_dir)
 
         verbosity = 2 if args.verbose else 1
-        unittest.TextTestRunner(verbosity=verbosity).run(suite)
+        result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
+        if not result.wasSuccessful():
+            sys.exit(1)
 
     def release(self, args):
         try:
