@@ -31,9 +31,21 @@ except ImportError:
     pass
 
 
+PY2 = sys.version_info[0] < 3
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 tmp_pyconcrete_dir = None
 tmp_pyconcrete_exe = None
+
+
+def to_bytes(s):
+    if PY2:
+        if isinstance(s, unicode):
+            return s.encode('utf8')
+        return s
+    else:
+        if isinstance(s, str):
+            return s.encode('utf8')
+        return s
 
 
 def touch(file_path):
@@ -169,7 +181,7 @@ class TestPyConcreteBase(unittest.TestCase):
         self.assertTrue(py_filename.endswith('.py'))
         py_filepath = join(folder, py_filename)
         with open(py_filepath, 'wb') as f:
-            f.write(py_code)
+            f.write(to_bytes(py_code))
         return py_filepath
 
     def lib_gen_pyc(self, py_code, pyc_filename, folder=None, keep_py=False):
@@ -180,14 +192,14 @@ class TestPyConcreteBase(unittest.TestCase):
         filename = os.path.splitext(pyc_filename)[0]
         py_filepath = join(folder, filename + '.py')
         pyc_filepath = join(folder, filename + '.pyc')
-        
+
         # create .py
         with open(py_filepath, 'wb') as f:
-            f.write(py_code)
+            f.write(to_bytes(py_code))
 
         # create .pyc
         py_compile.compile(py_filepath, cfile=pyc_filepath)
-        
+
         # remove files
         if not keep_py:
             os.remove(py_filepath)
@@ -203,14 +215,14 @@ class TestPyConcreteBase(unittest.TestCase):
         py_filepath = join(folder, filename + '.py')
         pyc_filepath = join(folder, filename + '.pyc')
         pye_filepath = join(folder, filename + '.pye')
-        
+
         # create .py
         with open(py_filepath, 'wb') as f:
-            f.write(py_code)
-        
+            f.write(to_bytes(py_code))
+
         # create .pyc
         py_compile.compile(py_filepath, cfile=pyc_filepath)
-        
+
         # create .pye & remove .py & .pyc
         import pyconcrete
         pyconcrete.encrypt_file(pyc_filepath, pye_filepath)
@@ -220,7 +232,7 @@ class TestPyConcreteBase(unittest.TestCase):
             os.remove(py_filepath)
         if not keep_pyc:
             os.remove(pyc_filepath)
-        
+
         return pye_filepath
 
     def lib_compile_pyc(self, folder, remove_py=False):

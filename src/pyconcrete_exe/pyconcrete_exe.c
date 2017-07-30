@@ -15,16 +15,39 @@ void runFile(const char* filepath);
 
 int main(int argc, char *argv[])
 {
-    Py_SetProgramName(argv[0]);  /* optional but recommended */
+#if PY_MAJOR_VERSION >= 3
+    int i, len;
+    wchar_t** argv_ex = NULL;
+    argv_ex = (wchar_t**) malloc(sizeof(wchar_t*) * argc);
+    for(i=0 ; i<argc ; ++i)
+    {
+        len = mbstowcs(NULL, argv[i], 0);
+        argv_ex[i] = (wchar_t*) malloc(sizeof(wchar_t) * (len+1));
+        mbstowcs(argv_ex[i], argv[i], len);
+        argv_ex[i][len] = 0;
+    }
+#else
+    char** argv_ex = argv;
+#endif
+
+    Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
     Py_Initialize();
 
     if(argc >= 2)
     {
-        PySys_SetArgv(argc-1, argv+1);
+        PySys_SetArgv(argc-1, argv_ex+1);
         runFile(argv[1]);
     }
 
     Py_Finalize();
+
+#if PY_MAJOR_VERSION >= 3
+    for(i=0 ; i<argc ; ++i)
+    {
+        free(argv_ex[i]);
+    }
+    free(argv_ex);
+#endif
     return 0;
 }
 
@@ -38,6 +61,11 @@ void execPycContent(PyObject* pyc_content)
     PyObject* local = PyDict_New();
     Py_ssize_t content_size = 0;
     char* content = NULL;
+#if PY_MAJOR_VERSION >= 3
+    PyObject* main_name = PyUnicode_FromString("__main__");
+#else
+    PyObject* main_name = PyBytes_FromString("__main__");
+#endif
 
     // load compiled source from .pyc content
     py_marshal = PyImport_ImportModule("marshal");
@@ -50,7 +78,7 @@ void execPycContent(PyObject* pyc_content)
     py_code = PyObject_CallFunctionObjArgs(py_marshal_loads, pyc_content_wo_magic, NULL);
 
     // setup global and exec loaded py_code
-    PyDict_SetItemString(global, "__name__", PyBytes_FromString("__main__"));
+    PyDict_SetItemString(global, "__name__", main_name);
     PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
     PyEval_EvalCode((PyCodeObject*)py_code, global, local);
 
