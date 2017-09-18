@@ -59,6 +59,10 @@ def is_mingw():
     return False
 
 
+def is_msvc():
+    return sys.platform == 'win32' and not is_mingw()
+
+
 def hash_key(key):
     if PY2:
         factor = sum([ord(s) for s in key])
@@ -256,9 +260,14 @@ class InstallEx(CmdBase, install):
         print('creating %s' % filename)
 
     def install_exe(self):
-        # install `pyconcrete` to /usr/local/bin
-        self.copy_file(os.path.join(self.build_scripts, 'pyconcrete'),
-                       os.path.join(self.install_scripts, 'pyconcrete'))
+        if sys.platform == 'win32':
+            # install `pyconcrete.exe` to %PYTHON%/Scripts
+            exe_name = 'pyconcrete.exe'
+        else:
+            # install `pyconcrete` to /usr/local/bin
+            exe_name = 'pyconcrete'
+        self.copy_file(os.path.join(self.build_scripts, exe_name),
+                       os.path.join(self.install_scripts, exe_name))
 
 # ================================================= test command ================================================= #
 
@@ -281,28 +290,47 @@ class TestEx(Command):
 
 # ================================================= extension ================================================= #
 
-openaes_include_dirs = [
-    join(EXT_SRC_DIR),
-    join(EXT_SRC_DIR, 'openaes', 'inc'),
-]
-if sys.platform == 'win32' and not is_mingw():
-    openaes_include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
+def get_include_dirs():
+    openaes_include_dirs = [
+        join(EXT_SRC_DIR),
+        join(EXT_SRC_DIR, 'openaes', 'inc'),
+    ]
+    if is_msvc() and PY2:  # Only Python 2.7 & 3.2 Need VisualStudio 2008 (without stdint.h)
+        openaes_include_dirs.append(join(EXT_SRC_DIR, 'include_win'))
+    return openaes_include_dirs
 
+
+def get_libraries(include_python_lib=False):
+    libraries = []
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 5 and is_msvc():
+        # https://stackoverflow.com/questions/32418766/c-unresolved-external-symbol-sprintf-and-sscanf-in-visual-studio-2015
+        libraries = ['legacy_stdio_definitions']
+
+    if is_msvc():
+        link_py = 'python{0}{1}'.format(*sys.version_info[0:2])
+    else:
+        if PY2:
+            link_py_fmt = 'python{version}'
+        else:
+            link_py_fmt = 'python{version}m'
+        link_py = link_py_fmt.format(version=sysconfig.get_python_version())
+
+    if include_python_lib:
+        libraries.append(link_py)
+
+    return libraries
+
+
+include_dirs = get_include_dirs()
 openaes_sources = [
     join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
     join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_lib.c'),
 ]
 
-if PY2:
-    link_py = 'python{version}'
-else:
-    link_py = 'python{version}m'
-link_py = link_py.format(version=sysconfig.get_python_version())
-
-
 ext_module = Extension(
     'pyconcrete._pyconcrete',
-    include_dirs=openaes_include_dirs,
+    include_dirs=include_dirs,
+    libraries=get_libraries(include_python_lib=False),
     sources=[
         join(EXT_SRC_DIR, 'pyconcrete.c'),
         join(EXT_SRC_DIR, 'pyconcrete_module.c'),
@@ -311,8 +339,8 @@ ext_module = Extension(
 
 exe_module = Extension(
     'pyconcrete',
-    include_dirs=openaes_include_dirs,
-    extra_link_args=['-l'+link_py],
+    include_dirs=include_dirs,
+    libraries=get_libraries(include_python_lib=True),
     sources=[
         join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
         join(EXT_SRC_DIR, 'pyconcrete.c'),
