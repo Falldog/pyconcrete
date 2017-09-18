@@ -87,7 +87,8 @@ def build_tmp_pyconcrete(passphrase):
 
         copy_pyconcrete_ext(tmp_dir)
 
-        tmp_pyconcrete_exe = join(tmp_dir, 'scripts', 'pyconcrete')
+        exe_name = 'pyconcrete.exe' if sys.platform == 'win32' else 'pyconcrete'
+        tmp_pyconcrete_exe = join(tmp_dir, 'scripts', exe_name)
         tmp_pyconcrete_dir = tmp_dir
         print('build tmp pyconcrete at "%s"' % tmp_dir)
 

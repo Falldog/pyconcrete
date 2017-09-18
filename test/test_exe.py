@@ -45,6 +45,7 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
 
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')
+        output = output.replace('\r\n', '\n')
         paths = output.split('\n')
 
         self.assertTrue(pye_dir in paths, "pye dir(%s) not in output paths %s" % (pye_dir, paths))
