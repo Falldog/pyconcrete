@@ -111,6 +111,35 @@ $ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
 
 Building on Windows
 --------------
+#### Python 2.7 - Visual Studio 2008
+https://www.microsoft.com/en-us/download/details.aspx?id=44266
+
+* Open VS2008 Command Prompt
+* `set DISTUTILS_USE_SDK=1`
+* `set SET MSSdk=1`
+* create `distutils.cfg` and put inside
+    ```text
+    [build]
+    compiler=msvc
+    ```
+
+#### Python 3.5, 3.6 - Visual Studio 2015
+
+[MSVC 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+
+[Document](https://matthew-brett.github.io/pydagogue/python_msvc.html#python-3-5-3-6)
+
+* make sure setuptools >= 24.0
+    ```sh
+    python -c 'import setuptools; print(setuptools.__version__)'
+    ```
+
+* Open VS2015 Build Tools Command Prompt
+* `set DISTUTILS_USE_SDK=1 `
+* `setenv /x64 /release`  or `setenv /x86 /release`
+
+
+#### Reference
 https://matthew-brett.github.io/pydagogue/python_msvc.html
 https://github.com/cython/cython/wiki/CythonExtensionsOnWindows
 
