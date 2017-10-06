@@ -1,6 +1,7 @@
 pyconcrete
 ==============
-[![Build Status](https://travis-ci.org/Falldog/pyconcrete.svg?branch=master)](https://travis-ci.org/Falldog/pyconcrete)
+[![Travis](https://img.shields.io/travis/Falldog/pyconcrete.svg?label=travis)](https://travis-ci.org/Falldog/pyconcrete)
+[![AppVeyor](https://img.shields.io/appveyor/ci/Falldog/pyconcrete.svg?label=appveyor)](https://ci.appveyor.com/project/Falldog/pyconcrete)
 [![PyPI Version](https://img.shields.io/pypi/v/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
 [![PyPI PyVersion](https://img.shields.io/pypi/pyversions/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
 [![PyPI License](https://img.shields.io/pypi/l/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
