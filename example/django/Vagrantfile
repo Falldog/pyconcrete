@@ -1,0 +1,19 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.hostname = "pyconcrete-example-django-server"
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = "pyconcrete_example_django_server_sandbox"
+  end
+
+  config.vm.synced_folder "../../", "/home/pyconcrete"
+  config.vm.synced_folder "./pye_web/", "/home/pye_web_src"
+
+  config.vm.network :forwarded_port, guest:5151, host:5151, auto_correct: false  # Nginx
+
+  config.vm.provision :shell, path: "bootstrap.sh", args: $args, privileged: false
+
+end
