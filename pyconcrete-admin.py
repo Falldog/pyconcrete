@@ -69,7 +69,7 @@ class PyConcreteAdmin(object):
         parser_test.set_defaults(func=self.test)
 
         # === release === #
-        parser_release = subparsers.add_parser('release', help='release pyconcrete for github')
+        parser_release = subparsers.add_parser('release', help='release pyconcrete for pypi')
         parser_release.set_defaults(func=self.release)
 
         args = parser.parse_args()
