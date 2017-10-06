@@ -61,7 +61,7 @@ install:
 
   # Install Python (from the official .msi of http://python.org) and pip when
   # not already installed.
-  - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
+  - ps: if (-not(Test-Path($env:PYTHON))) { & _appveyor\install.ps1 }
 
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
@@ -82,9 +82,9 @@ install:
   # target Python version and architecture
   #- "%CMD_IN_ENV% pip install -r dev-requirements.txt"
 
-build_script:
-  # Build the compiled extension
-  - "%CMD_IN_ENV% python setup.py build"
+#build_script:
+#  # Build the compiled extension
+#  - "%CMD_IN_ENV% python setup.py build"
 
 test_script:
   # Run the project tests
