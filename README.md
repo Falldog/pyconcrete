@@ -112,12 +112,15 @@ $ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
 
 Example
 --------------
+
 [Django with pyconcrete](example/django)
+
 
 
 Building on Windows
 --------------
-#### Python 2.7 - Visual Studio 2008
+
+### Python 2.7 - Visual Studio 2008
 https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
 * Open VS2008 Command Prompt
@@ -129,7 +132,7 @@ https://www.microsoft.com/en-us/download/details.aspx?id=44266
     compiler=msvc
     ```
 
-#### Python 3.5, 3.6 - Visual Studio 2015
+### Python 3.5, 3.6 - Visual Studio 2015
 
 [MSVC 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
 
@@ -145,7 +148,7 @@ https://www.microsoft.com/en-us/download/details.aspx?id=44266
 * `setenv /x64 /release`  or `setenv /x86 /release`
 
 
-#### Reference
+### Reference
 https://matthew-brett.github.io/pydagogue/python_msvc.html
 https://github.com/cython/cython/wiki/CythonExtensionsOnWindows
 
