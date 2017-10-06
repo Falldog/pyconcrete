@@ -109,6 +109,11 @@ $ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
 ```
 
 
+Example
+--------------
+[Django with pyconcrete](example/django)
+
+
 Building on Windows
 --------------
 #### Python 2.7 - Visual Studio 2008
