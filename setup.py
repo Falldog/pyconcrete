@@ -321,6 +321,14 @@ def get_libraries(include_python_lib=False):
     return libraries
 
 
+def get_exe_link_args():
+    ver = '%d.%d' % (sys.version_info[0], sys.version_info[1])
+    if is_msvc() and (ver == '3.3' or ver == '3.4'):
+        # For Fix Manifest error, https://bugs.python.org/issue4431
+        return ['/MANIFEST']
+    return None
+
+
 include_dirs = get_include_dirs()
 openaes_sources = [
     join(EXT_SRC_DIR, 'openaes', 'src', 'oaes_base64.c'),
@@ -341,6 +349,7 @@ exe_module = Extension(
     'pyconcrete',
     include_dirs=include_dirs,
     libraries=get_libraries(include_python_lib=True),
+    extra_link_args=get_exe_link_args(),
     sources=[
         join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
         join(EXT_SRC_DIR, 'pyconcrete.c'),
