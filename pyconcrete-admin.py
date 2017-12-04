@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import fnmatch
 import os
 import sys
 import unittest
@@ -22,7 +23,10 @@ import py_compile
 import subprocess
 from os.path import abspath, dirname, join, exists, isdir, isfile
 
+
 CUR_DIR = dirname(abspath(__file__))
+
+IGNORE_FILES = ['.', '..', '.git', '.svn', 'pyconcrete']
 
 
 class PyConcreteError(Exception):
@@ -93,11 +97,22 @@ class PyConcreteAdmin(object):
         elif isdir(args.source):
             self._compile_dir(args, args.source)
 
+    def get_ignore_patterns(self, args):
+        patterns = []
+        for pat in args.ignore_file_list:
+            if not pat.startswith('*'):
+                pat = '*' + pat
+            patterns.append(pat)
+        return patterns
+
     def _compile_dir(self, args, folder):
-        for f in os.listdir(folder):
-            if f in ['.', '..', '.git', '.svn', 'pyconcrete'] or f in args.ignore_file_list:
+        # ignore patterns
+        patterns = self.get_ignore_patterns(args)
+        for file in os.listdir(folder):
+            fullpath = join(folder, file)
+            if (file in IGNORE_FILES or self._fnmatch(fullpath, patterns)):
                 continue
-            fullpath = join(folder, f)
+
             if isdir(fullpath):
                 self._compile_dir(args, fullpath)
             elif fullpath.endswith('.py'):
@@ -173,6 +188,18 @@ class PyConcreteAdmin(object):
         subprocess.check_output('rm README.rst', shell=True)
         subprocess.check_output('rm -rf build', shell=True)
         subprocess.check_output('rm -rf dist', shell=True)
+
+    @staticmethod
+    def _fnmatch(name, patterns):
+        """Test whether FILENAME matches PATTERN.
+
+        Patterns are Unix shell style:
+        *       matches everything
+        ?       matches any single character
+        [seq]   matches any character in seq
+        [!seq]  matches any char not in seq
+        """
+        return any(fnmatch.fnmatch(name, pat) for pat in patterns)
 
 
 if __name__ == '__main__':
