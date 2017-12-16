@@ -67,6 +67,13 @@ class TestAdminScript(base.TestPyConcreteBase):
         self.assertTrue(exists(expect_file1))
         self.assertTrue(exists(expect_file2))
 
+
+class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
+    def setUp(self):
+        super(TestAdminIgnoreFilesScript, self).setUp()
+        self.lib_gen_py("", "test1.py")
+        self.lib_gen_py("", "test2.py")
+
     def test_ignore_file_list_match(self):
         target_dir = join(self.tmp_dir, 'data')
         relative_import_dir = join(self.tmp_dir, 'data', 'relative_import')
@@ -117,12 +124,12 @@ class TestAdminScript(base.TestPyConcreteBase):
 
         expect_file1 = join(target_dir, '__init__.pye')
         expect_file2 = join(target_dir, 'main.pye')
-        expect_file3 = join(target_dir, 'test1.pye')
-        expect_file4 = join(target_dir, 'test2.pye')
+        expect_file3 = join(self.tmp_dir, 'test1.pye')
+        expect_file4 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
             ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i main.py test?.py'
-             % (sys.executable, target_dir)),
+             % (sys.executable, self.tmp_dir)),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -133,15 +140,12 @@ class TestAdminScript(base.TestPyConcreteBase):
         self.assertFalse(exists(expect_file4))
 
     def test_ignore_file_list_match_in_seq(self):
-        target_dir = join(self.tmp_dir, 'data')
-        shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
-
-        expect_file1 = join(target_dir, 'test1.pye')
-        expect_file2 = join(target_dir, 'test2.pye')
+        expect_file1 = join(self.tmp_dir, 'test1.pye')
+        expect_file2 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
             ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i main.py test[1,3].py'
-             % (sys.executable, target_dir)),
+             % (sys.executable, self.tmp_dir)),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -150,15 +154,12 @@ class TestAdminScript(base.TestPyConcreteBase):
         self.assertTrue(exists(expect_file2))
 
     def test_ignore_file_list_match_not_in_seq(self):
-        target_dir = join(self.tmp_dir, 'data')
-        shutil.copytree(SAMPLE_PACKAGE_DIR, target_dir)
-
-        expect_file1 = join(target_dir, 'test1.pye')
-        expect_file2 = join(target_dir, 'test2.pye')
+        expect_file1 = join(self.tmp_dir, 'test1.pye')
+        expect_file2 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
             ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i main.py test[!1,3].py'
-             % (sys.executable, target_dir)),
+             % (sys.executable, self.tmp_dir)),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
