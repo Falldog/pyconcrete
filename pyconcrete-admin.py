@@ -100,8 +100,10 @@ class PyConcreteAdmin(object):
     def get_ignore_patterns(self, args):
         patterns = []
         for pat in args.ignore_file_list:
-            if not pat.startswith('*'):
-                pat = '*' + pat
+            if not pat.startswith("*"):
+                if not pat.startswith(os.sep):
+                    pat = os.sep + pat
+                pat = "*" + pat
             patterns.append(pat)
         return patterns
 

@@ -73,6 +73,9 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         super(TestAdminIgnoreFilesScript, self).setUp()
         self.lib_gen_py("", "test1.py")
         self.lib_gen_py("", "test2.py")
+        self.lib_gen_py("", "test.py")
+        self.lib_gen_py("", "a_test.py")
+        self.lib_gen_py("", "b_test.py")
 
     def test_ignore_file_list_match(self):
         target_dir = join(self.tmp_dir, 'data')
@@ -117,6 +120,32 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         self.assertTrue(exists(expect_file1))
         self.assertFalse(exists(expect_file2))
         self.assertFalse(exists(expect_file3))
+
+    def test_ignore_file_list_match_everything_patterns(self):
+        patterns = ["*/test.py", "/test.py", "test.py"]
+        expect_file1 = join(self.tmp_dir, 'test1.pye')
+        expect_file2 = join(self.tmp_dir, 'test2.pye')
+        expect_file3 = join(self.tmp_dir, 'test.pye')
+        expect_file4 = join(self.tmp_dir, 'a_test.pye')
+        expect_file5 = join(self.tmp_dir, 'b_test.pye')
+
+        def test_pattern(pat):
+            subprocess.check_call(
+                ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i %s'
+                 % (sys.executable, self.tmp_dir, pat)),
+                env=base.get_pyconcrete_env_path(),
+                shell=True,
+            )
+
+            self.assertTrue(exists(expect_file1))
+            self.assertTrue(exists(expect_file2))
+            # test.py excluded
+            self.assertFalse(exists(expect_file3))
+            self.assertTrue(exists(expect_file4))
+            self.assertTrue(exists(expect_file5))
+
+        for pat in patterns:
+            test_pattern(pat)
 
     def test_ignore_file_list_match_single(self):
         target_dir = join(self.tmp_dir, 'data')
