@@ -122,7 +122,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         self.assertFalse(exists(expect_file3))
 
     def test_ignore_file_list_match_everything_patterns(self):
-        patterns = ["*/test.py", "/test.py", "test.py"]
+        patterns = ["*%stest.py" % os.sep, "%stest.py" % os.sep, "test.py"]
         expect_file1 = join(self.tmp_dir, 'test1.pye')
         expect_file2 = join(self.tmp_dir, 'test2.pye')
         expect_file3 = join(self.tmp_dir, 'test.pye')
