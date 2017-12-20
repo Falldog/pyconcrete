@@ -3,8 +3,10 @@
 *.pye
 *.so
 .idea/*
+.vscode/*
 build/*
 dist/*
 vagrant/.vagrant/*
+venv/*
 
 src/pyconcrete/_pyconcrete.so
