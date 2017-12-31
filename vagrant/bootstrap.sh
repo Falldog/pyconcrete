@@ -5,7 +5,7 @@ sudo apt-get install -y vim
 sudo apt-get install -y python-pip
 
 sudo apt-get install -y python-software-properties
-sudo add-apt-repository -y ppa:fkrull/deadsnakes
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
 
 sudo apt-get install -y python2.7 python2.7-dev
