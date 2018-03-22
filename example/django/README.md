@@ -25,7 +25,7 @@ How the example working
 * install `pyconcrete` in system
 * source code path in VM: `/home/pye_web_src`
 * encrypted code path in VM: `/home/pye_web`
-* leave these two files as `.py`, and need add `ipmort pyconcrete` at beginning
+* leave these two files as `.py`, and need add `import pyconcrete` at beginning
     * pye_web/pye_web/wsgi.py 
     * pye_web/manage.py
 
