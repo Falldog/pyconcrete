@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "pyconcrete.h"
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
     #define MAGIC_OFFSET 12
 #else
@@ -37,7 +40,7 @@ int main(int argc, char *argv[])
     {
         if(argc == 2 && (strncmp(argv[1], "-v", 3)==0 || strncmp(argv[1], "--version", 10)==0))
         {
-            printf("pyconcrete %s [Python %s]\n", PYCONCRETE_VERSION, PY_VERSION);  // defined in setup.py
+            printf("pyconcrete %s [Python %s]\n", TOSTRING(PYCONCRETE_VERSION), TOSTRING(PY_VERSION));  // defined in setup.py
         }
         else
         {
