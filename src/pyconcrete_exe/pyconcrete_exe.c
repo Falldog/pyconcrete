@@ -76,18 +76,24 @@ void execPycContent(PyObject* pyc_content)
 
     pyc_content_wo_magic = PyBytes_FromStringAndSize(content+MAGIC_OFFSET, content_size-MAGIC_OFFSET);
     py_code = PyObject_CallFunctionObjArgs(py_marshal_loads, pyc_content_wo_magic, NULL);
+    if(py_code == NULL && PyErr_Occurred() != NULL)
+    {
+        PyErr_Print();
+        goto ERROR;
+    }
 
     // setup global and exec loaded py_code
     PyDict_SetItemString(global, "__name__", main_name);
     PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
     PyEval_EvalCode((PyCodeObject*)py_code, global, local);
 
-    Py_DECREF(py_code);
-    Py_DECREF(global);
-    Py_DECREF(local);
-    Py_DECREF(pyc_content_wo_magic);
-    Py_DECREF(py_marshal_loads);
-    Py_DECREF(py_marshal);
+ERROR:
+    Py_XDECREF(py_code);
+    Py_XDECREF(global);
+    Py_XDECREF(local);
+    Py_XDECREF(pyc_content_wo_magic);
+    Py_XDECREF(py_marshal_loads);
+    Py_XDECREF(py_marshal);
 }
 
 void runFile(const char* filepath)
