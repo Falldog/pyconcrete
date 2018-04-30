@@ -35,8 +35,15 @@ int main(int argc, char *argv[])
 
     if(argc >= 2)
     {
-        PySys_SetArgv(argc-1, argv_ex+1);
-        runFile(argv[1]);
+        if(argc == 2 && (strncmp(argv[1], "-v", 3)==0 || strncmp(argv[1], "--version", 10)==0))
+        {
+            printf("pyconcrete %s [Python %s]\n", PYCONCRETE_VERSION, PY_VERSION);  // defined in setup.py
+        }
+        else
+        {
+            PySys_SetArgv(argc-1, argv_ex+1);
+            runFile(argv[1]);
+        }
     }
 
     Py_Finalize();

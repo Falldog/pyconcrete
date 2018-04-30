@@ -27,6 +27,9 @@ from distutils.command.build_ext import build_ext
 from distutils.command.install import install
 from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, EXE_SRC_DIR, SECRET_HEADER_PATH
 
+version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
+version = version_mod.__version__
+
 PY2 = sys.version_info[0] < 3
 
 
@@ -196,10 +199,15 @@ class BuildExe(CmdBase, build_ext):
         """
         ext = self.extensions[0]  # only one exe extension
 
+        macros = ext.define_macros[:]
+        for undef in ext.undef_macros:
+            macros.append((undef,))
+
         objects = self.compiler.compile(
             list(ext.sources),
             output_dir=self.build_temp,
             include_dirs=ext.include_dirs,
+            macros=macros,
             debug=self.debug,
             depends=ext.depends)
 
@@ -349,6 +357,7 @@ exe_module = Extension(
     'pyconcrete',
     include_dirs=include_dirs,
     libraries=get_libraries(include_python_lib=True),
+    define_macros=[('PYCONCRETE_VERSION', '"%s"' % version)],
     extra_link_args=get_exe_link_args(),
     sources=[
         join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
@@ -358,11 +367,10 @@ exe_module = Extension(
 
 # ================================================= setup ================================================= #
 
-version = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 
 setup(
     name='pyconcrete',
-    version=version.__version__,
+    version=version,
     description='Protect your python script, encrypt it as .pye and decrypt when import it',
     long_description=readme,
     keywords='python source encryption obfuscation',
