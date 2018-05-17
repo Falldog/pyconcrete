@@ -139,7 +139,6 @@ void runFile(const char* filepath)
         py_plaint_content = fnDecryptBuffer(NULL, py_args);
 
         Py_DECREF(py_args);
-        Py_DECREF(py_content);
         free(content);
     }
     fclose(src);
