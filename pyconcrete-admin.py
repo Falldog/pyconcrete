@@ -76,8 +76,16 @@ class PyConcreteAdmin(object):
         parser_release = subparsers.add_parser('release', help='release pyconcrete for pypi')
         parser_release.set_defaults(func=self.release)
 
-        args = parser.parse_args()
-        args.func(args)
+        if len(sys.argv) == 1:
+            parser.print_help()
+
+        else:
+            try:
+                args = parser.parse_args()
+                args.func(args)
+            except PyConcreteError as e:
+                print('Error: ' + str(e))
+                sys.exit(1)
 
     def compile(self, args):
         if args.source is None:
