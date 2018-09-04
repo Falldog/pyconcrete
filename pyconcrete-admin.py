@@ -53,8 +53,8 @@ class PyConcreteAdmin(object):
 
         # === compile === #
         parser_compile = subparsers.add_parser('compile', help='compile .pye')
-        parser_compile.add_argument('-s', '--source', dest='source', default=None,
-                                    help='specific the source to process, source could be file/dir')
+        parser_compile.add_argument('-s', '--source', dest='sources', default=None, nargs='+',
+                                    help='specific the sources to process, source could be file/dir')
         parser_compile.add_argument('--pye', dest='pye', action='store_true', help='process on .pye')
         parser_compile.add_argument('--pyc', dest='pyc', action='store_true', help='process on .pyc')
         parser_compile.add_argument('--remove-py', dest='remove_py', action='store_true',
@@ -88,22 +88,23 @@ class PyConcreteAdmin(object):
                 sys.exit(1)
 
     def compile(self, args):
-        if args.source is None:
+        if args.sources is None:
             raise PyConcreteError("arg: compile, need assign --source={file/dir} to process")
         if not args.pye and not args.pyc:
             raise PyConcreteError("arg: compile, need assign the type for compile to `pye` or `pyc`")
 
-        if isfile(args.source):
-            if not args.source.endswith('.py'):
-                raise PyConcreteError("source file should end with .py")
+        for source in args.sources:
+            if isfile(source):
+                if not source.endswith('.py'):
+                    raise PyConcreteError("source file should end with .py")
 
-            if args.pye:
-                self._compile_pye_file(args, args.source)
-            elif args.pyc:
-                self._compile_pyc_file(args, args.source)
+                if args.pye:
+                    self._compile_pye_file(args, source)
+                elif args.pyc:
+                    self._compile_pyc_file(args, source)
 
-        elif isdir(args.source):
-            self._compile_dir(args, args.source)
+            elif isdir(source):
+                self._compile_dir(args, source)
 
     def get_ignore_patterns(self, args):
         patterns = []
