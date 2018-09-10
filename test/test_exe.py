@@ -42,6 +42,7 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
                                pye_filename='main.pye')
 
         pye_dir = os.path.dirname(pye)
+        pye_dir = os.path.realpath(pye_dir)  # tmpdir would be under symlink at MacOS
 
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')
