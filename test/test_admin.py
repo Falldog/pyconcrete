@@ -122,7 +122,11 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         self.assertFalse(exists(expect_file3))
 
     def test_ignore_file_list_match_everything_patterns(self):
-        patterns = ["*%stest.py" % os.sep, "%stest.py" % os.sep, "test.py"]
+        patterns = [
+            "*%s%s" % (os.sep, "test.py"),  # */test.py
+            "%s%s" % (os.sep, "test.py"),   # /test.py
+            "test.py",                      # test.py
+        ]
         expect_file1 = join(self.tmp_dir, 'test1.pye')
         expect_file2 = join(self.tmp_dir, 'test2.pye')
         expect_file3 = join(self.tmp_dir, 'test.pye')
@@ -131,7 +135,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
         def test_pattern(pat):
             subprocess.check_call(
-                ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i %s'
+                ("%s pyconcrete-admin.py compile --source=%s --pye --verbose -i '%s'"
                  % (sys.executable, self.tmp_dir, pat)),
                 env=base.get_pyconcrete_env_path(),
                 shell=True,
@@ -139,8 +143,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
             self.assertTrue(exists(expect_file1))
             self.assertTrue(exists(expect_file2))
-            # test.py excluded
-            self.assertFalse(exists(expect_file3))
+            self.assertFalse(exists(expect_file3))  # test.py excluded
             self.assertTrue(exists(expect_file4))
             self.assertTrue(exists(expect_file5))
 
