@@ -5,7 +5,9 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=7
+    #define MAGIC_OFFSET 16
+#elif PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
     #define MAGIC_OFFSET 12
 #else
     #define MAGIC_OFFSET 8

@@ -117,6 +117,20 @@ Example
 
 
 
+Building on Linux
+--------------
+
+### Python 3.7 - fix build error
+```bash
+x86_64-linux-gnu-gcc: error: unrecognized command line option `-fstack-protector-strong`
+```
+Reference by [Stackoverflow solution](https://stackoverflow.com/questions/27182042/pip-error-unrecognized-command-line-option-fstack-protector-strong)
+* you should install `gcc-4.9` first
+* symlink `/usr/bin/x86_64-linux-gnu-gcc` to `gcc-4.9`
+* build pycocnrete again
+* rollback symlink
+
+
 Building on Windows
 --------------
 
