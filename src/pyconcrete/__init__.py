@@ -62,7 +62,12 @@ class PyeLoader(object):
 
         self._validate_version(data)
 
-        if sys.version_info >= (3, 3):
+        if sys.version_info >= (3, 7):
+            # reference python source code
+            # python/Lib/importlib/_bootstrap_external.py _code_to_timestamp_pyc() & _code_to_hash_pyc()
+            # MAGIC + HASH + TIMESTAMP + FILE_SIZE
+            magic = 16
+        elif sys.version_info >= (3, 3):
             # reference python source code
             # python/Lib/importlib/_bootstrap_external.py _code_to_bytecode()
             # MAGIC + TIMESTAMP + FILE_SIZE
