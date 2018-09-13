@@ -135,17 +135,18 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
         def test_pattern(pat):
             subprocess.check_call(
-                ("%s pyconcrete-admin.py compile --source=%s --pye --verbose -i '%s'"
+                ('%s pyconcrete-admin.py compile --source=%s --pye --verbose -i "%s"'
                  % (sys.executable, self.tmp_dir, pat)),
                 env=base.get_pyconcrete_env_path(),
                 shell=True,
             )
 
-            self.assertTrue(exists(expect_file1))
-            self.assertTrue(exists(expect_file2))
-            self.assertFalse(exists(expect_file3))  # test.py excluded
-            self.assertTrue(exists(expect_file4))
-            self.assertTrue(exists(expect_file5))
+            msg = "pattern(%s) fail" % pat
+            self.assertTrue(exists(expect_file1), msg)
+            self.assertTrue(exists(expect_file2), msg)
+            self.assertFalse(exists(expect_file3), msg)  # test.py excluded
+            self.assertTrue(exists(expect_file4), msg)
+            self.assertTrue(exists(expect_file5), msg)
 
         for pat in patterns:
             test_pattern(pat)

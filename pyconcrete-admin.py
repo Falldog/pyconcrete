@@ -106,7 +106,7 @@ class PyConcreteAdmin(object):
             elif isdir(source):
                 self._compile_dir(args, source)
 
-    def get_ignore_patterns(self, args):
+    def _get_ignore_patterns(self, args):
         patterns = []
         for pat in args.ignore_file_list:
             if not pat.startswith("*"):
@@ -118,7 +118,7 @@ class PyConcreteAdmin(object):
 
     def _compile_dir(self, args, folder):
         # ignore patterns
-        patterns = self.get_ignore_patterns(args)
+        patterns = self._get_ignore_patterns(args)
         for file in os.listdir(folder):
             fullpath = join(folder, file)
             if (file in IGNORE_FILES or self._fnmatch(fullpath, patterns)):
