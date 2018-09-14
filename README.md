@@ -120,7 +120,7 @@ Example
 Building on Linux
 --------------
 
-### Python 3.7 - fix build error
+### Python 3.7 - fix Ubuntu 14.04 build error
 ```bash
 x86_64-linux-gnu-gcc: error: unrecognized command line option `-fstack-protector-strong`
 ```
@@ -146,7 +146,7 @@ https://www.microsoft.com/en-us/download/details.aspx?id=44266
     compiler=msvc
     ```
 
-### Python 3.5, 3.6 - Visual Studio 2015
+### Python 3.5, 3.6, 3.7 - Visual Studio 2015
 
 [MSVC 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
 
