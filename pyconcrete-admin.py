@@ -190,9 +190,10 @@ class PyConcreteAdmin(object):
             import pypandoc
             readme = pypandoc.convert('README.md', 'rst')
             with open('README.rst', 'wb') as f:
-                f.write(readme)
+                f.write(readme.encode('utf8'))
         except ImportError:
             print('you need to install `pypandoc` before release pyconcrete')
+            raise
 
         subprocess.call('python setup.py sdist', shell=True)  # ignore can't found README error
         subprocess.check_output('twine upload dist/*', shell=True)
