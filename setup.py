@@ -19,6 +19,7 @@ import sys
 import imp
 import hashlib
 import sysconfig
+import subprocess
 from os.path import join
 from distutils.core import setup, Extension, Command
 from distutils.dist import Distribution
@@ -64,6 +65,10 @@ def is_mingw():
 
 def is_msvc():
     return sys.platform == 'win32' and not is_mingw()
+
+
+def is_mac():
+    return sys.platform == 'darwin'
 
 
 def hash_key(key):
@@ -334,6 +339,13 @@ def get_exe_link_args():
     if is_msvc() and (ver == '3.3' or ver == '3.4'):
         # For Fix Manifest error, https://bugs.python.org/issue4431
         return ['/MANIFEST']
+
+    # add -Lxxxx for link correct lib -lpython3.x
+    if is_mac():
+        ldflags = subprocess.check_output('python{ver}-config --ldflags'.format(ver=ver), shell=True)
+        ldflags = ldflags.decode('utf8')
+        return [ld for ld in ldflags.split() if ld.startswith('-L')]
+
     return None
 
 
