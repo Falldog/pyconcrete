@@ -70,7 +70,6 @@ void execPycContent(PyObject* pyc_content)
     PyObject* pyc_content_wo_magic = NULL;
     PyObject* py_code = NULL;
     PyObject* global = PyDict_New();
-    PyObject* local = PyDict_New();
     Py_ssize_t content_size = 0;
     char* content = NULL;
 #if PY_MAJOR_VERSION >= 3
@@ -97,12 +96,11 @@ void execPycContent(PyObject* pyc_content)
     // setup global and exec loaded py_code
     PyDict_SetItemString(global, "__name__", main_name);
     PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
-    PyEval_EvalCode((PyCodeObject*)py_code, global, local);
+    PyEval_EvalCode((PyCodeObject*)py_code, global, global);
 
 ERROR:
     Py_XDECREF(py_code);
     Py_XDECREF(global);
-    Py_XDECREF(local);
     Py_XDECREF(pyc_content_wo_magic);
     Py_XDECREF(py_marshal_loads);
     Py_XDECREF(py_marshal);
