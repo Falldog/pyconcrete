@@ -33,20 +33,12 @@ Installation
   * same passphrase will generate the same secret key
   * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
 
-### pip
-```sh
-$ pip install pyconcrete
-```
-  > If you only execute `pip install` will not display any prompt(via stdout) from pyconcrete. 
-  > Installation will be `blocked` and `waiting for user input passphrase twice`.
-  > You must input passphrase for installation continuously.
-
-```sh
-$ pip install pyconcrete --egg --install-option="--passphrase=<your passphrase>"
-```
-  > pyconcrete installed as egg, if you want to uninstall pyconcrete will need to manually delete `pyconcrete.pth`.
-  
 ### source
+* get python-dev lib ( example for ubuntu18.04 & python 3.7 )
+```sh
+$ apt install python3.7-dev
+```
+
 * get the pyconcrete source code
 ```sh
 $ git clone <pyconcrete repo> <pyconcre dir>
@@ -54,6 +46,7 @@ $ git clone <pyconcrete repo> <pyconcre dir>
 
 * install pyconcrete
 ```sh
+$ export PYCONCRETE_PASSPHRASE=your_passphrese
 $ python setup.py install
 ```
 

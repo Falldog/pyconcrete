@@ -142,13 +142,7 @@ class CmdBase:
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
         if self.manual_create_secrete_key_file:
             if not self.passphrase:
-                self.passphrase = input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
-                if len(self.passphrase) == 0:
-                    self.passphrase = DEFAULT_KEY
-                else:
-                    passphrase2 = input("please input again to confirm\n")
-                    if self.passphrase != passphrase2:
-                        raise Exception("Passphrase is different")
+                self.passphrase=os.getenv('PYCONCRETE_PASSPHRASE', DEFAULT_KEY)
 
             k, f = hash_key(self.passphrase.encode('utf8'))
             create_secret_key_header(k, f)
