@@ -34,6 +34,11 @@ Installation
   * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
 
 ### source
+* get python-dev lib ( example for ubuntu18.04 & python 3.7 )
+```sh
+$ apt install python3.7-dev
+```
+
 * get the pyconcrete source code
 ```sh
 $ git clone <pyconcrete repo> <pyconcre dir>
