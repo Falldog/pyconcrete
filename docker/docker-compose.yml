@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  pye27:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        PY_VER: 2.7
+    image: falldog/pyconcrete-tester:2.7
+
+  pye36:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        PY_VER: 3.6
+    image: falldog/pyconcrete-tester:3.6
+
