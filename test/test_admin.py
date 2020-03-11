@@ -21,7 +21,7 @@ import unittest
 import subprocess
 from os.path import dirname, abspath, join, exists
 
-import base
+from test import base
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')

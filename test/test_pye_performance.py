@@ -22,7 +22,7 @@ from zipfile import ZipFile
 from multiprocessing import Process, Queue
 from os.path import dirname, abspath, join
 
-import base
+from test import base
 
 CUR_DIR = abspath(dirname(__file__))
 ROOT_DIR = abspath(join(CUR_DIR, '..'))
@@ -60,27 +60,27 @@ def main_requests(import_concrete, q):
     t = time.time() - t
     q.put(requests.__file__)
     q.put(t)
-    
+
 
 @unittest.skipIf(not os.path.exists(REQUEST_ZIP), "requests zip file doesn't exists")
 class TestPerformance(base.TestPyConcreteBase):
-    
+
     def setUp(self):
         super(TestPerformance, self).setUp()
 
         zip = ZipFile(REQUEST_ZIP)
         zip.extractall(self.tmp_dir)
         zip.close()
-        
+
         self.req_dir = join(self.tmp_dir, 'requests')
         base.touch(join(self.req_dir, '__init__.py'))
 
     def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
-        
+
         q = Queue()
         p = Process(target=main_requests, args=(import_concrete, q))
-        
+
         p.start()
         path = q.get(timeout=5)
         t = q.get(timeout=2)

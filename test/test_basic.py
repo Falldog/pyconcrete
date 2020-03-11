@@ -15,8 +15,9 @@
 # limitations under the License.
 from __future__ import unicode_literals
 
-import base
 import unittest
+
+from test import base
 
 
 class TestBasic(base.TestPyConcreteBase):

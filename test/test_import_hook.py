@@ -15,9 +15,10 @@
 # limitations under the License.
 
 import sys
-import base
 import shutil
 from os.path import join
+
+from test import base
 
 
 class TestImportHook(base.TestPyConcreteBase):

@@ -16,8 +16,9 @@
 from __future__ import unicode_literals
 
 import os
-import base
 import subprocess
+
+from test import base
 
 
 class TestPyconcreteExe(base.TestPyConcreteBase):
