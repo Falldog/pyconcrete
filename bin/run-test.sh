@@ -59,6 +59,5 @@ elif [[ "$1" = "test" ]]; then
     run_test "${PY_VER}"
 
 else
-    run_test 2.7
     run_test 3.6
 fi

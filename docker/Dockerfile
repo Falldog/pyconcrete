@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer=falldog
 
-ARG PY_VER=2.7
+ARG PY_VER=3.6
 
 RUN set -ex \
     && apt-get update \
