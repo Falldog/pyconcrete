@@ -27,6 +27,7 @@ from os.path import abspath, dirname, join, exists, isdir, isfile
 CUR_DIR = dirname(abspath(__file__))
 
 IGNORE_FILES = ['.', '..', '.git', '.svn', 'pyconcrete']
+IS_TEST_VERBOSE = os.environ.get('TEST_VERBOSE', None)
 
 
 class PyConcreteError(Exception):
@@ -38,6 +39,7 @@ class PyConcreteAdmin(object):
         self.parser = None
         self.args = None
         self.parse_arg()
+        self.verbose = False
 
     def parse_arg(self):
         """
@@ -82,6 +84,7 @@ class PyConcreteAdmin(object):
         else:
             try:
                 args = parser.parse_args()
+                self.verbose = args.verbose or IS_TEST_VERBOSE
                 args.func(args)
             except PyConcreteError as e:
                 print('Error: ' + str(e))
@@ -137,10 +140,10 @@ class PyConcreteAdmin(object):
         pyc_exists = exists(pyc_file)
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
             py_compile.compile(py_file, cfile=pyc_file)
-            if args.verbose:
+            if self.verbose:
                 print('* create %s' % pyc_file)
         else:
-            if args.verbose:
+            if self.verbose:
                 print('* skip %s' % pyc_file)
 
         if args.remove_py:
@@ -159,10 +162,10 @@ class PyConcreteAdmin(object):
             py_compile.compile(py_file, cfile=pyc_file)
         if not exists(pye_file) or os.stat(py_file).st_mtime != os.stat(pye_file).st_mtime:
             pyconcrete.encrypt_file(pyc_file, pye_file)
-            if args.verbose:
+            if self.verbose:
                 print('* create %s' % pye_file)
         else:
-            if args.verbose:
+            if self.verbose:
                 print('* skip %s' % pye_file)
 
         # .pyc doesn't exists at beginning, remove it after .pye created
@@ -180,7 +183,11 @@ class PyConcreteAdmin(object):
         else:
             suite = unittest.TestLoader().discover(test_dir)
 
-        verbosity = 2 if args.verbose else 1
+        if self.verbose:
+            verbosity = 2
+            os.environ['TEST_VERBOSE'] = '1'  # for by-pass to subprocess call on pyconcrete-admin.py
+        else:
+            verbosity = 1
         result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
         if not result.wasSuccessful():
             sys.exit(1)

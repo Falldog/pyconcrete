@@ -3,6 +3,7 @@
 set -ex
 
 PY_VER=${PY_VER:="3.6"}
+TEST_VERBOSE=${TEST_VERBOSE:=""}
 
 
 declare -xr REPO_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
@@ -27,6 +28,7 @@ run_test() {
         --rm \
         -t \
         -e TEST_PYE_PERFORMANCE_COUNT=1 \
+        -e TEST_VERBOSE=${TEST_VERBOSE} \
         --mount="type=bind,source=${REPO_ROOT}/,target=/code" \
         --mount="type=bind,source=${PIP_CACHE}/,target=/root/.cache/pip/" \
         falldog/pyconcrete-tester:${ver} \
