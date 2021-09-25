@@ -31,7 +31,7 @@ from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__
 
-PY2 = sys.version_info[0] < 3
+PY2 = sys.version_info.major < 3
 
 
 # .rst should created by pyconcrete-admin
@@ -315,12 +315,12 @@ def get_include_dirs():
 
 def get_libraries(include_python_lib=False):
     libraries = []
-    if sys.version_info[0] == 3 and sys.version_info[1] >= 5 and is_msvc():
+    if sys.version_info.major == 3 and sys.version_info.minor >= 5 and is_msvc():
         # https://stackoverflow.com/questions/32418766/c-unresolved-external-symbol-sprintf-and-sscanf-in-visual-studio-2015
         libraries = ['legacy_stdio_definitions']
 
     if is_msvc():
-        link_py = 'python{0}{1}'.format(*sys.version_info[0:2])
+        link_py = 'python{0}{1}'.format(sys.version_info.major, sys.version_info.minor)
     else:
         if PY2:
             link_py_fmt = 'python{version}'
@@ -335,7 +335,7 @@ def get_libraries(include_python_lib=False):
 
 
 def get_exe_link_args():
-    ver = '%d.%d' % (sys.version_info[0], sys.version_info[1])
+    ver = '%d.%d' % (sys.version_info.major, sys.version_info.minor)
     if is_msvc() and (ver == '3.3' or ver == '3.4'):
         # For Fix Manifest error, https://bugs.python.org/issue4431
         return ['/MANIFEST']
