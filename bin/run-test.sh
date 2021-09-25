@@ -12,10 +12,12 @@ mkdir -p ${PIP_CACHE}
 cd "${REPO_ROOT}"
 
 build() {
+    ver=$1
+    ver_wo_dot=`echo "${ver}" | sed -e "s/\.//g"`  # "3.6" -> "36"
+    service="pye${ver_wo_dot}"
+
     pushd docker
-
-    docker-compose build
-
+    docker-compose build ${service}
     popd
 }
 
@@ -50,14 +52,14 @@ attach_for_test() {
 }
 
 
-build
 
-if [[ "$1" = "attach" ]]; then
-    attach_for_test "${PY_VER}"
-
-elif [[ "$1" = "test" ]]; then
-    run_test "${PY_VER}"
-
-else
-    run_test 3.6
-fi
+case $1 in
+    attach)
+      build ${PY_VER}
+      attach_for_test "${PY_VER}"
+      ;;
+    *)
+      build ${PY_VER}
+      run_test "${PY_VER}"
+      ;;
+esac
