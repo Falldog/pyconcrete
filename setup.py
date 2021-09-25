@@ -322,11 +322,15 @@ def get_libraries(include_python_lib=False):
     if is_msvc():
         link_py = 'python{0}{1}'.format(sys.version_info.major, sys.version_info.minor)
     else:
-        if PY2:
-            link_py_fmt = 'python{version}'
-        else:
-            link_py_fmt = 'python{version}m'
-        link_py = link_py_fmt.format(version=sysconfig.get_python_version())
+        # PEP 3149 -- ABI version tagged .so files
+        # link python lib may be: `-l python3.3` or `-l python3.6m`
+        # reference link: https://www.python.org/dev/peps/pep-3149/
+        link_py_fmt = 'python{version}{abiflags}'
+        abiflags = getattr(sys, 'abiflags', '')
+        link_py = link_py_fmt.format(
+            version=sysconfig.get_python_version(),
+            abiflags=abiflags,
+        )
 
     if include_python_lib:
         libraries.append(link_py)
