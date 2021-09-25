@@ -17,6 +17,7 @@
 import os
 import sys
 import time
+import logging
 import unittest
 from zipfile import ZipFile
 from multiprocessing import Process, Queue
@@ -31,6 +32,8 @@ REQUEST_ZIP = join(DATA_DIR, 'requests-2.12.4.zip')
 REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
 PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
 RUN_COUNT = int(os.environ.get('TEST_PYE_PERFORMANCE_COUNT', '5'))
+
+logger = logging.getLogger('pyconcrete')
 
 
 def main_requests(import_concrete, q):
@@ -94,33 +97,33 @@ class TestPerformance(base.TestPyConcreteBase):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print('test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info('test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_pyc(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        print('test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info('test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_pyc_with_import_hooker(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print('test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info('test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_py(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        print('test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info('test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
     def test_requests_py_with_import_hooker(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        print('test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info('test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
 
 
 if __name__ == '__main__':

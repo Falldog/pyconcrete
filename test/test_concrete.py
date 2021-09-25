@@ -15,15 +15,18 @@
 # limitations under the License.
 from __future__ import unicode_literals
 
+import logging
 import unittest
 
 from test import base
+
+logger = logging.getLogger('pyconcrete')
 
 
 class TestConcrete(base.TestPyConcreteBase):
     def test_decrypt_exception(self):
         import pyconcrete
-        print(pyconcrete.__file__)
+        logger.info(pyconcrete.__file__)
         data = 'abc'
         self.assertLess(len(data), 16)
 

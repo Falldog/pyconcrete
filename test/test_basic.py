@@ -15,16 +15,18 @@
 # limitations under the License.
 from __future__ import unicode_literals
 
+import logging
 import unittest
-
 from test import base
+
+logger = logging.getLogger('pyconcrete')
 
 
 class TestBasic(base.TestPyConcreteBase):
     def test_import(self):
         import pyconcrete
 
-        print('pyconcrete info="%s", path=%s' % (pyconcrete.info(), pyconcrete.__file__))
+        logger.info('pyconcrete info="%s", path=%s' % (pyconcrete.info(), pyconcrete.__file__))
 
         # print "lib dir=[%s], pyconcrete __init__=[%s]" % (self.lib_dir, pyconcrete.__file__)
         self.assertTrue(pyconcrete.__file__.startswith(self.lib_dir))  # check import correct module

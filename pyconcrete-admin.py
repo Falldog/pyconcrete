@@ -21,6 +21,7 @@ import unittest
 import argparse
 import py_compile
 import subprocess
+import logging
 from os.path import abspath, dirname, join, exists, isdir, isfile
 
 
@@ -28,6 +29,7 @@ CUR_DIR = dirname(abspath(__file__))
 
 IGNORE_FILES = ['.', '..', '.git', '.svn', 'pyconcrete']
 IS_TEST_VERBOSE = os.environ.get('TEST_VERBOSE', None)
+logger = logging.getLogger('pyconcrete')
 
 
 class PyConcreteError(Exception):
@@ -184,8 +186,18 @@ class PyConcreteAdmin(object):
             suite = unittest.TestLoader().discover(test_dir)
 
         if self.verbose:
+            # unittest setup
             verbosity = 2
-            os.environ['TEST_VERBOSE'] = '1'  # for by-pass to subprocess call on pyconcrete-admin.py
+
+            # stdout logger setup
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(logging.DEBUG)
+            handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+            logger.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
+
+            # for by-pass to subprocess call on pyconcrete-admin.py
+            os.environ['TEST_VERBOSE'] = '1'
         else:
             verbosity = 1
         result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
