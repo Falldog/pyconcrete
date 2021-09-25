@@ -31,4 +31,8 @@ RUN set -ex \
     && mkdir -p /code \
     && ln -sf /usr/bin/python${PY_VER} /usr/bin/python
 
+COPY test/requirements.txt /code
+RUN set -ex \
+    && pip install --no-cache-dir -r /code/requirements.txt
+
 WORKDIR /code

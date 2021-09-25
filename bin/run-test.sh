@@ -17,9 +17,7 @@ build() {
     ver_wo_dot=`echo "${ver}" | sed -e "s/\.//g"`  # "3.6" -> "36"
     service="pye${ver_wo_dot}"
 
-    pushd docker
-    docker-compose build ${service}
-    popd
+    docker-compose -f docker-compose-test.yml build ${service}
 }
 
 run_test() {
@@ -35,7 +33,6 @@ run_test() {
         \
         /bin/bash -c \
         " \
-            pip install -r /code/test/requirements.txt && \
             pip list && \
             python /code/pyconcrete-admin.py test \
         "

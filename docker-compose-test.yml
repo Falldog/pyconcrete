@@ -4,7 +4,7 @@ services:
   pye36:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker/Dockerfile
       args:
         PY_VER: 3.6
     image: falldog/pyconcrete-tester:3.6
