@@ -3,25 +3,21 @@ sudo: required
 
 matrix:
   include:
-    - python: "3.3"
-      env: PY_VER=3.3
-      dist: trusty
-
-    - python: "3.4"
-      env: PY_VER=3.4
-      dist: trusty
-
     - python: "3.5"
       env: PY_VER=3.5
-      dist: trusty
+      dist: xenial
 
     - python: "3.6"
       env: PY_VER=3.6
-      dist: trusty
+      dist: xenial
 
     - python: "3.7"
       env: PY_VER=3.7
-      dist: xenial    # default gcc > 4.8
+      dist: xenial
+
+    - python: "3.8"
+      env: PY_VER=3.8
+      dist: xenial
 
 before_install:
   - sudo apt-get install -y python-software-properties
