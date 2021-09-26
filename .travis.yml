@@ -3,10 +3,6 @@ sudo: required
 
 matrix:
   include:
-    - python: "2.7"
-      env: PY_VER=2.7
-      dist: trusty
-
     - python: "3.3"
       env: PY_VER=3.3
       dist: trusty
