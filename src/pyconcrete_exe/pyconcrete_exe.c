@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
     Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
     Py_Initialize();
+	PyGILState_Ensure();
 
     if(argc >= 2)
     {
@@ -50,6 +51,18 @@ int main(int argc, char *argv[])
             runFile(argv[1]);
         }
     }
+
+	PyGILState_Ensure();
+
+    // reference mod_wsgi & uwsgi finalize steps
+    // https://github.com/GrahamDumpleton/mod_wsgi/blob/develop/src/server/wsgi_interp.c
+    // https://github.com/unbit/uwsgi/blob/master/plugins/python/python_plugin.c
+    PyObject *module = PyImport_ImportModule("atexit");
+    Py_XDECREF(module);
+
+	if (!PyImport_AddModule("dummy_threading")) {
+        PyErr_Clear();
+	}
 
     Py_Finalize();
 
