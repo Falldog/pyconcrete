@@ -23,8 +23,9 @@ VALIDATOR_PY = 'validator.py'
 
 
 class ImportedTestCaseError(Exception):
-    def __init__(self, output_lines, validate_errors, *args, **kwargs):
+    def __init__(self, output_lines, return_code, validate_errors, *args, **kwargs):
         self.output_lines = output_lines
+        self.return_code = return_code
         self.validate_errors = validate_errors
 
 
@@ -65,8 +66,8 @@ class ImportedTestCase(object):
 
     def run(self):
         main_pye_path = self.build_pye()
-        output_lines = self.execute(main_pye_path)
-        return self.validate(output_lines, main_pye_path)
+        ret_data = self.execute(main_pye_path)
+        return self.validate(ret_data, main_pye_path)
 
     def build_pye(self):
         dest_dir = join(self.tmp_dir, self.module_name)
@@ -76,25 +77,32 @@ class ImportedTestCase(object):
         return join(dest_dir, 'main.pye')
 
     def execute(self, main_pye_path):
-        output = subprocess.check_output(
+        p = subprocess.Popen(
             [self.pyconcrete_exe, main_pye_path],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
+        output, error = p.communicate()
         output = output.decode('utf8')
         output = output.replace('\r\n', '\n')
-        return output.strip().split('\n')
+        return {
+            'output_lines': output.strip().split('\n'),
+            'return_code': p.returncode,
+        }
 
-    def validate(self, output_lines, main_pye_path):
+    def validate(self, ret_data, main_pye_path):
         validator_py = join(self.module_path, VALIDATOR_PY)
         validator = imp.load_source('', validator_py)
         try:
             return validator.validate(
-                output_lines,
+                ret_data['output_lines'],
                 main_pye_path=main_pye_path,
+                return_code=ret_data['return_code'],
             )
         except Exception as e:
             import traceback
-            raise ImportedTestCaseError(output_lines, str(e))
+            raise ImportedTestCaseError(ret_data['output_lines'], ret_data['return_code'], str(e))
 
 
 def lib_compile_pyc(folder, remove_py=False):

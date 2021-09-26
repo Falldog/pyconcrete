@@ -40,6 +40,7 @@ class TestExe(base.TestPyConcreteBase):
                 print('Validate Exception')
                 print('{{')
                 print('  {tc.module_name} tmp_dir=`{tc.tmp_dir}`'.format(tc=tc))
+                print('  return code = {return_code}'.format(return_code=e.return_code))
                 print('  ======= output lines ======')
                 print('  ' + '\n  '.join(e.output_lines))
                 print('  ======= validate_errors ======')

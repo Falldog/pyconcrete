@@ -54,6 +54,10 @@ int main(int argc, char *argv[])
 
 	PyGILState_Ensure();
 
+    if (PyErr_Occurred()) {
+        PyErr_Print();
+    }
+
     // reference mod_wsgi & uwsgi finalize steps
     // https://github.com/GrahamDumpleton/mod_wsgi/blob/develop/src/server/wsgi_interp.c
     // https://github.com/unbit/uwsgi/blob/master/plugins/python/python_plugin.c
