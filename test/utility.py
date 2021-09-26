@@ -14,7 +14,8 @@ from os.path import join, isdir, dirname, basename, abspath
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 
 
-CODE_DIR_NAME = 'code'
+SOURCE_DIR_NAME = 'src'
+MODULE_PREFIX = 'test_'
 
 MAIN_PY = 'main.py'
 MAIN_PYE = 'main.pye'
@@ -41,22 +42,22 @@ class ImportedTestCase(object):
         return basename(self.module_path)
 
     @property
-    def module_code_path(self):
-        return join(self.module_path, CODE_DIR_NAME)
+    def module_src_path(self):
+        return join(self.module_path, SOURCE_DIR_NAME)
 
     def is_available_test_case(self):
         if not isdir(self.module_path):
             return False
-        if self.module_name.startswith('_'):  # ignore _xxxx folder
+        if not self.module_name.startswith(MODULE_PREFIX):
             return False
 
         module_files = os.listdir(self.module_path)
         if VALIDATOR_PY not in module_files:
             return False
-        if CODE_DIR_NAME not in module_files:
+        if SOURCE_DIR_NAME not in module_files:
             return False
 
-        module_code_files = os.listdir(self.module_code_path)
+        module_code_files = os.listdir(self.module_src_path)
         if MAIN_PY not in module_code_files:
             return False
 
@@ -69,7 +70,7 @@ class ImportedTestCase(object):
 
     def build_pye(self):
         dest_dir = join(self.tmp_dir, self.module_name)
-        shutil.copytree(self.module_code_path, dest_dir)
+        shutil.copytree(self.module_src_path, dest_dir)
 
         lib_compile_pye(dest_dir, remove_py=True, remove_pyc=True)
         return join(dest_dir, 'main.pye')

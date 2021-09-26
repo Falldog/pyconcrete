@@ -10,12 +10,7 @@ from test import base
 from test.utility import ImportedTestCase, ImportedTestCaseError
 
 
-MAIN_PY = 'main.py'
-CODE_DIR = 'code'
-VALIDATOR_PY = 'validator.py'
-
-
-class TestThreading(base.TestPyConcreteBase):
+class TestExe(base.TestPyConcreteBase):
     def discover(self):
         test_cases = []
         test_case_dir = join(base.ROOT_DIR, 'test', 'exe_testcases')
@@ -30,6 +25,7 @@ class TestThreading(base.TestPyConcreteBase):
 
     def test_auto_loading(self):
         test_cases = self.discover()
+        error = False
         for tc in test_cases:
             print('test_exe_testcases - {tc.module_name} ... '.format(tc=tc),
                   end='')
@@ -41,19 +37,22 @@ class TestThreading(base.TestPyConcreteBase):
                 else:
                     print('Fail')
             except ImportedTestCaseError as e:
+                print('Validate Exception')
+                print('{{')
+                print('  {tc.module_name} tmp_dir=`{tc.tmp_dir}`'.format(tc=tc))
+                print('  ======= output lines ======')
+                print('  ' + '\n  '.join(e.output_lines))
+                print('  ======= validate_errors ======')
+                print('  ' + e.validate_errors)
+                print('}}')
+                error = True
+            except Exception as e:
                 print('Exception')
-                print('>>>>>>')
-                print('{tc.module_name} tmp_dir=`{tc.tmp_dir}`'.format(tc=tc))
-                print('======= output lines ======')
-                print('\n'.join(e.output_lines))
-                print('======= validate_errors ======')
-                print(e.validate_errors)
-                print('<<<<<<')
-            except:
-                print('Exception')
-                print('>>>>>>')
-                print('{tc.module_name} tmp_dir=`{tc.tmp_dir}`'.format(tc=tc))
-                print('<<<<<<')
+                print(str(e))
+                print('{{')
+                print('  {tc.module_name} tmp_dir=`{tc.tmp_dir}`'.format(tc=tc))
+                print('}}')
                 raise
             tc.close()
 
+        assert error is False
