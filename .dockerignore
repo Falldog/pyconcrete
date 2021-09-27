@@ -1,0 +1,10 @@
+.pip-cache/*
+build/*
+dist/*
+
+.python-version
+
+**/*.pyc
+**/*.pye
+**/*.so
+
