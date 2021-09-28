@@ -4,28 +4,27 @@ pyconcrete example for Django
 
 Environment setup
 --------------
-* install vagrant && VirtualBox
+* install docker & execute below command to build and run
     ```bash
-    $ cd pyconcrete/example/django && vagrant up
+    $ ./bin/run-example-djnaog.sh
     ```
 * access `http://127.0.0.1:5151` by browser
 
 
 Environment 
 --------------
-* Ubuntu 14.04
-* Python 2.7
-* Nginx + uwsgi
-* Django 1.11
+* Docker, Ubuntu 18.04
+* Python 3.6
+* Django 2
 
 
 How the example working
 --------------
-* Django in VM listen port 5151
+* django in docker listen port `5151`
 * install `pyconcrete` in system
-* source code path in VM: `/home/pye_web_src`
-* encrypted code path in VM: `/home/pye_web`
+* django source code be encrypted in docker image, `/code/`
 * leave these two files as `.py`, and need add `import pyconcrete` at beginning
-    * pye_web/pye_web/wsgi.py 
-    * pye_web/manage.py
+    * /code/pye_web/wsgi.py 
+    * /code/manage.py
+* (Note) docker image will cache source code by image layer, the example only for testing. In production, you need to make sure docker image will not cache the original .py source code.
 
