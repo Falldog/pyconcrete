@@ -98,17 +98,21 @@ src/*.pye     # your libs
 
 Test
 --------------
-* test all case
+* test in local
 ```sh
 $ ./pyconcrete-admin.py test
 ```
 
-
-* test all case, setup `TEST_PYE_PERFORMANCE_COUNT` env to reduce testing time
+* test in docker environment
 ```sh
-$ TEST_PYE_PERFORMANCE_COUNT=1 ./pyconcrete-admin.py test
+$ ./bin/run-test.sh
 ```
 
+* add test case for pyconcrete.exe
+  * reference exists test case
+  * add folder in `test/exe_testcases/`
+  * add testing code at `test/exe_testcases/src/main.py`
+  * add validator at `test/exe_testcases/validator.py`
 
 Example
 --------------
