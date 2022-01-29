@@ -14,8 +14,7 @@ cd "${REPO_ROOT}"
 
 build() {
     ver=$1
-    ver_wo_dot=`echo "${ver}" | sed -e "s/\.//g"`  # "3.6" -> "36"
-    service="pye${ver_wo_dot}"
+    service="pye${ver}"
 
     docker-compose -f docker-compose-test.yml build ${service}
 }

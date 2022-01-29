@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer=falldog
 
+ARG DEBIAN_FRONTEND=noninteractive
 ARG PY_VER=3.6
 
 RUN set -ex \
@@ -21,7 +22,9 @@ RUN set -ex \
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        python${PY_VER} python${PY_VER}-dev \
+        python${PY_VER} \
+        python${PY_VER}-dev \
+        python${PY_VER}-distutils \
         \
 	&& rm -rf /var/lib/apt/lists/* \
 	\
@@ -33,6 +36,6 @@ RUN set -ex \
 
 COPY test/requirements.txt /code
 RUN set -ex \
-    && pip install --no-cache-dir -r /code/requirements.txt
+    && python${PY_VER} -m pip install --no-cache-dir -r /code/requirements.txt
 
 WORKDIR /code
