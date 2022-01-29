@@ -25,6 +25,7 @@ logger = logging.getLogger('pyconcrete')
 class TestConcrete(base.TestPyConcreteBase):
     def test_decrypt_exception(self):
         import pyconcrete
+
         logger.info(pyconcrete.__file__)
         data = 'abc'
         self.assertLess(len(data), 16)
@@ -37,6 +38,7 @@ class TestConcrete(base.TestPyConcreteBase):
         pye_filepath = py_filepath + 'e'
 
         import pyconcrete
+
         pyconcrete.encrypt_file(py_filepath, pye_filepath)
 
         with open(pye_filepath, 'rb') as f:
@@ -51,7 +53,7 @@ class TestConcrete(base.TestPyConcreteBase):
     def test_process_py_code_large(self):
         py_code = ''
         for i in range(100):
-            py_code += ('print("This is testing large py file ... %s")\r\n' % i)
+            py_code += 'print("This is testing large py file ... %s")\r\n' % i
         res = self.__do_encrypt_decrypt_file(py_code.encode('utf8'))
         self.assertEqual(py_code, res.decode('utf8'))
 
@@ -76,6 +78,7 @@ class TestConcrete(base.TestPyConcreteBase):
 
         res = self.__do_encrypt_decrypt_file(py_code)
         self.assertEqual(py_code, res)
+
 
 if __name__ == '__main__':
     unittest.main()

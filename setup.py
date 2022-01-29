@@ -27,8 +27,7 @@ from distutils.core import Command, Extension, setup
 from distutils.dist import Distribution
 from os.path import join
 
-from src.config import (DEFAULT_KEY, EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR,
-                        SECRET_HEADER_PATH, SRC_DIR, TEST_DIR)
+from src.config import DEFAULT_KEY, EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__
@@ -45,9 +44,9 @@ with open(readme_path, 'r') as f:
     readme = f.read()
 
 try:
-   input = raw_input
+    input = raw_input
 except NameError:
-   pass
+    pass
 
 
 def is_mingw():
@@ -118,7 +117,11 @@ def create_secret_key_header(key, factor):
             }
             return key;
         }
-    """ % (factor, len(key), key_val_code)
+    """ % (
+        factor,
+        len(key),
+        key_val_code,
+    )
 
     with open(SECRET_HEADER_PATH, 'w') as f:
         f.write(code)
@@ -144,7 +147,9 @@ class CmdBase:
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
         if self.manual_create_secrete_key_file:
             if not self.passphrase:
-                self.passphrase = input("please input the passphrase \nfor encrypt your python script (enter for default) : \n")
+                self.passphrase = input(
+                    "please input the passphrase \nfor encrypt your python script (enter for default) : \n"
+                )
                 if len(self.passphrase) == 0:
                     self.passphrase = DEFAULT_KEY
                 else:
@@ -164,6 +169,7 @@ class BuildEx(CmdBase, build):
     """
     execute extra function before/after build.run()
     """
+
     user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
 
     def initialize_options(self):
@@ -181,6 +187,7 @@ class BuildExe(CmdBase, build_ext):
     """
     execute extra function before/after build.run()
     """
+
     user_options = build.user_options + [('passphrase=', None, 'specify passphrase')]
 
     def initialize_options(self):
@@ -190,8 +197,7 @@ class BuildExe(CmdBase, build_ext):
 
     def finalize_options(self):
         build_ext.finalize_options(self)
-        self.set_undefined_options('build',
-                                   ('build_scripts', 'build_scripts'))
+        self.set_undefined_options('build', ('build_scripts', 'build_scripts'))
         self.extensions = self.distribution.exe_modules
 
     def run(self):
@@ -216,7 +222,8 @@ class BuildExe(CmdBase, build_ext):
             include_dirs=ext.include_dirs,
             macros=macros,
             debug=self.debug,
-            depends=ext.depends)
+            depends=ext.depends,
+        )
 
         self._built_objects = objects[:]
 
@@ -229,13 +236,15 @@ class BuildExe(CmdBase, build_ext):
             runtime_library_dirs=ext.runtime_library_dirs,
             extra_postargs=ext.extra_link_args,
             output_dir=self.build_scripts,  # should not use build_lib, it will be copied to python site-packages
-            debug=self.debug)
+            debug=self.debug,
+        )
 
 
 class InstallEx(CmdBase, install):
     """
     execute extra function before/after install.run()
     """
+
     user_options = install.user_options + [('passphrase=', None, 'specify passphrase')]
     sub_commands = install.sub_commands + [('build_exe', lambda self: True)]
 
@@ -246,8 +255,7 @@ class InstallEx(CmdBase, install):
 
     def finalize_options(self):
         install.finalize_options(self)
-        self.set_undefined_options('build',
-                                   ('build_scripts', 'build_scripts'))
+        self.set_undefined_options('build', ('build_scripts', 'build_scripts'))
 
     def run(self):
         self.pre_process()
@@ -281,8 +289,8 @@ class InstallEx(CmdBase, install):
         else:
             # install `pyconcrete` to /usr/local/bin
             exe_name = 'pyconcrete'
-        self.copy_file(os.path.join(self.build_scripts, exe_name),
-                       os.path.join(self.install_scripts, exe_name))
+        self.copy_file(os.path.join(self.build_scripts, exe_name), os.path.join(self.install_scripts, exe_name))
+
 
 # ================================================= test command ================================================= #
 
@@ -299,11 +307,13 @@ class TestEx(Command):
 
     def run(self):
         import unittest
+
         suite = unittest.TestLoader().discover(TEST_DIR)
         unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 # ================================================= extension ================================================= #
+
 
 def get_include_dirs():
     openaes_include_dirs = [
@@ -368,7 +378,8 @@ ext_module = Extension(
     sources=[
         join(EXT_SRC_DIR, 'pyconcrete.c'),
         join(EXT_SRC_DIR, 'pyconcrete_module.c'),
-    ] + openaes_sources,
+    ]
+    + openaes_sources,
 )
 
 exe_module = Extension(
@@ -380,7 +391,8 @@ exe_module = Extension(
     sources=[
         join(EXE_SRC_DIR, 'pyconcrete_exe.c'),
         join(EXT_SRC_DIR, 'pyconcrete.c'),
-    ] + openaes_sources,
+    ]
+    + openaes_sources,
 )
 
 # ================================================= setup ================================================= #

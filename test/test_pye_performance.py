@@ -47,12 +47,18 @@ def main_requests(import_concrete, q):
     import requests
     from requests.adapters import HTTPAdapter
     from requests.auth import HTTPDigestAuth, _basic_auth_str
-    from requests.compat import (Morsel, builtin_str, cookielib, getproxies,
-                                 is_py3, str, urljoin, urlparse)
+    from requests.compat import Morsel, builtin_str, cookielib, getproxies, is_py3, str, urljoin, urlparse
     from requests.cookies import cookiejar_from_dict, morsel_to_cookie
-    from requests.exceptions import (ConnectionError, ConnectTimeout,
-                                     InvalidSchema, InvalidURL, MissingSchema,
-                                     ReadTimeout, RetryError, Timeout)
+    from requests.exceptions import (
+        ConnectionError,
+        ConnectTimeout,
+        InvalidSchema,
+        InvalidURL,
+        MissingSchema,
+        ReadTimeout,
+        RetryError,
+        Timeout,
+    )
     from requests.hooks import default_hooks
     from requests.models import PreparedRequest, urlencode
     from requests.sessions import SessionRedirectMixin
@@ -65,7 +71,6 @@ def main_requests(import_concrete, q):
 
 @unittest.skipIf(not os.path.exists(REQUEST_ZIP), "requests zip file doesn't exists")
 class TestPerformance(base.TestPyConcreteBase):
-
     def setUp(self):
         super(TestPerformance, self).setUp()
 
@@ -95,33 +100,45 @@ class TestPerformance(base.TestPyConcreteBase):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_pyc(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        logger.info('test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_pyc_with_import_hooker(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f'
+            % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_py(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        logger.info('test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_py_with_import_hooker(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f'
+            % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
 
 if __name__ == '__main__':

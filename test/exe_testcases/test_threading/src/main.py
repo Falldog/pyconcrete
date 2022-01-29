@@ -24,7 +24,7 @@ def main():
 
 
 def sqrt(q, n):
-    q.put(n*n)
+    q.put(n * n)
 
 
 if __name__ == '__main__':

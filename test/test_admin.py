@@ -88,8 +88,10 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         expect_file3 = join(relative_import_dir, 'main.pye')
 
         subprocess.check_call(
-            ('%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/util.py'
-             % (sys.executable, target_dir)),
+            (
+                '%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/util.py'
+                % (sys.executable, target_dir)
+            ),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -110,8 +112,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         expect_file3 = join(relative_import_dir, 'main.pye')
 
         subprocess.check_call(
-            ('%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/*'
-             % (sys.executable, target_dir)),
+            ('%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/*' % (sys.executable, target_dir)),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -123,8 +124,8 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
     def test_ignore_file_list_match_everything_patterns(self):
         patterns = [
             "*%s%s" % (os.sep, "test.py"),  # */test.py
-            "%s%s" % (os.sep, "test.py"),   # /test.py
-            "test.py",                      # test.py
+            "%s%s" % (os.sep, "test.py"),  # /test.py
+            "test.py",  # test.py
         ]
         expect_file1 = join(self.tmp_dir, 'test1.pye')
         expect_file2 = join(self.tmp_dir, 'test2.pye')
@@ -134,8 +135,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
         def test_pattern(pat):
             subprocess.check_call(
-                ('%s pyconcrete-admin.py compile --source=%s --pye -i "%s"'
-                 % (sys.executable, self.tmp_dir, pat)),
+                ('%s pyconcrete-admin.py compile --source=%s --pye -i "%s"' % (sys.executable, self.tmp_dir, pat)),
                 env=base.get_pyconcrete_env_path(),
                 shell=True,
             )
@@ -160,8 +160,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         expect_file4 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
-            ('%s pyconcrete-admin.py compile --source=%s --pye -i main.py test?.py'
-             % (sys.executable, self.tmp_dir)),
+            ('%s pyconcrete-admin.py compile --source=%s --pye -i main.py test?.py' % (sys.executable, self.tmp_dir)),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -176,8 +175,10 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         expect_file2 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
-            ('%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[1,3].py'
-             % (sys.executable, self.tmp_dir)),
+            (
+                '%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[1,3].py'
+                % (sys.executable, self.tmp_dir)
+            ),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )
@@ -190,8 +191,10 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         expect_file2 = join(self.tmp_dir, 'test2.pye')
 
         subprocess.check_call(
-            ('%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[!1,3].py'
-             % (sys.executable, self.tmp_dir)),
+            (
+                '%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[!1,3].py'
+                % (sys.executable, self.tmp_dir)
+            ),
             env=base.get_pyconcrete_env_path(),
             shell=True,
         )

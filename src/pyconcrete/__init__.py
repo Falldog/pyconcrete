@@ -19,7 +19,7 @@ import marshal
 import sys
 from os.path import exists, isdir, join
 
-EXT_PY  = '.py'
+EXT_PY = '.py'
 EXT_PYC = '.pyc'
 EXT_PYD = '.pyd'
 EXT_PYE = '.pye'
