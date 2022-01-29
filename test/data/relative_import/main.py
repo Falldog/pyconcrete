@@ -1,2 +1,3 @@
-from . import util
+from . import util  # noqa: F401
+
 data = 'main'

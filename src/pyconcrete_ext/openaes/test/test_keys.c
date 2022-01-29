@@ -1,19 +1,19 @@
-/* 
+/*
  * ---------------------------------------------------------------------------
  * OpenAES License
  * ---------------------------------------------------------------------------
  * Copyright (c) 2012, Nabil S. Al Ramli, www.nalramli.com
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   - Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   - Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@
 #include "oaes_lib.h"
 
 /*
- * 
+ *
  */
 int main(int argc, char** argv) {
 
@@ -43,13 +43,13 @@ int main(int argc, char** argv) {
 	size_t _data_len;
 	FILE * f = NULL;
 	OAES_RET _rc;
-	
+
 	if( NULL == ( ctx = oaes_alloc() ) )
 	{
 		printf( "Error: Initialization failed.\n" );
 		return 1;
 	}
-	
+
 	/* ************** Generate 128-bit key and export it **************
 	 * ****************************************************************/
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_gen_128(ctx) ) )
@@ -58,14 +58,14 @@ int main(int argc, char** argv) {
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_export(ctx, NULL, &_data_len) ) )
 	{
 		printf( "Error: Failed to retrieve key length [%d].\n", _rc );
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	_buf = (uint8_t *) calloc(_data_len, sizeof(uint8_t));
 	if( _buf )
 	{
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
 			oaes_free(&ctx);
 			return 1;
 		}
-		
+
 		f = fopen( "key_128", "wb" );
 		if( f )
 		{
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 		}
 		free(_buf);
 	}
-	
+
 	/* ************** Generate 192-bit key and export it **************
 	 * ****************************************************************/
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_gen_192(ctx) ) )
@@ -94,14 +94,14 @@ int main(int argc, char** argv) {
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_export(ctx, NULL, &_data_len) ) )
 	{
 		printf( "Error: Failed to retrieve key length [%d].\n", _rc );
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	_buf = (uint8_t *) calloc(_data_len, sizeof(uint8_t));
 	if( _buf )
 	{
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
 			oaes_free(&ctx);
 			return 1;
 		}
-		
+
 		f = fopen("key_192", "wb");
 		if( f )
 		{
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 		}
 		free(_buf);
 	}
-	
+
 	/* ************** Generate 256-bit key and export it **************
 	 * ****************************************************************/
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_gen_256(ctx) ) )
@@ -130,14 +130,14 @@ int main(int argc, char** argv) {
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	if( OAES_RET_SUCCESS != ( _rc = oaes_key_export(ctx, NULL, &_data_len) ) )
 	{
 		printf("Error: Failed to retrieve key length [%d].\n", _rc);
 		oaes_free(&ctx);
 		return 1;
 	}
-	
+
 	_buf = (uint8_t *) calloc(_data_len, sizeof(uint8_t));
 	if( _buf )
 	{
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 			oaes_free(&ctx);
 			return 1;
 		}
-		
+
 		f = fopen("key_256", "wb");
 		if( f )
 		{
@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
 		}
 		free(_buf);
 	}
-	
+
 	/* ********************** Import 128-bit key **********************
 	 * ****************************************************************/
 	f = fopen("key_128", "rb");
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
 		if( _buf )
 		{
 			fread(_buf, _data_len, sizeof(uint8_t), f);
-			
+
 			if( OAES_RET_SUCCESS !=
 					( _rc = oaes_key_import(ctx, _buf, _data_len) ) )
 			{
@@ -180,12 +180,12 @@ int main(int argc, char** argv) {
 				oaes_free(&ctx);
 				return 1;
 			}
-			
+
 			free(_buf);
 		}
 		fclose(f);
 	}
-	
+
 	/* ********************** Import 192-bit key **********************
 	 * ****************************************************************/
 	f = fopen("key_192", "rb");
@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
 		if( _buf )
 		{
 			fread(_buf, _data_len, sizeof(uint8_t), f);
-			
+
 			if( OAES_RET_SUCCESS !=
 					( _rc = oaes_key_import(ctx, _buf, _data_len) ) )
 			{
@@ -208,12 +208,12 @@ int main(int argc, char** argv) {
 				oaes_free(&ctx);
 				return 1;
 			}
-			
+
 			free(_buf);
 		}
 		fclose(f);
 	}
-	
+
 	/* ********************** Import 256-bit key **********************
 	 * ****************************************************************/
 	f = fopen("key_256", "rb");
@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
 		if( _buf )
 		{
 			fread(_buf, _data_len, sizeof(uint8_t), f);
-			
+
 			if( OAES_RET_SUCCESS !=
 					( _rc = oaes_key_import(ctx, _buf, _data_len) ) )
 			{
@@ -236,12 +236,12 @@ int main(int argc, char** argv) {
 				oaes_free(&ctx);
 				return 1;
 			}
-			
+
 			free(_buf);
 		}
 		fclose(f);
 	}
-	
+
 	oaes_free(&ctx);
 
 	return (EXIT_SUCCESS);

@@ -66,4 +66,3 @@ init_pyconcrete(void)
     return m;
 #endif
 }
-

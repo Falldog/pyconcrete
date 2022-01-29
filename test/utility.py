@@ -3,13 +3,13 @@
 # Create on : 2019/07/13
 from __future__ import unicode_literals
 
-import os
-import sys
 import imp
+import os
 import shutil
-import tempfile
 import subprocess
-from os.path import join, isdir, dirname, basename, abspath
+import sys
+import tempfile
+from os.path import abspath, basename, dirname, isdir, join
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 
@@ -101,12 +101,12 @@ class ImportedTestCase(object):
                 return_code=ret_data['return_code'],
             )
         except Exception as e:
-            import traceback
             raise ImportedTestCaseError(ret_data['output_lines'], ret_data['return_code'], str(e))
 
 
 def lib_compile_pyc(folder, remove_py=False):
     from test.base import get_pyconcrete_env_path
+
     admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
     arg_remove_py = '--remove-py' if remove_py else ''
     subprocess.check_call(
@@ -118,6 +118,7 @@ def lib_compile_pyc(folder, remove_py=False):
 
 def lib_compile_pye(folder, remove_py=False, remove_pyc=False):
     from test.base import get_pyconcrete_env_path
+
     admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
     arg_remove_py = '--remove-py' if remove_py else ''
     arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
@@ -126,5 +127,3 @@ def lib_compile_pye(folder, remove_py=False, remove_pyc=False):
         env=get_pyconcrete_env_path(),
         shell=True,
     )
-
-

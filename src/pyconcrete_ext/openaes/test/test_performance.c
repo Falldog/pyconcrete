@@ -1,19 +1,19 @@
-/* 
+/*
  * ---------------------------------------------------------------------------
  * OpenAES License
  * ---------------------------------------------------------------------------
  * Copyright (c) 2012, Nabil S. Al Ramli, www.nalramli.com
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   - Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   - Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ void usage(const char * exe_name)
 {
 	if( NULL == exe_name )
 		return;
-	
+
 	printf(
 			"Usage:\n"
 			"\t%s [-ecb] [-key < 128 | 192 | 256 >] [-data <data_len>]\n",
@@ -48,7 +48,7 @@ void usage(const char * exe_name)
 }
 
 /*
- * 
+ *
  */
 int main(int argc, char** argv) {
 
@@ -61,17 +61,17 @@ int main(int argc, char** argv) {
 	short _is_ecb = 0;
 	int _key_len = 128;
 	size_t _data_len = 64;
-	
+
 	for( _i = 1; _i < argc; _i++ )
 	{
 		int _found = 0;
-		
+
 		if( 0 == strcmp( argv[_i], "-ecb" ) )
 		{
 			_found = 1;
 			_is_ecb = 1;
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "-key" ) )
 		{
 			_found = 1;
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 					return 1;
 			}
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "-data" ) )
 		{
 			_found = 1;
@@ -111,13 +111,13 @@ int main(int argc, char** argv) {
 			}
 			_data_len = atoi( argv[_i] );
 		}
-		
+
 		if( 0 == _found )
 		{
 			printf("Error: Invalid option '%s'.\n", argv[_i]);
 			usage( argv[0] );
 			return 1;
-		}			
+		}
 	}
 
 	// generate random test data
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 	srand( _time_start );
 	for( _i = 0; _i < 1024 * 1024; _i++ )
 		_buf[_i] = rand();
-	
+
 	ctx = oaes_alloc();
 	if( NULL == ctx )
 	{
@@ -175,7 +175,7 @@ int main(int argc, char** argv) {
 	}
 
 	time( &_time_start );
-	
+
 	for( _i = 0; _i < _data_len; _i++ )
 	{
 		if( OAES_RET_SUCCESS != oaes_encrypt( ctx,
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
 				_encbuf, _encbuf_len, _decbuf, &_decbuf_len ) )
 			printf("Error: Decryption failed.\n");
 	}
-	
+
 	time( &_time_end );
 	printf( "Test encrypt and decrypt:\n\ttime: %lld seconds\n\tdata: %ld MB"
 			"\n\tkey: %d bits\n\tmode: %s\n",

@@ -1,7 +1,8 @@
 from threading import Thread
+
 try:
     from queue import Queue
-except:
+except:  # noqa: E722
     from Queue import Queue
 
 
@@ -23,7 +24,7 @@ def main():
 
 
 def sqrt(q, n):
-    q.put(n*n)
+    q.put(n * n)
 
 
 if __name__ == '__main__':

@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import fnmatch
-import os
-import sys
-import unittest
 import argparse
+import fnmatch
+import logging
+import os
 import py_compile
 import subprocess
-import logging
-from os.path import abspath, dirname, join, exists, isdir, isfile
-
+import sys
+import unittest
+from os.path import abspath, dirname, exists, isdir, isfile, join
 
 CUR_DIR = dirname(abspath(__file__))
 
@@ -57,16 +56,31 @@ class PyConcreteAdmin(object):
 
         # === compile === #
         parser_compile = subparsers.add_parser('compile', help='compile .pye')
-        parser_compile.add_argument('-s', '--source', dest='sources', default=None, nargs='+',
-                                    help='specific the sources to process, source could be file/dir')
+        parser_compile.add_argument(
+            '-s',
+            '--source',
+            dest='sources',
+            default=None,
+            nargs='+',
+            help='specific the sources to process, source could be file/dir',
+        )
         parser_compile.add_argument('--pye', dest='pye', action='store_true', help='process on .pye')
         parser_compile.add_argument('--pyc', dest='pyc', action='store_true', help='process on .pyc')
-        parser_compile.add_argument('--remove-py', dest='remove_py', action='store_true',
-                                    help='remove .py after compile pye')
-        parser_compile.add_argument('--remove-pyc', dest='remove_pyc', action='store_true',
-                                    help='remove .pyc after compile pye')
-        parser_compile.add_argument('-i', '--ignore-file-list', dest='ignore_file_list', metavar='filename', nargs='+',
-                                    default=tuple(), help='ignore file name list')
+        parser_compile.add_argument(
+            '--remove-py', dest='remove_py', action='store_true', help='remove .py after compile pye'
+        )
+        parser_compile.add_argument(
+            '--remove-pyc', dest='remove_pyc', action='store_true', help='remove .pyc after compile pye'
+        )
+        parser_compile.add_argument(
+            '-i',
+            '--ignore-file-list',
+            dest='ignore_file_list',
+            metavar='filename',
+            nargs='+',
+            default=tuple(),
+            help='ignore file name list',
+        )
         parser_compile.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
         parser_compile.set_defaults(func=self.compile)
 
@@ -126,7 +140,7 @@ class PyConcreteAdmin(object):
         patterns = self._get_ignore_patterns(args)
         for file in os.listdir(folder):
             fullpath = join(folder, file)
-            if (file in IGNORE_FILES or self._fnmatch(fullpath, patterns)):
+            if file in IGNORE_FILES or self._fnmatch(fullpath, patterns):
                 continue
 
             if isdir(fullpath):
@@ -157,6 +171,7 @@ class PyConcreteAdmin(object):
         then compile .pye
         """
         import pyconcrete
+
         pyc_file = py_file + 'c'
         pye_file = py_file + 'e'
         pyc_exists = exists(pyc_file)
@@ -207,6 +222,7 @@ class PyConcreteAdmin(object):
     def release(self, args):
         try:
             import pypandoc
+
             readme = pypandoc.convert('README.md', 'rst')
             with open('README.rst', 'wb') as f:
                 f.write(readme.encode('utf8'))

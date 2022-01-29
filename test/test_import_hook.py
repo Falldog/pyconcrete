@@ -14,24 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import shutil
+import sys
 from os.path import join
-
 from test import base
 
 
 class TestImportHook(base.TestPyConcreteBase):
     def test_py_import_hook(self):
         import os
+
         assert os
         import csv
+
         assert csv
 
     def test_py_relative_import(self):
         import os
+
         sys.path.insert(0, os.path.join(base.ROOT_DIR, 'test', 'data'))
         from test.data.relative_import import main
+
         self.assertEqual(main.data, 'main')
         self.assertEqual(main.util.data, 'util')
         sys.path.pop(0)
@@ -44,7 +47,6 @@ class TestImportHook(base.TestPyConcreteBase):
         self.lib_compile_pye(self.tmp_dir, remove_py=True, remove_pyc=True)
 
         from relative_import import main
+
         self.assertEqual(main.data, 'main')
         self.assertEqual(main.util.data, 'util')
-
-

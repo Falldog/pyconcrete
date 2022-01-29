@@ -14,17 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-import sys
-import shutil
 import atexit
-import unittest
-import tempfile
-import subprocess
+import os
 import py_compile
-from os.path import dirname, abspath, join, exists
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from os.path import abspath, dirname, exists, join
+
 from src.config import SECRET_HEADER_PATH
+
 try:
     from importlib import reload
 except ImportError:
@@ -39,7 +41,7 @@ tmp_pyconcrete_exe = None
 
 def to_bytes(s):
     if PY2:
-        if isinstance(s, unicode):
+        if isinstance(s, unicode):  # noqa: F821
             return s.encode('utf8')
         return s
     else:
@@ -103,11 +105,8 @@ def build_tmp_pyconcrete(passphrase):
 def copy_pyconcrete_ext(tmp_dir):
     tmp_pyconcrete = join(tmp_dir, 'pyconcrete')
     for f in os.listdir(tmp_pyconcrete):
-        if re.match('^_pyconcrete.*\.(so|dll|pyd)$', f):
-            shutil.copy(
-                join(tmp_pyconcrete, f),
-                join(ROOT_DIR, 'src', 'pyconcrete')
-            )
+        if re.match(r'^_pyconcrete.*\.(so|dll|pyd)$', f):
+            shutil.copy(join(tmp_pyconcrete, f), join(ROOT_DIR, 'src', 'pyconcrete'))
             break
 
 
@@ -117,6 +116,8 @@ def remove_tmp_pyconcrete():
         shutil.rmtree(tmp_pyconcrete_dir)
         print('remove tmp pyconcrete at "%s"' % tmp_pyconcrete_dir)
         tmp_pyconcrete_dir = None
+
+
 atexit.register(remove_tmp_pyconcrete)
 
 
@@ -176,7 +177,7 @@ class TestPyConcreteBase(unittest.TestCase):
         shutil.rmtree(self.tmp_dir)
 
     def lib_gen_py(self, py_code, py_filename, folder=None):
-        """ folder = None -> use @_tmp_dir """
+        """folder = None -> use @_tmp_dir"""
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(py_filename.endswith('.py'))
@@ -186,7 +187,7 @@ class TestPyConcreteBase(unittest.TestCase):
         return py_filepath
 
     def lib_gen_pyc(self, py_code, pyc_filename, folder=None, keep_py=False):
-        """ folder = None -> use @_tmp_dir """
+        """folder = None -> use @_tmp_dir"""
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(pyc_filename.endswith('.pyc'))
@@ -204,11 +205,11 @@ class TestPyConcreteBase(unittest.TestCase):
         # remove files
         if not keep_py:
             os.remove(py_filepath)
-        
+
         return pyc_filepath
 
     def lib_gen_pye(self, py_code, pye_filename, folder=None, keep_py=False, keep_pyc=False):
-        """ folder = None -> use @_tmp_dir """
+        """folder = None -> use @_tmp_dir"""
         if not folder:
             folder = self.tmp_dir
         self.assertTrue(pye_filename.endswith('.pye'))
@@ -226,6 +227,7 @@ class TestPyConcreteBase(unittest.TestCase):
 
         # create .pye & remove .py & .pyc
         import pyconcrete
+
         pyconcrete.encrypt_file(pyc_filepath, pye_filepath)
 
         # remove files
@@ -239,12 +241,19 @@ class TestPyConcreteBase(unittest.TestCase):
     def lib_compile_pyc(self, folder, remove_py=False):
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
-        subprocess.check_call('%s %s compile --source=%s --pyc %s' % (sys.executable, admin_path, folder, arg_remove_py), env=get_pyconcrete_env_path(), shell=True)
+        subprocess.check_call(
+            '%s %s compile --source=%s --pyc %s' % (sys.executable, admin_path, folder, arg_remove_py),
+            env=get_pyconcrete_env_path(),
+            shell=True,
+        )
 
     def lib_compile_pye(self, folder, remove_py=False, remove_pyc=False):
         admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
-        subprocess.check_call('%s %s compile --source=%s --pye %s %s' % (sys.executable, admin_path, folder, arg_remove_py, arg_remove_pyc), env=get_pyconcrete_env_path(), shell=True)
-
-
+        subprocess.check_call(
+            '%s %s compile --source=%s --pye %s %s'
+            % (sys.executable, admin_path, folder, arg_remove_py, arg_remove_pyc),
+            env=get_pyconcrete_env_path(),
+            shell=True,
+        )

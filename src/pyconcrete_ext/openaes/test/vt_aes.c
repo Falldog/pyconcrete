@@ -1,19 +1,19 @@
-/* 
+/*
  * ---------------------------------------------------------------------------
  * OpenAES License
  * ---------------------------------------------------------------------------
  * Copyright (c) 2012, Nabil S. Al Ramli, www.nalramli.com
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   - Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   - Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -59,7 +59,7 @@ static int step_cb(
 		printf( "round[%2d].%-7s --> %s", step_count, step_name, _buf );
 		free( _buf );
 	}
-	
+
 	if( 1 == _is_step && '\n' != getchar( ) )
 		_is_step = 0;
 
@@ -69,7 +69,7 @@ static int step_cb(
 static int to_binary(uint8_t * buf, size_t * buf_len, const char * data)
 {
 	size_t _i, _buf_len_in;
-	
+
 	if( NULL == buf_len )
 		return 1;
 
@@ -78,7 +78,7 @@ static int to_binary(uint8_t * buf, size_t * buf_len, const char * data)
 
 	_buf_len_in = *buf_len;
 	*buf_len = strlen( data ) / 2;
-	
+
 	if( NULL == buf )
 		return 0;
 
@@ -86,7 +86,7 @@ static int to_binary(uint8_t * buf, size_t * buf_len, const char * data)
 		return 1;
 
 	memset( buf, 0, strlen( data ) / 2 );
-	
+
 	// lookup ascii table
 	for( _i = 0; _i < strlen( data ); _i++ )
 	{
@@ -103,7 +103,7 @@ static int to_binary(uint8_t * buf, size_t * buf_len, const char * data)
 		else
 			return 1;
 	}
-	
+
 	return 0;
 }
 
@@ -111,7 +111,7 @@ static void usage(const char * exe_name)
 {
 	if( NULL == exe_name )
 		return;
-	
+
 	printf(
 			"Usage:\n"
 			"  %s [-step] [-ecb] [[-key < 128 | 192 | 256 | key_data >] [-bin] <text>\n",
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 	short _is_ecb = 0, _is_bin = 0;
 	char * _text = NULL, * _key_text = NULL;
 	int _key_len = 128;
-	
+
 	if( argc < 2 )
 	{
 		usage( argv[0] );
@@ -152,13 +152,13 @@ int main(int argc, char** argv)
 			_found = 1;
 			_is_ecb = 1;
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "-bin" ) )
 		{
 			_found = 1;
 			_is_bin = 1;
 		}
-		
+
 		if( 0 == strcmp( argv[_i], "-key" ) )
 		{
 			_found = 1;
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
 					}
 			}
 		}
-		
+
 		if( 0 == _found )
 		{
 			if( _text )
@@ -218,7 +218,7 @@ int main(int argc, char** argv)
 					return EXIT_FAILURE;
 				}
 			}
-		}			
+		}
 	}
 
 	if( NULL == _text )
@@ -259,7 +259,7 @@ int main(int argc, char** argv)
 		printf( "\n**********************\n" );
 		free( _buf );
 	}
-	
+
 	ctx = oaes_alloc();
 	if( NULL == ctx )
 	{
@@ -371,7 +371,7 @@ int main(int argc, char** argv)
 
 	if( OAES_RET_SUCCESS !=  oaes_free( &ctx ) )
 		printf("Error: Failed to uninitialize OAES.\n");
-	
+
 	oaes_sprintf( NULL, &_buf_len, _encbuf, _encbuf_len );
 	_buf = (char *) calloc(_buf_len, sizeof(char));
 	printf( "\n***** cyphertext *****\n" );
@@ -382,7 +382,7 @@ int main(int argc, char** argv)
 	}
 	printf( "\n**********************\n" );
 	free( _buf );
-	
+
 	oaes_sprintf( NULL, &_buf_len, _decbuf, _decbuf_len );
 	_buf = (char *) calloc(_buf_len, sizeof(char));
 	printf( "\n***** plaintext  *****\n" );
@@ -393,7 +393,7 @@ int main(int argc, char** argv)
 	}
 	printf( "\n**********************\n\n" );
 	free( _buf );
-	
+
 	free( _encbuf );
 	free( _decbuf );
 	if( _key_data )

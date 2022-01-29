@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import os
 from os.path import join
-
 from test import base
 from test.utility import ImportedTestCase, ImportedTestCaseError
 
@@ -27,8 +26,7 @@ class TestExe(base.TestPyConcreteBase):
         test_cases = self.discover()
         error = False
         for tc in test_cases:
-            print('test_exe_testcases - {tc.module_name} ... '.format(tc=tc),
-                  end='')
+            print('test_exe_testcases - {tc.module_name} ... '.format(tc=tc), end='')
             try:
                 res = tc.run()
                 if res:

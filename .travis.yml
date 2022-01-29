@@ -30,4 +30,3 @@ before_install:
 
 script:
   - python$PY_VER pyconcrete-admin.py test
-

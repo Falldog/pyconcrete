@@ -8,4 +8,3 @@ PyObject * fnDecryptFile(PyObject* self, PyObject* args);
 PyObject * fnDecryptBuffer(PyObject* self, PyObject* args);
 
 #endif  // PYCONCRETE_H
-

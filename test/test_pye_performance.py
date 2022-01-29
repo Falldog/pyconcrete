@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import sys
 import time
-import logging
 import unittest
-from zipfile import ZipFile
 from multiprocessing import Process, Queue
-from os.path import dirname, abspath, join
-
+from os.path import abspath, dirname, join
 from test import base
+from zipfile import ZipFile
 
 CUR_DIR = abspath(dirname(__file__))
 ROOT_DIR = abspath(join(CUR_DIR, '..'))
@@ -42,23 +41,26 @@ def main_requests(import_concrete, q):
     purpose: testing import without exception
     """
     if import_concrete:
-        import pyconcrete
+        import pyconcrete  # noqa: F401
 
     t = time.time()
-    import requests
-
-    from requests.adapters import HTTPAdapter
-    from requests.auth import HTTPDigestAuth, _basic_auth_str
-    from requests.compat import (Morsel, cookielib, getproxies, str, urljoin, urlparse, is_py3, builtin_str)
-    from requests.cookies import cookiejar_from_dict, morsel_to_cookie
-    from requests.exceptions import (
-        ConnectionError, ConnectTimeout, InvalidSchema, InvalidURL, MissingSchema, ReadTimeout, Timeout, RetryError
-    )
-    from requests.models import PreparedRequest
-    from requests.structures import CaseInsensitiveDict
-    from requests.sessions import SessionRedirectMixin
-    from requests.models import urlencode
-    from requests.hooks import default_hooks
+    import requests  # noqa: F401
+    from requests.adapters import HTTPAdapter  # noqa: F401
+    from requests.auth import HTTPDigestAuth, _basic_auth_str  # noqa: F401
+    from requests.compat import Morsel, builtin_str, cookielib, getproxies, is_py3, str, urljoin, urlparse  # noqa: F401
+    from requests.cookies import cookiejar_from_dict, morsel_to_cookie  # noqa: F401
+    from requests.exceptions import ConnectionError  # noqa: F401
+    from requests.exceptions import ConnectTimeout  # noqa: F401
+    from requests.exceptions import InvalidSchema  # noqa: F401
+    from requests.exceptions import InvalidURL  # noqa: F401
+    from requests.exceptions import MissingSchema  # noqa: F401
+    from requests.exceptions import ReadTimeout  # noqa: F401
+    from requests.exceptions import RetryError  # noqa: F401
+    from requests.exceptions import Timeout  # noqa: F401
+    from requests.hooks import default_hooks  # noqa: F401
+    from requests.models import PreparedRequest, urlencode  # noqa: F401
+    from requests.sessions import SessionRedirectMixin  # noqa: F401
+    from requests.structures import CaseInsensitiveDict  # noqa: F401
 
     t = time.time() - t
     q.put(requests.__file__)
@@ -67,7 +69,6 @@ def main_requests(import_concrete, q):
 
 @unittest.skipIf(not os.path.exists(REQUEST_ZIP), "requests zip file doesn't exists")
 class TestPerformance(base.TestPyConcreteBase):
-
     def setUp(self):
         super(TestPerformance, self).setUp()
 
@@ -97,33 +98,45 @@ class TestPerformance(base.TestPyConcreteBase):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pye) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_pyc(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        logger.info('test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pyc) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_pyc_with_import_hooker(self):
         self.lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (pyc) (import hooker) [count=%d] total time = %.2f, avg time = %.2f'
+            % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_py(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
-        logger.info('test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (py) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
     def test_requests_py_with_import_hooker(self):
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
-        logger.info('test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f' % (RUN_COUNT, t, t/RUN_COUNT))
+        logger.info(
+            'test import request (py) (import hooker) [count=%d] total time = %.2f, avg time = %.2f'
+            % (RUN_COUNT, t, t / RUN_COUNT)
+        )
 
 
 if __name__ == '__main__':
