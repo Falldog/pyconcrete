@@ -28,7 +28,7 @@ from test import base
 CUR_DIR = abspath(dirname(__file__))
 ROOT_DIR = abspath(join(CUR_DIR, '..'))
 DATA_DIR = join(CUR_DIR, 'data')
-REQUEST_ZIP = join(DATA_DIR, 'requests-2.12.4.zip')
+REQUEST_ZIP = join(DATA_DIR, 'requests-2.27.1.zip')  # zip structure: first level must contain `requests` folder
 REQUEST_MAIN = join(DATA_DIR, 'main_requests.py')
 PYADMIN_PATH = join(ROOT_DIR, 'pyconcrete-admin.py')
 RUN_COUNT = int(os.environ.get('TEST_PYE_PERFORMANCE_COUNT', '5'))
