@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import os
 from os.path import join
-
 from test import base
 from test.utility import ImportedTestCase, ImportedTestCaseError
 

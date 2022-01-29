@@ -14,17 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-import sys
-import shutil
 import atexit
-import unittest
-import tempfile
-import subprocess
+import os
 import py_compile
-from os.path import dirname, abspath, join, exists
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from os.path import abspath, dirname, exists, join
+
 from src.config import SECRET_HEADER_PATH
+
 try:
     from importlib import reload
 except ImportError:

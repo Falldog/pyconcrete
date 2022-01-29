@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import fnmatch
-import os
-import sys
-import unittest
 import argparse
+import fnmatch
+import logging
+import os
 import py_compile
 import subprocess
-import logging
-from os.path import abspath, dirname, join, exists, isdir, isfile
-
+import sys
+import unittest
+from os.path import abspath, dirname, exists, isdir, isfile, join
 
 CUR_DIR = dirname(abspath(__file__))
 

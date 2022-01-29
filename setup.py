@@ -14,19 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import imp
 import hashlib
-import sysconfig
+import imp
+import os
 import subprocess
-from os.path import join
-from distutils.core import setup, Extension, Command
-from distutils.dist import Distribution
+import sys
+import sysconfig
 from distutils.command.build import build
 from distutils.command.build_ext import build_ext
 from distutils.command.install import install
-from src.config import DEFAULT_KEY, TEST_DIR, SRC_DIR, PY_SRC_DIR, EXT_SRC_DIR, EXE_SRC_DIR, SECRET_HEADER_PATH
+from distutils.core import Command, Extension, setup
+from distutils.dist import Distribution
+from os.path import join
+
+from src.config import (DEFAULT_KEY, EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR,
+                        SECRET_HEADER_PATH, SRC_DIR, TEST_DIR)
 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__

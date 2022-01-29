@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import imp
 import marshal
-from os.path import join, exists, isdir
+import sys
+from os.path import exists, isdir, join
 
 EXT_PY  = '.py'
 EXT_PYC = '.pyc'
@@ -94,6 +94,7 @@ class PyeLoader(object):
         ml = len(magic)
         if data[:ml] != magic:
             import struct
+
             # convert little-endian byte string to unsigned short
             py_magic = struct.unpack('<H', magic[:2])[0]
             pye_magic = struct.unpack('<H', data[:2])[0]

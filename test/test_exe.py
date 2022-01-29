@@ -17,7 +17,6 @@ from __future__ import unicode_literals
 
 import os
 import subprocess
-
 from test import base
 
 

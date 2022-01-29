@@ -15,12 +15,11 @@
 # limitations under the License.
 
 import os
-import sys
 import shutil
-import unittest
 import subprocess
-from os.path import dirname, abspath, join, exists
-
+import sys
+import unittest
+from os.path import abspath, dirname, exists, join
 from test import base
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))

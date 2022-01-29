@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import sys
 import time
-import logging
 import unittest
-from zipfile import ZipFile
 from multiprocessing import Process, Queue
-from os.path import dirname, abspath, join
-
+from os.path import abspath, dirname, join
 from test import base
+from zipfile import ZipFile
 
 CUR_DIR = abspath(dirname(__file__))
 ROOT_DIR = abspath(join(CUR_DIR, '..'))
@@ -46,19 +45,18 @@ def main_requests(import_concrete, q):
 
     t = time.time()
     import requests
-
     from requests.adapters import HTTPAdapter
     from requests.auth import HTTPDigestAuth, _basic_auth_str
-    from requests.compat import (Morsel, cookielib, getproxies, str, urljoin, urlparse, is_py3, builtin_str)
+    from requests.compat import (Morsel, builtin_str, cookielib, getproxies,
+                                 is_py3, str, urljoin, urlparse)
     from requests.cookies import cookiejar_from_dict, morsel_to_cookie
-    from requests.exceptions import (
-        ConnectionError, ConnectTimeout, InvalidSchema, InvalidURL, MissingSchema, ReadTimeout, Timeout, RetryError
-    )
-    from requests.models import PreparedRequest
-    from requests.structures import CaseInsensitiveDict
-    from requests.sessions import SessionRedirectMixin
-    from requests.models import urlencode
+    from requests.exceptions import (ConnectionError, ConnectTimeout,
+                                     InvalidSchema, InvalidURL, MissingSchema,
+                                     ReadTimeout, RetryError, Timeout)
     from requests.hooks import default_hooks
+    from requests.models import PreparedRequest, urlencode
+    from requests.sessions import SessionRedirectMixin
+    from requests.structures import CaseInsensitiveDict
 
     t = time.time() - t
     q.put(requests.__file__)

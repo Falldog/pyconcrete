@@ -3,13 +3,13 @@
 # Create on : 2019/07/13
 from __future__ import unicode_literals
 
-import os
-import sys
 import imp
+import os
 import shutil
-import tempfile
 import subprocess
-from os.path import join, isdir, dirname, basename, abspath
+import sys
+import tempfile
+from os.path import abspath, basename, dirname, isdir, join
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 

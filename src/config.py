@@ -4,7 +4,7 @@
 #
 # @author : Falldog
 #
-from os.path import join, abspath, dirname, pardir
+from os.path import abspath, dirname, join, pardir
 
 DEFAULT_KEY = 'Falldog'
 

@@ -14,10 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import shutil
+import sys
 from os.path import join
-
 from test import base
 
 

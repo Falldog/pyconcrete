@@ -1,4 +1,5 @@
 from threading import Thread
+
 try:
     from queue import Queue
 except:

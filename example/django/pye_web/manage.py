@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import pyconcrete
 import os
 import sys
+
+import pyconcrete
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pye_web.settings")
