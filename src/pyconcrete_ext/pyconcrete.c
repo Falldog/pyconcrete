@@ -64,12 +64,12 @@ PyObject * fnEncryptFile(PyObject* self, PyObject* args)
     OAES_CTX* key = NULL;
     size_t s;
     int is_last_block_fragment = FALSE;
-    
+
     if (!PyArg_ParseTuple(args, "ss", &src_filepath, &dest_filepath))
         return NULL;
-    
+
     // printf("fnEncryptFile() src=%s, dest=%s\n", src_filepath, dest_filepath);
-    
+
     KeyAlloc(&key);
     {
         src = fopen(src_filepath, "rb");
@@ -78,7 +78,7 @@ PyObject * fnEncryptFile(PyObject* self, PyObject* args)
             PyErr_Format(g_PyConcreteError, "open source file fail! (%s)", src_filepath);
             return NULL;
         }
-        
+
         dest = fopen(dest_filepath, "wb");
         if(!dest)
         {
@@ -86,7 +86,7 @@ PyObject * fnEncryptFile(PyObject* self, PyObject* args)
             PyErr_Format(g_PyConcreteError, "open destination file fail! (%s)", dest_filepath);
             return NULL;
         }
-        
+
         while(!feof(src))
         {
             s = fread(buf, 1, AES_BLOCK_SIZE, src);
@@ -110,12 +110,12 @@ PyObject * fnEncryptFile(PyObject* self, PyObject* args)
             fwrite(buf, 1, AES_BLOCK_SIZE, dest);
             // printf("fnEncryptFile() is_last_block_fragment=FALSE, padding num = %d\n", AES_BLOCK_SIZE);
         }
-        
+
         fclose(src);
         fclose(dest);
     }
     KeyDestroy(&key);
-    
+
     Py_INCREF(Py_True);
     return Py_True;
 }
@@ -130,27 +130,27 @@ PyObject * fnDecryptFile(PyObject* self, PyObject* args)
     OAES_CTX* key = NULL;
     int is_find_last_block = FALSE;
     int file_size = 0;
-    
+
     if (!PyArg_ParseTuple(args, "s", &src_filepath))
         return NULL;
-    
+
     KeyAlloc(&key);
     {
         /*
         src = fopen(src_filepath, "rb");
-        
+
         // error handling
         // if(!src)
         // {
         // }
-        
+
         fseek(src, 0, SEEK_END);
         file_size = ftell(src);
         fseek(src, 0, SEEK_SET);
-        
+
         plaint = (unsigned char*) malloc( file_size * sizeof(unsigned char) );
         cur_plaint = plaint;
-        
+
         while(!feof(src))
         {
             s = fread(cur_plaint, 1, AES_BLOCK_SIZE, src);
@@ -224,7 +224,7 @@ PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
             {
                 memcpy(cur_plain, cur_cipher, AES_BLOCK_SIZE);
                 oaes_decrypt_block(key, cur_plain, AES_BLOCK_SIZE);
-                
+
                 cur_plain += AES_BLOCK_SIZE;
                 cur_cipher += AES_BLOCK_SIZE;
                 proc_size += AES_BLOCK_SIZE;
@@ -238,4 +238,3 @@ PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
     KeyDestroy(&key);
     return py_plain_obj;
 }
-

@@ -204,7 +204,7 @@ class TestPyConcreteBase(unittest.TestCase):
         # remove files
         if not keep_py:
             os.remove(py_filepath)
-        
+
         return pyc_filepath
 
     def lib_gen_pye(self, py_code, pye_filename, folder=None, keep_py=False, keep_pyc=False):
@@ -246,5 +246,3 @@ class TestPyConcreteBase(unittest.TestCase):
         arg_remove_py = '--remove-py' if remove_py else ''
         arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
         subprocess.check_call('%s %s compile --source=%s --pye %s %s' % (sys.executable, admin_path, folder, arg_remove_py, arg_remove_pyc), env=get_pyconcrete_env_path(), shell=True)
-
-

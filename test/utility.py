@@ -126,5 +126,3 @@ def lib_compile_pye(folder, remove_py=False, remove_pyc=False):
         env=get_pyconcrete_env_path(),
         shell=True,
     )
-
-

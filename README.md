@@ -37,7 +37,7 @@ Installation
 ```sh
 $ pip install pyconcrete
 ```
-  > If you only execute `pip install` will not display any prompt(via stdout) from pyconcrete. 
+  > If you only execute `pip install` will not display any prompt(via stdout) from pyconcrete.
   > Installation will be `blocked` and `waiting for user input passphrase twice`.
   > You must input passphrase for installation continuously.
 
@@ -45,7 +45,7 @@ $ pip install pyconcrete
 $ pip install pyconcrete --egg --install-option="--passphrase=<your passphrase>"
 ```
   > pyconcrete installed as egg, if you want to uninstall pyconcrete will need to manually delete `pyconcrete.pth`.
-  
+
 ### source
 * get the pyconcrete source code
 ```sh
@@ -69,8 +69,8 @@ $ pyconcrete-admin.py compile --source=<your py module dir> --pye
 ```
 
 * remove `*.py` `*.pyc` or copy `*.pye` to other folder
-* *main*.py encrypted as *main*.pye, it can't be executed by normal `python`. 
-You must use `pyconcrete` to process the *main*.pye script. 
+* *main*.py encrypted as *main*.pye, it can't be executed by normal `python`.
+You must use `pyconcrete` to process the *main*.pye script.
 `pyconcrete`(*exe*) will be installed in your system path (ex: /usr/local/bin)
 
 ```sh
@@ -174,4 +174,3 @@ https://github.com/cython/cython/wiki/CythonExtensionsOnWindows
 Announcement
 --------------
 pyconcrete is an experimental project, there is always a way to decrypt .pye files, but pyconcrete just make it harder.
-

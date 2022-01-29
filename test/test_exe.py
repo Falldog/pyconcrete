@@ -88,4 +88,3 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')
         self.assertEqual(output.strip(), '__main__')
-

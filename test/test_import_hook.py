@@ -46,5 +46,3 @@ class TestImportHook(base.TestPyConcreteBase):
         from relative_import import main
         self.assertEqual(main.data, 'main')
         self.assertEqual(main.util.data, 'util')
-
-
