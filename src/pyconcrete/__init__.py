@@ -26,7 +26,7 @@ EXT_PYE = '.pye'
 
 __all__ = ["info"]
 
-from . import _pyconcrete
+from . import _pyconcrete  # noqa: E402
 
 info = _pyconcrete.info
 encrypt_file = _pyconcrete.encrypt_file

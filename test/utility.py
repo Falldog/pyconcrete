@@ -101,8 +101,6 @@ class ImportedTestCase(object):
                 return_code=ret_data['return_code'],
             )
         except Exception as e:
-            import traceback
-
             raise ImportedTestCaseError(ret_data['output_lines'], ret_data['return_code'], str(e))
 
 

@@ -2,7 +2,7 @@ from threading import Thread
 
 try:
     from queue import Queue
-except:
+except:  # noqa: E722
     from Queue import Queue
 
 

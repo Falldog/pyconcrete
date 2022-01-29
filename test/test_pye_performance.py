@@ -41,28 +41,26 @@ def main_requests(import_concrete, q):
     purpose: testing import without exception
     """
     if import_concrete:
-        import pyconcrete
+        import pyconcrete  # noqa: F401
 
     t = time.time()
-    import requests
-    from requests.adapters import HTTPAdapter
-    from requests.auth import HTTPDigestAuth, _basic_auth_str
-    from requests.compat import Morsel, builtin_str, cookielib, getproxies, is_py3, str, urljoin, urlparse
-    from requests.cookies import cookiejar_from_dict, morsel_to_cookie
-    from requests.exceptions import (
-        ConnectionError,
-        ConnectTimeout,
-        InvalidSchema,
-        InvalidURL,
-        MissingSchema,
-        ReadTimeout,
-        RetryError,
-        Timeout,
-    )
-    from requests.hooks import default_hooks
-    from requests.models import PreparedRequest, urlencode
-    from requests.sessions import SessionRedirectMixin
-    from requests.structures import CaseInsensitiveDict
+    import requests  # noqa: F401
+    from requests.adapters import HTTPAdapter  # noqa: F401
+    from requests.auth import HTTPDigestAuth, _basic_auth_str  # noqa: F401
+    from requests.compat import Morsel, builtin_str, cookielib, getproxies, is_py3, str, urljoin, urlparse  # noqa: F401
+    from requests.cookies import cookiejar_from_dict, morsel_to_cookie  # noqa: F401
+    from requests.exceptions import ConnectionError  # noqa: F401
+    from requests.exceptions import ConnectTimeout  # noqa: F401
+    from requests.exceptions import InvalidSchema  # noqa: F401
+    from requests.exceptions import InvalidURL  # noqa: F401
+    from requests.exceptions import MissingSchema  # noqa: F401
+    from requests.exceptions import ReadTimeout  # noqa: F401
+    from requests.exceptions import RetryError  # noqa: F401
+    from requests.exceptions import Timeout  # noqa: F401
+    from requests.hooks import default_hooks  # noqa: F401
+    from requests.models import PreparedRequest, urlencode  # noqa: F401
+    from requests.sessions import SessionRedirectMixin  # noqa: F401
+    from requests.structures import CaseInsensitiveDict  # noqa: F401
 
     t = time.time() - t
     q.put(requests.__file__)

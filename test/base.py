@@ -41,7 +41,7 @@ tmp_pyconcrete_exe = None
 
 def to_bytes(s):
     if PY2:
-        if isinstance(s, unicode):
+        if isinstance(s, unicode):  # noqa: F821
             return s.encode('utf8')
         return s
     else:
@@ -105,7 +105,7 @@ def build_tmp_pyconcrete(passphrase):
 def copy_pyconcrete_ext(tmp_dir):
     tmp_pyconcrete = join(tmp_dir, 'pyconcrete')
     for f in os.listdir(tmp_pyconcrete):
-        if re.match('^_pyconcrete.*\.(so|dll|pyd)$', f):
+        if re.match(r'^_pyconcrete.*\.(so|dll|pyd)$', f):
             shutil.copy(join(tmp_pyconcrete, f), join(ROOT_DIR, 'src', 'pyconcrete'))
             break
 
