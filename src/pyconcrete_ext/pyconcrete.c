@@ -36,7 +36,7 @@ PyObject* g_PyConcreteError = NULL;
 static void print_buffer(unsigned char* buf, int size)
 {
     int i = 0;
-    printf("print buffer 0x%P(%d) ", buf, size);
+    printf("print buffer 0x%p(%d) ", buf, size);
     for(i=0 ; i<size ; ++i)
         printf("%X ", *(buf+i));
     printf("\n");
@@ -122,6 +122,7 @@ PyObject * fnEncryptFile(PyObject* self, PyObject* args)
 
 PyObject * fnDecryptFile(PyObject* self, PyObject* args)
 {
+    /*
     FILE* src = NULL;
     const char* src_filepath = NULL;
     //unsigned char buf[AES_BLOCK_SIZE];
@@ -136,7 +137,6 @@ PyObject * fnDecryptFile(PyObject* self, PyObject* args)
 
     KeyAlloc(&key);
     {
-        /*
         src = fopen(src_filepath, "rb");
 
         // error handling
@@ -164,9 +164,9 @@ PyObject * fnDecryptFile(PyObject* self, PyObject* args)
             }
         }
         fclose(src);
-        */
     }
     KeyDestroy(&key);
+    */
     return NULL;
 }
 
@@ -209,7 +209,7 @@ PyObject * fnDecryptBuffer(PyObject* self, PyObject* args)
         // printf("fnDecryptBuffer() cipher_size=%d, plain_size=%d padding_size=%d\n", cipher_buf_size, plain_buf_size, padding_size);
 
         py_plain_obj = PyBytes_FromStringAndSize(NULL, plain_buf_size);  // allocate whole string memory first, fill later
-        plain_buf = PyBytes_AS_STRING(py_plain_obj);
+        plain_buf = (unsigned char *)PyBytes_AS_STRING(py_plain_obj);
 
         cur_plain = plain_buf;
         cur_cipher = cipher_buf;

@@ -113,7 +113,7 @@ void execPycContent(PyObject* pyc_content)
     // setup global and exec loaded py_code
     PyDict_SetItemString(global, "__name__", main_name);
     PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
-    PyEval_EvalCode((PyCodeObject*)py_code, global, global);
+    PyEval_EvalCode(py_code, global, global);
 
 ERROR:
     Py_XDECREF(py_code);
