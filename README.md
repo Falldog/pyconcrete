@@ -42,6 +42,12 @@ $ pip install pyconcrete
   > You must input passphrase for installation continuously.
 
 ```sh
+$ PASSPHRASE=YOUR_PASSPHRASE_HERE pip install pyconcrete
+```
+
+or, if you use an old pip version that supports --egg:
+
+```sh
 $ pip install pyconcrete --egg --install-option="--passphrase=<your passphrase>"
 ```
   > pyconcrete installed as egg, if you want to uninstall pyconcrete will need to manually delete `pyconcrete.pth`.
