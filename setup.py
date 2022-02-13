@@ -17,7 +17,6 @@
 import hashlib
 import imp
 import os
-import subprocess
 import sys
 import sysconfig
 from distutils.command.build import build
@@ -359,9 +358,8 @@ def get_exe_link_args():
 
     # add -Lxxxx for link correct lib -lpython3.x
     if is_mac():
-        ldflags = subprocess.check_output('python{ver}-config --ldflags'.format(ver=ver), shell=True)
-        ldflags = ldflags.decode('utf8')
-        return [ld for ld in ldflags.split() if ld.startswith('-L')]
+        if not sysconfig.get_config_var('Py_ENABLE_SHARED'):  # reference from `python-config --ldflags`
+            return ['-L' + sysconfig.get_config_var('LIBPL')]
 
     return None
 
