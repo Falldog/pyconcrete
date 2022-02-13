@@ -100,7 +100,7 @@ class PyConcreteAdmin(object):
         else:
             try:
                 args = parser.parse_args()
-                self.verbose = args.verbose or IS_TEST_VERBOSE
+                self.verbose = getattr(args, 'verbose', False) or IS_TEST_VERBOSE
                 args.func(args)
             except PyConcreteError as e:
                 print('Error: ' + str(e))
