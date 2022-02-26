@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import atexit
 import hashlib
 import imp
 import os
@@ -30,6 +31,7 @@ from src.config import DEFAULT_KEY, EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR, SECRET
 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__
+secret_key_header_created = False
 
 PY2 = sys.version_info.major < 3
 
@@ -91,6 +93,9 @@ def create_secret_key_header(key, factor):
     # reference from - http://stackoverflow.com/questions/1356896/how-to-hide-a-string-in-binary-code
     # encrypt the secret key in binary code
     # avoid to easy read from HEX view
+    global secret_key_header_created
+    if secret_key_header_created:
+        return
 
     key_val_lst = []
     for i, k in enumerate(key):
@@ -125,6 +130,9 @@ def create_secret_key_header(key, factor):
     with open(SECRET_HEADER_PATH, 'w') as f:
         f.write(code)
 
+    secret_key_header_created = True
+    atexit.register(remove_secret_key_header)
+
 
 def remove_secret_key_header():
     if os.path.exists(SECRET_HEADER_PATH):
@@ -143,27 +151,28 @@ class ExeDistribution(Distribution):
 
 class CmdBase:
     def pre_process(self):
-        self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
-        if self.manual_create_secrete_key_file:
-            if not self.passphrase:
-                self.passphrase = os.getenv('PASSPHRASE')
-            if not self.passphrase:
-                self.passphrase = input(
-                    "please input the passphrase \nfor encrypt your python script (enter for default) : \n"
-                )
-                if len(self.passphrase) == 0:
-                    self.passphrase = DEFAULT_KEY
-                else:
-                    passphrase2 = input("please input again to confirm\n")
-                    if self.passphrase != passphrase2:
-                        raise Exception("Passphrase is different")
+        if secret_key_header_created:
+            return
 
-            k, f = hash_key(self.passphrase.encode('utf8'))
-            create_secret_key_header(k, f)
+        if not self.passphrase:
+            self.passphrase = os.getenv('PASSPHRASE')
+
+        if not self.passphrase:
+            self.passphrase = input(
+                "please input the passphrase \nfor encrypt your python script (enter for default) : \n"
+            )
+            if len(self.passphrase) == 0:
+                self.passphrase = DEFAULT_KEY
+            else:
+                passphrase2 = input("please input again to confirm\n")
+                if self.passphrase != passphrase2:
+                    raise Exception("Passphrase is different")
+
+        k, f = hash_key(self.passphrase.encode('utf8'))
+        create_secret_key_header(k, f)
 
     def post_process(self):
-        if self.manual_create_secrete_key_file:
-            remove_secret_key_header()
+        pass
 
 
 class BuildEx(CmdBase, build):
