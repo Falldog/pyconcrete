@@ -145,7 +145,8 @@ class CmdBase:
     def pre_process(self):
         self.manual_create_secrete_key_file = not os.path.exists(SECRET_HEADER_PATH)
         if self.manual_create_secrete_key_file:
-            self.passphrase = os.getenv('PASSPHRASE')
+            if not self.passphrase:
+                self.passphrase = os.getenv('PASSPHRASE')
             if not self.passphrase:
                 self.passphrase = input(
                     "please input the passphrase \nfor encrypt your python script (enter for default) : \n"
