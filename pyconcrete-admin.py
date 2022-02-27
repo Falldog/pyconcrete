@@ -92,6 +92,7 @@ class PyConcreteAdmin(object):
 
         # === release === #
         parser_release = subparsers.add_parser('release', help='release pyconcrete for pypi')
+        parser_release.add_argument('-t', '--test', dest='test', action='store_true', help='test on testpypi')
         parser_release.set_defaults(func=self.release)
 
         if len(sys.argv) == 1:
@@ -231,7 +232,13 @@ class PyConcreteAdmin(object):
             raise
 
         subprocess.call('python setup.py sdist', shell=True)  # ignore can't found README error
-        subprocess.check_output('twine upload dist/*', shell=True)
+        if args.test:
+            # could be testing by pypi
+            # $ pip install -i https://test.pypi.org/simple/ pyconcrete==xxx
+            # note: `testpypi` should be appear on ~/.pypirc
+            subprocess.check_output('twine upload -r testpypi dist/*', shell=True)
+        else:
+            subprocess.check_output('twine upload dist/*', shell=True)
         subprocess.check_output('rm README.rst', shell=True)
         subprocess.check_output('rm -rf build', shell=True)
         subprocess.check_output('rm -rf dist', shell=True)
