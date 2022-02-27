@@ -6,6 +6,7 @@
 #
 from os.path import abspath, dirname, join, pardir
 
+PASSPHRASE_ENV = 'PYCONCRETE_PASSPHRASE'
 ROOT_DIR = abspath(join(dirname(__file__), pardir))
 TEST_DIR = 'test'
 SRC_DIR = join('src')

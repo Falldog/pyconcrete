@@ -28,7 +28,7 @@ from distutils.core import Command, Extension, setup
 from distutils.dist import Distribution
 from os.path import join
 
-from src.config import EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
+from src.config import EXE_SRC_DIR, EXT_SRC_DIR, PASSPHRASE_ENV, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__
@@ -156,7 +156,7 @@ class CmdBase:
             return
 
         if not self.passphrase:
-            self.passphrase = os.getenv('PASSPHRASE')
+            self.passphrase = os.getenv(PASSPHRASE_ENV)
 
         if not self.passphrase:
             self.passphrase = input(
