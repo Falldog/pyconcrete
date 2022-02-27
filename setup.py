@@ -22,6 +22,7 @@ import sys
 import sysconfig
 from distutils.command.build import build
 from distutils.command.build_ext import build_ext
+from distutils.command.clean import clean
 from distutils.command.install import install
 from distutils.core import Command, Extension, setup
 from distutils.dist import Distribution
@@ -267,7 +268,15 @@ class InstallEx(CmdBase, install):
         install.finalize_options(self)
         self.set_undefined_options('build', ('build_scripts', 'build_scripts'))
 
+    def _clean_build(self):
+        c = clean(self.distribution)
+        c.all = True
+        c.finalize_options()
+        c.run()
+
     def run(self):
+        self._clean_build()
+
         self.pre_process()
         ret = install.run(self)
         self.install_exe()
