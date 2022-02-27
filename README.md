@@ -34,15 +34,9 @@ Installation
   * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
 
 ### pip
+You must set up environment variable `PYCONCRETE_PASSPHRASE` for installation continuously.
 ```sh
-$ pip install pyconcrete
-```
-  > If you only execute `pip install` will not display any prompt(via stdout) from pyconcrete.
-  > Installation will be `blocked` and `waiting for user input passphrase twice`.
-  > You must input passphrase for installation continuously.
-
-```sh
-$ PASSPHRASE=YOUR_PASSPHRASE_HERE pip install pyconcrete
+$ PYCONCRETE_PASSPHRASE=<your passphrase here> pip install pyconcrete
 ```
 
 or, if you use an old pip version that supports --egg:
