@@ -6,8 +6,6 @@
 #
 from os.path import abspath, dirname, join, pardir
 
-DEFAULT_KEY = 'Falldog'
-
 ROOT_DIR = abspath(join(dirname(__file__), pardir))
 TEST_DIR = 'test'
 SRC_DIR = join('src')

@@ -28,7 +28,7 @@ from distutils.core import Command, Extension, setup
 from distutils.dist import Distribution
 from os.path import join
 
-from src.config import DEFAULT_KEY, EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
+from src.config import EXE_SRC_DIR, EXT_SRC_DIR, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
 
 version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
 version = version_mod.__version__
@@ -163,7 +163,7 @@ class CmdBase:
                 "please input the passphrase \nfor encrypt your python script (enter for default) : \n"
             )
             if len(self.passphrase) == 0:
-                self.passphrase = DEFAULT_KEY
+                raise Exception("empty passphrase is not allow")
             else:
                 passphrase2 = input("please input again to confirm\n")
                 if self.passphrase != passphrase2:
