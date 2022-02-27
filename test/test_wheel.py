@@ -16,6 +16,7 @@
 
 import os
 import subprocess
+import tempfile
 from test import base
 
 from src.config import PASSPHRASE_ENV
@@ -25,7 +26,13 @@ class TestWheel(base.TestPyConcreteBase):
     def test_building_by_wheel(self):
         env = os.environ.copy()
         env[PASSPHRASE_ENV] = 'test'
-        sp = subprocess.run('pip wheel .', env=env, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        sp = subprocess.run(
+            'pip wheel --wheel-dir=%s .' % tempfile.gettempdir(),
+            env=env,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
         if sp.returncode != 0:
             print(sp.stdout.decode('utf-8'))
             raise Exception("pip create wheel fail...")
