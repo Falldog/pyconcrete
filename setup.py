@@ -269,6 +269,13 @@ class InstallEx(CmdBase, install):
         self.set_undefined_options('build', ('build_scripts', 'build_scripts'))
 
     def _clean_build(self):
+        # for clear old build cached (majorly for *.o)
+        # but, `pip install pyconcrete` will build wheel first, then do installation, should skip the case avoid
+        # to clear current building files
+        for cmd, ran in self.distribution.have_run.items():
+            if cmd.startswith('build') and ran:
+                return
+
         c = clean(self.distribution)
         c.all = True
         c.finalize_options()
