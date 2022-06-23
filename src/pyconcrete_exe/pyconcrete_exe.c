@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
     Py_Initialize();
-	PyGILState_Ensure();
+    PyGILState_Ensure();
 
     if(argc >= 2)
     {
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         }
     }
 
-	PyGILState_Ensure();
+    PyGILState_Ensure();
 
     if (PyErr_Occurred()) {
         PyErr_Print();
@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     PyObject *module = PyImport_ImportModule("atexit");
     Py_XDECREF(module);
 
-	if (!PyImport_AddModule("dummy_threading")) {
+    if (!PyImport_AddModule("dummy_threading")) {
         PyErr_Clear();
-	}
+    }
 
     Py_Finalize();
 
