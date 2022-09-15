@@ -11,22 +11,22 @@ RUN set -ex \
         less \
         \
         curl \
-		build-essential \
-		software-properties-common \
-		python3-distutils \
+        build-essential \
+        software-properties-common \
+        python3-distutils \
         \
     && add-apt-repository -y ppa:deadsnakes/ppa \
     \
-	&& rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         python${PY_VER} python${PY_VER}-dev \
         \
-	&& rm -rf /var/lib/apt/lists/* \
-	\
-	&& curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    && curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
 
 RUN set -ex \
     && mkdir -p /code \
