@@ -6,7 +6,7 @@ Environment setup
 --------------
 * install docker & execute below command to build and run
     ```bash
-    $ ./bin/run-example-djnaog.sh
+    $ ./bin/run-example-django.sh
     ```
 * access `http://127.0.0.1:5151` by browser
 
