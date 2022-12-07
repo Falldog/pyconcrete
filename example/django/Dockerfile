@@ -26,7 +26,7 @@ RUN set -ex \
         \
     && rm -rf /var/lib/apt/lists/* \
     \
-    && curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
+    && curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python${PY_VER}
 
 RUN set -ex \
     && mkdir -p /code \
