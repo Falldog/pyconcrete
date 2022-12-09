@@ -1,8 +1,8 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 LABEL maintainer=falldog
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG PY_VER=3.6
+ARG PY_VER=3.10
 
 RUN set -ex \
     && apt-get update \
@@ -16,7 +16,6 @@ RUN set -ex \
         software-properties-common \
         python3-distutils \
         \
-    && add-apt-repository -y ppa:deadsnakes/ppa \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \

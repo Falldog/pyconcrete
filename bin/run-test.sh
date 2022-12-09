@@ -2,7 +2,7 @@
 
 set -ex
 
-PY_VER=${PY_VER:="3.6"}
+PY_VER=${PY_VER:="3.10"}
 TEST_VERBOSE=${TEST_VERBOSE:=""}
 
 

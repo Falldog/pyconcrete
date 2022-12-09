@@ -2,7 +2,6 @@
 
 set -ex
 
-PY_VER=${PY_VER:="3.6"}
 PORT=${PORT:="5151"}
 
 declare -xr REPO_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )

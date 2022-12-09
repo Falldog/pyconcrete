@@ -13,8 +13,8 @@ Environment setup
 
 Environment
 --------------
-* Docker, Ubuntu 18.04
-* Python 3.6
+* Docker, Ubuntu 22.04
+* Python 3.10
 * Django 2
 
 
