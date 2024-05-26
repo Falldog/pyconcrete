@@ -3,11 +3,10 @@ import sys
 from os.path import join
 
 from .defines import ROOT_DIR
+from .pyconcrete_builder import get_pyconcrete_env_path
 
 
 def lib_compile_pyc(folder, remove_py=False):
-    from test.base import get_pyconcrete_env_path
-
     admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
     arg_remove_py = '--remove-py' if remove_py else ''
     subprocess.check_call(
@@ -18,8 +17,6 @@ def lib_compile_pyc(folder, remove_py=False):
 
 
 def lib_compile_pye(folder, remove_py=False, remove_pyc=False):
-    from test.base import get_pyconcrete_env_path
-
     admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
     arg_remove_py = '--remove-py' if remove_py else ''
     arg_remove_pyc = '--remove-pyc' if remove_pyc else ''

@@ -14,17 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import atexit
-import os
-import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import unittest
-from os.path import abspath, dirname, exists, join
-
-from src.config import SECRET_HEADER_PATH
+from os.path import join
+from test.utility.defines import ROOT_DIR
+from test.utility.pyconcrete_builder import pyconcrete_in_test_builder
 
 try:
     from importlib import reload
@@ -32,100 +28,14 @@ except ImportError:
     pass
 
 
-PY2 = sys.version_info[0] < 3
-ROOT_DIR = abspath(join(dirname(__file__), '..'))
-tmp_pyconcrete_dir = None
-tmp_pyconcrete_exe = None
-
-
 def touch(file_path):
     open(file_path, 'a').close()
-
-
-def build_tmp_pyconcrete(passphrase):
-    global tmp_pyconcrete_dir, tmp_pyconcrete_exe
-    if tmp_pyconcrete_dir:
-        return tmp_pyconcrete_dir
-
-    # remove secret key header, for testing on generate secret-key file
-    if os.path.exists(SECRET_HEADER_PATH):
-        os.remove(SECRET_HEADER_PATH)
-
-    tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_lib_')
-
-    _ori_dir = os.getcwd()
-    os.chdir(ROOT_DIR)
-    try:
-        # just build
-        # force_option = '--force' if force else ''
-        # subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
-
-        cmd = (
-            sys.executable,
-            'setup.py',
-            'install',
-            '--passphrase=%s' % passphrase,
-            '--install-base=%s' % tmp_dir,
-            '--install-purelib=%s' % tmp_dir,
-            '--install-platlib=%s' % tmp_dir,
-            '--install-scripts=%s' % join(tmp_dir, 'scripts'),
-            '--install-headers=%s' % join(tmp_dir, 'headers'),
-            '--install-data=%s' % join(tmp_dir, 'data'),
-            '--quiet',
-        )
-        subprocess.check_call(' '.join(cmd), shell=True)
-
-        copy_pyconcrete_ext(tmp_dir)
-
-        exe_name = 'pyconcrete.exe' if sys.platform == 'win32' else 'pyconcrete'
-        tmp_pyconcrete_exe = join(tmp_dir, 'scripts', exe_name)
-        tmp_pyconcrete_dir = tmp_dir
-        print('build tmp pyconcrete at "%s"' % tmp_dir)
-
-        if not exists(tmp_pyconcrete_exe):
-            raise ValueError("can't find pyconcrete exe!")
-    finally:
-        os.chdir(_ori_dir)
-
-    return tmp_pyconcrete_dir
-
-
-def copy_pyconcrete_ext(tmp_dir):
-    tmp_pyconcrete = join(tmp_dir, 'pyconcrete')
-    for f in os.listdir(tmp_pyconcrete):
-        if re.match(r'^_pyconcrete.*\.(so|dll|pyd)$', f):
-            shutil.copy(join(tmp_pyconcrete, f), join(ROOT_DIR, 'src', 'pyconcrete'))
-            break
-
-
-def remove_tmp_pyconcrete():
-    global tmp_pyconcrete_dir
-    if tmp_pyconcrete_dir:
-        shutil.rmtree(tmp_pyconcrete_dir)
-        print('remove tmp pyconcrete at "%s"' % tmp_pyconcrete_dir)
-        tmp_pyconcrete_dir = None
-
-
-atexit.register(remove_tmp_pyconcrete)
-
-
-def get_pyconcrete_env_path():
-    """
-    append tmp_pyconcrete_dir path into PYTHONPATH
-    for subprocess execute script and import the pyconcrete we just builded
-    """
-    global tmp_pyconcrete_dir
-    env = os.environ.copy()
-    env.setdefault('PYTHONPATH', '')
-    env['PYTHONPATH'] += os.pathsep + tmp_pyconcrete_dir
-    return env
 
 
 # ==================================== TestPyConcreteBase ==================================== #
 
 
 class TestPyConcreteBase(unittest.TestCase):
-    passphrase = 'Falldog'
     force_build = True
 
     def __init__(self, *argv, **argd):
@@ -133,7 +43,7 @@ class TestPyConcreteBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        build_tmp_pyconcrete(cls.passphrase)
+        pyconcrete_in_test_builder.init()
 
         cls.lib_dir = join(ROOT_DIR, 'src')
         cls._cls_sys_path = sys.path[:]
@@ -152,11 +62,10 @@ class TestPyConcreteBase(unittest.TestCase):
             cls._cls_sys_path = None
 
     def setUp(self):
-        global tmp_pyconcrete_exe
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
         self._sys_path = sys.path[:]
         sys.path.insert(0, self.tmp_dir)
-        self._pyconcrete_exe = tmp_pyconcrete_exe
+        self._pyconcrete_exe = pyconcrete_in_test_builder.pyconcrete_exe_path
 
     def tearDown(self):
         if self._sys_path:
