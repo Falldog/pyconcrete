@@ -18,11 +18,12 @@ from __future__ import unicode_literals
 import os
 import subprocess
 from test import base
+from test.utility.gen_code_tools import lib_gen_pye
 
 
 class TestPyconcreteExe(base.TestPyConcreteBase):
     def test_execute_pye(self):
-        pye = self.lib_gen_pye('import os\n' 'print(os.getcwd())', pye_filename='main.pye')
+        pye = lib_gen_pye('import os\n' 'print(os.getcwd())', pye_filename='main.pye', folder=self.tmp_dir)
 
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')
@@ -34,7 +35,9 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
 
     def test_sys_path(self):
         """pye dir should be listed in sys.path"""
-        pye = self.lib_gen_pye('import sys\n' 'paths = "\\n".join(sys.path)\n' 'print(paths)', pye_filename='main.pye')
+        pye = lib_gen_pye(
+            'import sys\n' 'paths = "\\n".join(sys.path)\n' 'print(paths)', pye_filename='main.pye', folder=self.tmp_dir
+        )
 
         pye_dir = os.path.dirname(pye)
         pye_dir = os.path.realpath(pye_dir)  # tmpdir would be under symlink at MacOS
@@ -47,14 +50,18 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
         self.assertTrue(pye_dir in paths, "pye dir(%s) not in output paths %s" % (pye_dir, paths))
 
     def test_sys_argv(self):
-        pye = self.lib_gen_pye('import sys\n' 'argv = " ".join(sys.argv)\n' 'print(argv)', pye_filename='main.pye')
+        pye = lib_gen_pye(
+            'import sys\n' 'argv = " ".join(sys.argv)\n' 'print(argv)', pye_filename='main.pye', folder=self.tmp_dir
+        )
 
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')
         self.assertEqual(output.strip(), pye)
 
     def test_sys_argv_more_arguments(self):
-        pye = self.lib_gen_pye('import sys\n' 'argv = " ".join(sys.argv)\n' 'print(argv)', pye_filename='main.pye')
+        pye = lib_gen_pye(
+            'import sys\n' 'argv = " ".join(sys.argv)\n' 'print(argv)', pye_filename='main.pye', folder=self.tmp_dir
+        )
 
         output = subprocess.check_output([self._pyconcrete_exe, pye, '1', '2', '3'])
         output = output.decode('utf8')
@@ -62,7 +69,7 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
         self.assertEqual(output.strip(), pye + ' 1 2 3')
 
     # def test_sys_exit(self):
-    #     pye = self.lib_gen_pye('import sys\n'
+    #     pye = lib_gen_pye('import sys\n'
     #                            'sys.exit(1)',
     #                            pye_filename='main.pye')
     #
@@ -70,7 +77,7 @@ class TestPyconcreteExe(base.TestPyConcreteBase):
     #     self.assertEqual(output, 1)
 
     def test__name__be__main__(self):
-        pye = self.lib_gen_pye('print(__name__)', pye_filename='main.pye')
+        pye = lib_gen_pye('print(__name__)', pye_filename='main.pye', folder=self.tmp_dir)
 
         output = subprocess.check_output([self._pyconcrete_exe, pye])
         output = output.decode('utf8')

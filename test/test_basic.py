@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 import logging
 import unittest
 from test import base
+from test.utility.gen_code_tools import lib_gen_pye
 
 logger = logging.getLogger('pyconcrete')
 
@@ -34,7 +35,7 @@ class TestBasic(base.TestPyConcreteBase):
     def test_import_pye(self):
         py_code = b"v_int=1\r\n"
         py_code += b"v_string='abc'\r\n"
-        pye_filepath = self.lib_gen_pye(py_code, 'test_module.pye')
+        pye_filepath = lib_gen_pye(py_code, 'test_module.pye', self.tmp_dir)
 
         # import test.pye testing
         import test_module

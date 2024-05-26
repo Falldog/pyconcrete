@@ -18,6 +18,7 @@ import shutil
 import sys
 from os.path import join
 from test import base
+from test.utility.compile_tools import lib_compile_pye
 
 
 class TestImportHook(base.TestPyConcreteBase):
@@ -44,7 +45,7 @@ class TestImportHook(base.TestPyConcreteBase):
         shutil.copytree(src_path, join(self.tmp_dir, 'relative_import'))
         base.touch(join(self.tmp_dir, '__init__.py'))
 
-        self.lib_compile_pye(self.tmp_dir, remove_py=True, remove_pyc=True)
+        lib_compile_pye(self.tmp_dir, remove_py=True, remove_pyc=True)
 
         from relative_import import main
 

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 import logging
 import unittest
 from test import base
+from test.utility.gen_code_tools import lib_gen_py
 
 logger = logging.getLogger('pyconcrete')
 
@@ -34,7 +35,7 @@ class TestConcrete(base.TestPyConcreteBase):
             pyconcrete.decrypt_buffer(data)
 
     def __do_encrypt_decrypt_file(self, py_code):
-        py_filepath = self.lib_gen_py(py_code, 'test.py')
+        py_filepath = lib_gen_py(py_code, 'test.py', self.tmp_dir)
         pye_filepath = py_filepath + 'e'
 
         import pyconcrete

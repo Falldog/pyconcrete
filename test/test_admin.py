@@ -21,6 +21,7 @@ import sys
 import unittest
 from os.path import abspath, dirname, exists, join
 from test import base
+from test.utility.gen_code_tools import lib_gen_py
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
@@ -70,11 +71,11 @@ class TestAdminScript(base.TestPyConcreteBase):
 class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
     def setUp(self):
         super(TestAdminIgnoreFilesScript, self).setUp()
-        self.lib_gen_py("", "test1.py")
-        self.lib_gen_py("", "test2.py")
-        self.lib_gen_py("", "test.py")
-        self.lib_gen_py("", "a_test.py")
-        self.lib_gen_py("", "b_test.py")
+        lib_gen_py("", "test1.py", self.tmp_dir)
+        lib_gen_py("", "test2.py", self.tmp_dir)
+        lib_gen_py("", "test.py", self.tmp_dir)
+        lib_gen_py("", "a_test.py", self.tmp_dir)
+        lib_gen_py("", "b_test.py", self.tmp_dir)
 
     def test_ignore_file_list_match(self):
         target_dir = join(self.tmp_dir, 'data')
