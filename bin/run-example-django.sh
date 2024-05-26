@@ -17,4 +17,5 @@ echo "Django testing website running at http://127.0.0.1:${PORT}"
 docker run \
     --rm \
     -p ${PORT}:80 \
+    --name pyconcrete-example-django \
     falldog/example-django
