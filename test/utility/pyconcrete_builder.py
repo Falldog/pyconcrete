@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import atexit
+import importlib
 import os
 import re
 import shutil
@@ -62,7 +63,6 @@ def import_pyconcrete_in_test():
     So, in testing environment, we should import pyconcrete via this function.
     """
     global pyconcrete_in_test_builder
-    import importlib
 
     m = importlib.import_module(f'{TMP_BASE_PACKAGE_NAME}.pyconcrete')
     return m
@@ -143,6 +143,7 @@ class PyconcreteInTestBuilder:
                 raise ValueError("can't find pyconcrete exe!")
 
             self.is_init = True
+            self._add_sys_path()
             ret = self.tmp_pyconcrete_base_path
 
         finally:
@@ -155,9 +156,19 @@ class PyconcreteInTestBuilder:
             shutil.rmtree(self.tmp_pyconcrete_base_path)
             print(f'PyconcreteInTestBuilder.destroy() remove pyconcrete at {self.tmp_pyconcrete_base_path}')
 
+            self._remove_sys_path()
             self.tmp_pyconcrete_base_path = None
             self.tmp_pyconcrete_exe_path = None
             self.is_init = False
+
+    def _add_sys_path(self):
+        sys.path.insert(0, self.tmp_pyconcrete_base_path)
+
+    def _remove_sys_path(self):
+        try:
+            sys.path.remove(self.tmp_pyconcrete_base_path)
+        except ValueError:
+            pass
 
 
 # singleton

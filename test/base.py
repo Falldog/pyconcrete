@@ -43,8 +43,6 @@ class TestPyConcreteBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pyconcrete_base_path = pyconcrete_in_test_builder.init()
-        sys.path.insert(0, pyconcrete_base_path)
-        cls._pyconcrete_base_path = pyconcrete_base_path
 
         # Don't import pyconcrete directly
         # Avoid to import pyconcrete from code repository to keep the testing code clear.
@@ -54,15 +52,6 @@ class TestPyConcreteBase(unittest.TestCase):
         if not pyconcrete.__file__.startswith(pyconcrete_base_path):
             reload(pyconcrete)
             print('RELOAD pyconcrete, may be unexpected')
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls._pyconcrete_base_path:
-            try:
-                sys.path.remove(cls._pyconcrete_base_path)
-            except ValueError:
-                pass
-            cls._pyconcrete_base_path = None
 
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
