@@ -28,10 +28,6 @@ except ImportError:
     pass
 
 
-def touch(file_path):
-    open(file_path, 'a').close()
-
-
 # ==================================== TestPyConcreteBase ==================================== #
 
 

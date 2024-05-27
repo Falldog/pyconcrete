@@ -23,6 +23,7 @@ from multiprocessing import Process, Queue
 from os.path import abspath, dirname, join
 from test import base
 from test.utility.compile_tools import lib_compile_pyc, lib_compile_pye
+from test.utility.shell_tools import touch
 from zipfile import ZipFile
 
 CUR_DIR = abspath(dirname(__file__))
@@ -78,7 +79,7 @@ class TestPerformance(base.TestPyConcreteBase):
         zip.close()
 
         self.req_dir = join(self.tmp_dir, 'requests')
-        base.touch(join(self.req_dir, '__init__.py'))
+        touch(join(self.req_dir, '__init__.py'))
 
     def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
