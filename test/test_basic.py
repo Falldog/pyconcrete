@@ -20,13 +20,14 @@ import logging
 import unittest
 from test import base
 from test.utility.gen_code_tools import lib_gen_pye
-from test.utility.pyconcrete_builder import import_pyconcrete_in_test
+from test.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
 
 logger = logging.getLogger('pyconcrete')
 
 
 class TestBasic(base.TestPyConcreteBase):
     def test_import(self):
+        base_dir_path = pyconcrete_in_test_builder.init()
         pyconcrete = import_pyconcrete_in_test()
 
         logger.info('pyconcrete info="%s", path=%s' % (pyconcrete.info(), pyconcrete.__file__))
@@ -35,7 +36,7 @@ class TestBasic(base.TestPyConcreteBase):
         # print(f'pyconcrete.__name__={pyconcrete.__name__}')
         # print(f'pyconcrete.__file__={pyconcrete.__file__}')
         # print(f'pyconcrete.__loader__={pyconcrete.__loader__}')
-        self.assertTrue(pyconcrete.__file__.startswith(self.lib_dir))  # check import correct module
+        self.assertTrue(pyconcrete.__file__.startswith(base_dir_path))  # check import correct module
 
     def test_import_pye(self):
         module_name = 'test_module'

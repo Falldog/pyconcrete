@@ -43,34 +43,32 @@ class TestPyConcreteBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pyconcrete_base_path = pyconcrete_in_test_builder.init()
-
-        cls.lib_dir = pyconcrete_base_path  # {pyconcrete_base_path}/src/pyconcrete
-        cls._cls_sys_path = sys.path[:]
-        sys.path.insert(0, cls.lib_dir)
+        sys.path.insert(0, pyconcrete_base_path)
+        cls._pyconcrete_base_path = pyconcrete_base_path
 
         # Don't import pyconcrete directly
         # Avoid to import pyconcrete from code repository to keep the testing code clear.
         pyconcrete = import_pyconcrete_in_test()
 
         # force to reload it, avoid to load installed module
-        if not pyconcrete.__file__.startswith(cls.lib_dir):
+        if not pyconcrete.__file__.startswith(pyconcrete_base_path):
             reload(pyconcrete)
             print('RELOAD pyconcrete, may be unexpected')
 
     @classmethod
     def tearDownClass(cls):
-        if cls._cls_sys_path:
-            sys.path = cls._cls_sys_path
-            cls._cls_sys_path = None
+        if cls._pyconcrete_base_path:
+            try:
+                sys.path.remove(cls._pyconcrete_base_path)
+            except ValueError:
+                pass
+            cls._pyconcrete_base_path = None
 
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
-        self._sys_path = sys.path[:]
         sys.path.insert(0, self.tmp_dir)
         self._pyconcrete_exe = pyconcrete_in_test_builder.pyconcrete_exe_path
 
     def tearDown(self):
-        if self._sys_path:
-            sys.path = self._sys_path
-            self._sys_path = None
+        sys.path.remove(self.tmp_dir)
         shutil.rmtree(self.tmp_dir)
