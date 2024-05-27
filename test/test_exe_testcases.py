@@ -21,6 +21,7 @@ from os.path import join
 from test import base
 from test.utility.defines import ROOT_DIR
 from test.utility.imported_test_case import ImportedTestCase, ImportedTestCaseError
+from test.utility.pyconcrete_builder import pyconcrete_in_test_builder
 
 
 class TestExe(base.TestPyConcreteBase):
@@ -29,7 +30,7 @@ class TestExe(base.TestPyConcreteBase):
         test_case_dir = join(ROOT_DIR, 'test', 'exe_testcases')
         for d in os.listdir(test_case_dir):
             test_case_path = join(test_case_dir, d)
-            itc = ImportedTestCase(self._pyconcrete_exe, test_case_path)
+            itc = ImportedTestCase(pyconcrete_in_test_builder.pyconcrete_exe_path, test_case_path)
             if itc.is_available_test_case():
                 test_cases.append(itc)
             else:

@@ -67,7 +67,6 @@ class TestPyConcreteBase(unittest.TestCase):
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='pyconcrete_tmp_')
         sys.path.insert(0, self.tmp_dir)
-        self._pyconcrete_exe = pyconcrete_in_test_builder.pyconcrete_exe_path
 
     def tearDown(self):
         sys.path.remove(self.tmp_dir)
