@@ -19,6 +19,7 @@ import sys
 from os.path import join
 from test import base
 from test.utility.compile_tools import lib_compile_pye
+from test.utility.defines import ROOT_DIR
 from test.utility.shell_tools import touch
 
 
@@ -34,7 +35,7 @@ class TestImportHook(base.TestPyConcreteBase):
     def test_py_relative_import(self):
         import os
 
-        sys.path.insert(0, os.path.join(base.ROOT_DIR, 'test', 'data'))
+        sys.path.insert(0, os.path.join(ROOT_DIR, 'test', 'data'))
         from test.data.relative_import import main
 
         self.assertEqual(main.data, 'main')
@@ -42,7 +43,7 @@ class TestImportHook(base.TestPyConcreteBase):
         sys.path.pop(0)
 
     def test_pye_relative_import(self):
-        src_path = join(base.ROOT_DIR, 'test', 'data', 'relative_import')
+        src_path = join(ROOT_DIR, 'test', 'data', 'relative_import')
         shutil.copytree(src_path, join(self.tmp_dir, 'relative_import'))
         touch(join(self.tmp_dir, '__init__.py'))
 

@@ -18,9 +18,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-from os.path import join
-from test.utility.defines import ROOT_DIR
-from test.utility.pyconcrete_builder import pyconcrete_in_test_builder
+from test.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
 
 try:
     from importlib import reload
@@ -31,6 +29,11 @@ except ImportError:
 # ==================================== TestPyConcreteBase ==================================== #
 
 
+def dump_debug_info():
+    sys_path = '\n\t'.join(sys.path)
+    print(f"sys.path={sys_path}")
+
+
 class TestPyConcreteBase(unittest.TestCase):
     force_build = True
 
@@ -39,17 +42,20 @@ class TestPyConcreteBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pyconcrete_in_test_builder.init()
+        pyconcrete_base_path = pyconcrete_in_test_builder.init()
 
-        cls.lib_dir = join(ROOT_DIR, 'src')
+        cls.lib_dir = pyconcrete_base_path  # {pyconcrete_base_path}/src/pyconcrete
         cls._cls_sys_path = sys.path[:]
         sys.path.insert(0, cls.lib_dir)
 
-        import pyconcrete
+        # Don't import pyconcrete directly
+        # Avoid to import pyconcrete from code repository to keep the testing code clear.
+        pyconcrete = import_pyconcrete_in_test()
 
         # force to reload it, avoid to load installed module
         if not pyconcrete.__file__.startswith(cls.lib_dir):
             reload(pyconcrete)
+            print('RELOAD pyconcrete, may be unexpected')
 
     @classmethod
     def tearDownClass(cls):

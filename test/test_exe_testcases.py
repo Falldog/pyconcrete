@@ -19,13 +19,14 @@ from __future__ import unicode_literals
 import os
 from os.path import join
 from test import base
+from test.utility.defines import ROOT_DIR
 from test.utility.imported_test_case import ImportedTestCase, ImportedTestCaseError
 
 
 class TestExe(base.TestPyConcreteBase):
     def discover(self):
         test_cases = []
-        test_case_dir = join(base.ROOT_DIR, 'test', 'exe_testcases')
+        test_case_dir = join(ROOT_DIR, 'test', 'exe_testcases')
         for d in os.listdir(test_case_dir):
             test_case_path = join(test_case_dir, d)
             itc = ImportedTestCase(self._pyconcrete_exe, test_case_path)

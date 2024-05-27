@@ -18,6 +18,7 @@ import os
 import py_compile
 from os.path import join, splitext
 
+from .pyconcrete_builder import import_pyconcrete_in_test
 from .str_tools import to_bytes
 
 
@@ -67,8 +68,7 @@ def lib_gen_pye(py_code, pye_filename, folder, keep_py=False, keep_pyc=False):
     py_compile.compile(py_filepath, cfile=pyc_filepath)
 
     # create .pye & remove .py & .pyc
-    import pyconcrete
-
+    pyconcrete = import_pyconcrete_in_test()
     pyconcrete.encrypt_file(pyc_filepath, pye_filepath)
 
     # remove files
