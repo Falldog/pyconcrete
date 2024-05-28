@@ -43,7 +43,7 @@ def main_requests(import_concrete, q):
     purpose: testing import without exception
     """
     if import_concrete:
-        import pyconcrete  # noqa: F401
+        from src import pyconcrete  # noqa: F401
 
     t = time.time()
     import requests  # noqa: F401
