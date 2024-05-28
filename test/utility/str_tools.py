@@ -13,9 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import uuid
 
 
 def to_bytes(s):
     if isinstance(s, str):
         return s.encode('utf8')
     return s
+
+
+def random_module_name(prefix='mod_'):
+    suffix = uuid.uuid4().hex
+    return f'{prefix}{suffix}'

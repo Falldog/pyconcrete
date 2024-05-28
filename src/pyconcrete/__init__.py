@@ -19,19 +19,40 @@ import marshal
 import struct
 import sys
 from importlib._bootstrap_external import _get_supported_file_loaders
-from importlib.machinery import FileFinder, SourceFileLoader, SOURCE_SUFFIXES
-from . import _pyconcrete  # noqa: E402
-
+from importlib.machinery import SOURCE_SUFFIXES, FileFinder, SourceFileLoader
 
 EXT_PYE = '.pye'
 
 __all__ = ["info"]
 
+_pyconcrete_module = None
 
-info = _pyconcrete.info
-encrypt_file = _pyconcrete.encrypt_file
-decrypt_file = _pyconcrete.decrypt_file
-decrypt_buffer = _pyconcrete.decrypt_buffer
+
+def import_pyconcrete_pyd():
+    """delay import _pyconcrete for testing"""
+    global info, _pyconcrete_module
+    if _pyconcrete_module:
+        return
+
+    from . import _pyconcrete  # noqa: E402
+
+    _pyconcrete_module = _pyconcrete
+
+
+def decrypt_buffer(data):
+    import_pyconcrete_pyd()
+    return _pyconcrete_module.decrypt_buffer(data)
+
+
+def encrypt_file(pyc_filepath, pye_filepath):
+    import_pyconcrete_pyd()
+    return _pyconcrete_module.encrypt_file(pyc_filepath, pye_filepath)
+
+
+def info():
+    import_pyconcrete_pyd()
+    return _pyconcrete_module.info()
+
 
 # We need to modify SOURCE_SUFFIXES, because it used in importlib.machinery.all_suffixes function which
 # called by inspect.getmodulename and we need to be able to detect the module name relative to .pye files
@@ -76,7 +97,7 @@ class PyeLoader(SourceFileLoader):
         path = self.get_filename(fullname)
         data = decrypt_buffer(self.get_data(path))
         self._validate_version(data)
-        return marshal.loads(data[self.magic:])
+        return marshal.loads(data[self.magic :])
 
     def get_source(self, fullname):
         if self.path.endswith(EXT_PYE):
@@ -84,10 +105,9 @@ class PyeLoader(SourceFileLoader):
         return super().get_source(fullname)
 
 
-loader_details = [(PyeLoader, SOURCE_SUFFIXES)] + _get_supported_file_loaders()
-
-
 def install():
+    loader_details = [(PyeLoader, SOURCE_SUFFIXES)] + _get_supported_file_loaders()
+
     sys.path_importer_cache.clear()
     sys.path_hooks.insert(0, FileFinder.path_hook(*loader_details))
 
