@@ -33,6 +33,9 @@ encrypt_file = _pyconcrete.encrypt_file
 decrypt_file = _pyconcrete.decrypt_file
 decrypt_buffer = _pyconcrete.decrypt_buffer
 
+# We need to modify SOURCE_SUFFIXES, because it used in importlib.machinery.all_suffixes function which
+# called by inspect.getmodulename and we need to be able to detect the module name relative to .pye files
+# because .py can be deleted by us
 SOURCE_SUFFIXES.append(EXT_PYE)
 
 
