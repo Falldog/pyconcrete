@@ -15,10 +15,12 @@ RUN set -ex \
         build-essential \
         software-properties-common \
         python3-distutils \
+        gpg-agent \
         \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
+    && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         python${PY_VER} \
