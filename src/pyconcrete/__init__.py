@@ -91,5 +91,8 @@ def install():
     sys.path_importer_cache.clear()
     sys.path_hooks.insert(0, FileFinder.path_hook(*loader_details))
 
+def is_pip_running():
+    return any('pip' in arg for arg in sys.argv)
 
-install()
+if not is_pip_running():
+    install()
