@@ -3,7 +3,7 @@
 # Create on : 2019/07/13
 from __future__ import unicode_literals
 
-import imp
+import importlib
 import os
 import shutil
 import subprocess
@@ -93,7 +93,9 @@ class ImportedTestCase(object):
 
     def validate(self, ret_data, main_pye_path):
         validator_py = join(self.module_path, VALIDATOR_PY)
-        validator = imp.load_source('', validator_py)
+        spec = importlib.util.spec_from_file_location('validator', validator_py)
+        validator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(validator)
         try:
             return validator.validate(
                 ret_data['output_lines'],

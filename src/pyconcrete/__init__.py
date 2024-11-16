@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import imp
+import importlib
 import marshal
 import struct
 import sys
@@ -61,7 +61,7 @@ class PyeLoader(SourceFileLoader):
 
     @staticmethod
     def _validate_version(data):
-        magic = imp.get_magic()
+        magic = importlib.util.MAGIC_NUMBER
         ml = len(magic)
         if data[:ml] != magic:
             # convert little-endian byte string to unsigned short

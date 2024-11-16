@@ -16,7 +16,6 @@
 
 import atexit
 import hashlib
-import imp
 import os
 import sys
 import sysconfig
@@ -30,8 +29,10 @@ from os.path import join
 
 from src.config import EXE_SRC_DIR, EXT_SRC_DIR, PASSPHRASE_ENV, PY_SRC_DIR, SECRET_HEADER_PATH, SRC_DIR, TEST_DIR
 
-version_mod = imp.load_source('version', join(PY_SRC_DIR, 'version.py'))
-version = version_mod.__version__
+sys.path.insert(0, PY_SRC_DIR)
+import version
+version = version.__version__
+
 secret_key_header_created = False
 
 PY2 = sys.version_info.major < 3
