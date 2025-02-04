@@ -1,3 +1,17 @@
+[project]
+name = 'pyconcrete'
+description = 'Protect your python script, encrypt .pyc to .pye and decrypt when import it'
+version = '0.15.2'
+readme = 'README.md'
+license = {file = 'LICENSE'}
+authors = [
+  {name = 'Falldog', email = 'falldog7@gmail.com'},
+]
+
+[build-system]
+build-backend = 'mesonpy'
+requires = ['meson-python']
+
 [tool.black]
 line-length = 120
 skip-string-normalization = true
