@@ -34,6 +34,7 @@ class TestExe(base.TestPyConcreteBase):
             if itc.is_available_test_case():
                 test_cases.append(itc)
             else:
+                itc.close()
                 print('test_exe_testcases - {itc.module_name} (skip)'.format(itc=itc))
         return sorted(test_cases, key=lambda x: x.module_name)
 

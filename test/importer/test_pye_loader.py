@@ -53,6 +53,7 @@ class TestPyeLoader(unittest.TestCase):
         sys.path.insert(0, self.tmp_dir)
 
     def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
         sys.path.remove(self.tmp_dir)
 
     @builder.patch('pyconcrete.decrypt_buffer', fake_decrypt_buffer)
