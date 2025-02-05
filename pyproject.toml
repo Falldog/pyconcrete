@@ -10,7 +10,10 @@ authors = [
 
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python']
+requires = [
+  'meson-python',
+  'meson >= 1.1.0',
+]
 
 [tool.black]
 line-length = 120

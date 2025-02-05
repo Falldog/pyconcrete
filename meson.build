@@ -1,8 +1,13 @@
-project('pyconcrete', 'c')
+project(
+    'pyconcrete',
+    'c',
+    meson_version: '>= 1.1',
+)
 
 INSTALL_DIR = 'pyconcrete'
 PYCONCRETE_EXE_NAME = 'pyconcrete'
 BUILD_UTILITY_DIR = './meson_utility/'
+version = run_command('cat', 'VERSION', check: true).stdout().strip()
 python_ins = import('python').find_installation(pure: false)
 python_ver = python_ins.language_version()
 
@@ -49,6 +54,7 @@ python_ins.install_sources(
     [
         'src/pyconcrete/__init__.py',
         'src/pyconcrete/version.py',
+        'VERSION',
     ],
     pure: false,
     subdir: INSTALL_DIR,
@@ -85,6 +91,7 @@ exe_srcs = [
 executable(
     PYCONCRETE_EXE_NAME,
     exe_srcs,
+    c_args: '-D PYCONCRETE_VERSION=@0@'.format(version),
     include_directories: exe_includes,
     dependencies: python_dep,
     install: true,
