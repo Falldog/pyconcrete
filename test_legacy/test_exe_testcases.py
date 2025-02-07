@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 import os
 from os.path import join
-from test import base
-from test.utility.defines import ROOT_DIR
-from test.utility.imported_test_case import ImportedTestCase, ImportedTestCaseError
-from test.utility.pyconcrete_builder import pyconcrete_in_test_builder
+
+from test_legacy import base
+from test_legacy.utility.defines import ROOT_DIR
+from test_legacy.utility.imported_test_case import ImportedTestCase, ImportedTestCaseError
+from test_legacy.utility.pyconcrete_builder import pyconcrete_in_test_builder
 
 
 class TestExe(base.TestPyConcreteBase):

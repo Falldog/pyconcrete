@@ -20,9 +20,10 @@ import subprocess
 import sys
 import unittest
 from os.path import abspath, dirname, exists, join
-from test import base
-from test.utility.gen_code_tools import lib_gen_py
-from test.utility.pyconcrete_builder import get_pyconcrete_env_path
+
+from test_legacy import base
+from test_legacy.utility.gen_code_tools import lib_gen_py
+from test_legacy.utility.pyconcrete_builder import get_pyconcrete_env_path
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')

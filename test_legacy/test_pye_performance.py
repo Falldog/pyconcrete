@@ -21,10 +21,11 @@ import time
 import unittest
 from multiprocessing import Process, Queue
 from os.path import abspath, dirname, join
-from test import base
-from test.utility.compile_tools import lib_compile_pyc, lib_compile_pye
-from test.utility.shell_tools import touch
 from zipfile import ZipFile
+
+from test_legacy import base
+from test_legacy.utility.compile_tools import lib_compile_pyc, lib_compile_pye
+from test_legacy.utility.shell_tools import touch
 
 CUR_DIR = abspath(dirname(__file__))
 ROOT_DIR = abspath(join(CUR_DIR, '..'))

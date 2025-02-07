@@ -193,7 +193,7 @@ class PyConcreteAdmin(object):
             os.remove(py_file)
 
     def test(self, args):
-        test_dir = join(CUR_DIR, 'test')
+        test_dir = join(CUR_DIR, 'test_legacy')
         sys.path.insert(0, test_dir)  # for loadTestsFromName
 
         if args.test_module:

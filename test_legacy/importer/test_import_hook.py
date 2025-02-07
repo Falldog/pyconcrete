@@ -17,10 +17,11 @@
 import shutil
 import sys
 from os.path import join
-from test import base
-from test.utility.compile_tools import lib_compile_pye
-from test.utility.defines import ROOT_DIR
-from test.utility.shell_tools import touch
+
+from test_legacy import base
+from test_legacy.utility.compile_tools import lib_compile_pye
+from test_legacy.utility.defines import ROOT_DIR
+from test_legacy.utility.shell_tools import touch
 
 
 class TestImportHook(base.TestPyConcreteBase):
@@ -36,7 +37,7 @@ class TestImportHook(base.TestPyConcreteBase):
         import os
 
         sys.path.insert(0, os.path.join(ROOT_DIR, 'test', 'data'))
-        from test.data.relative_import import main
+        from test_legacy.data.relative_import import main
 
         self.assertEqual(main.data, 'main')
         self.assertEqual(main.util.data, 'util')

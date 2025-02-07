@@ -17,9 +17,9 @@
 import os
 import subprocess
 import tempfile
-from test import base
 
 from src.config import PASSPHRASE_ENV
+from test_legacy import base
 
 
 class TestWheel(base.TestPyConcreteBase):

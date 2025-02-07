@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 import importlib
 import logging
 import unittest
-from test import base
-from test.utility.gen_code_tools import lib_gen_pye
-from test.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
+
+from test_legacy import base
+from test_legacy.utility.gen_code_tools import lib_gen_pye
+from test_legacy.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
 
 logger = logging.getLogger('pyconcrete')
 

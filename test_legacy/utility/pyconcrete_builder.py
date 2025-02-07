@@ -113,29 +113,23 @@ class PyconcreteInTestBuilder:
         _ori_dir = os.getcwd()
         os.chdir(ROOT_DIR)
         try:
-            # just build
-            # force_option = '--force' if force else ''
-            # subprocess.check_call('python setup.py build --passphrase=%s %s' % (passphrase, force_option), shell=True)
-
+            env = os.environ.copy()
+            env['PIP_TARGET'] = tmp_src_dir
             cmd = (
                 sys.executable,
-                'setup.py',
+                '-m',
+                'pip',
                 'install',
-                '--passphrase=%s' % PASSPHRASE,
-                '--install-base=%s' % tmp_src_dir,
-                '--install-purelib=%s' % tmp_src_dir,
-                '--install-platlib=%s' % tmp_src_dir,
-                '--install-scripts=%s' % join(tmp_src_dir, 'scripts'),
-                '--install-headers=%s' % join(tmp_src_dir, 'headers'),
-                '--install-data=%s' % join(tmp_src_dir, 'data'),
+                f'--config-settings=setup-args="-Dpassphrase={PASSPHRASE}"',
                 '--quiet',
+                '.',
             )
-            subprocess.check_call(' '.join(cmd), shell=True)
+            subprocess.check_call(' '.join(cmd), shell=True, env=env)
 
             copy_pyconcrete_ext(tmp_src_dir)
 
             exe_name = 'pyconcrete.exe' if sys.platform == 'win32' else 'pyconcrete'
-            self.tmp_pyconcrete_exe_path = join(tmp_src_dir, 'scripts', exe_name)
+            self.tmp_pyconcrete_exe_path = join(tmp_src_dir, 'bin', exe_name)
             self.tmp_pyconcrete_base_path = tmp_dir
             print(f'PyconcreteInTestBuilder.init() build pyconcrete at {self.tmp_pyconcrete_base_path}')
 

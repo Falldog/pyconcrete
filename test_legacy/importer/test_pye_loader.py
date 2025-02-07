@@ -20,10 +20,11 @@ import sys
 import tempfile
 import unittest
 from os.path import join
-from test.utility.gen_code_tools import lib_gen_pyc
-from test.utility.pyconcrete_fake_builder import fake_pyconcrete_in_test_builder as builder
-from test.utility.pyconcrete_fake_builder import get_pyconcrete_imported_obj
-from test.utility.str_tools import random_module_name
+
+from test_legacy.utility.gen_code_tools import lib_gen_pyc
+from test_legacy.utility.pyconcrete_fake_builder import fake_pyconcrete_in_test_builder as builder
+from test_legacy.utility.pyconcrete_fake_builder import get_pyconcrete_imported_obj
+from test_legacy.utility.str_tools import random_module_name
 
 
 def gen_fake_pye(code, module_name, folder):

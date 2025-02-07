@@ -18,7 +18,8 @@ import shutil
 import sys
 import tempfile
 import unittest
-from test.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
+
+from test_legacy.utility.pyconcrete_builder import import_pyconcrete_in_test, pyconcrete_in_test_builder
 
 try:
     from importlib import reload
