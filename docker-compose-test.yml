@@ -1,13 +1,14 @@
 version: '3.3'
 
 services:
-  pye3.6:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-      args:
-        PY_VER: "3.6"
-    image: falldog/pyconcrete-tester:3.6
+  # meson-python not support python3.6, drop the support
+  #  pye3.6:
+  #    build:
+  #      context: .
+  #      dockerfile: ./docker/Dockerfile_3_6
+  #      args:
+  #        PY_VER: "3.6"
+  #    image: falldog/pyconcrete-tester:3.6
 
   pye3.7:
     build:
