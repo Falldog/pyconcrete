@@ -26,17 +26,18 @@ RUN set -ex \
         python${PY_VER} \
         python${PY_VER}-dev \
         python${PY_VER}-distutils \
+        pkg-config \
         \
     && rm -rf /var/lib/apt/lists/* \
     \
     && curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
 
 RUN set -ex \
-    && mkdir -p /code \
+    && mkdir -p /code/tests \
     && ln -sf /usr/bin/python${PY_VER} /usr/bin/python
 
-COPY test/requirements.txt /code
+COPY tests/requirements.txt /code/tests
 RUN set -ex \
-    && python${PY_VER} -m pip install --no-cache-dir -r /code/requirements.txt
+    && python${PY_VER} -m pip install --no-cache-dir -r /code/tests/requirements.txt
 
 WORKDIR /code
