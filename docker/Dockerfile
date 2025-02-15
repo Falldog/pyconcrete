@@ -28,9 +28,14 @@ RUN set -ex \
         python${PY_VER}-distutils \
         pkg-config \
         \
-    && rm -rf /var/lib/apt/lists/* \
-    \
-    && curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
+    && rm -rf /var/lib/apt/lists/*
+
+# install pip
+RUN if [ "${PY_VER}" = "3.7" ] ; then \
+        curl https://bootstrap.pypa.io/pip/3.7/get-pip.py | python3.7 ; \
+    else \
+        curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER} ; \
+    fi
 
 RUN set -ex \
     && mkdir -p /code/tests \
