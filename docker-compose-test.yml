@@ -52,7 +52,15 @@ services:
   pye3.12:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile_3_12
+      dockerfile: ./docker/Dockerfile_3_12_plus
       args:
         PY_VER: "3.12"
     image: falldog/pyconcrete-tester:3.12
+
+  pye3.13:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile_3_12_plus
+      args:
+        PY_VER: "3.13"
+    image: falldog/pyconcrete-tester:3.13
