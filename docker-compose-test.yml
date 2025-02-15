@@ -40,3 +40,19 @@ services:
       args:
         PY_VER: "3.10"
     image: falldog/pyconcrete-tester:3.10
+
+  pye3.11:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        PY_VER: "3.11"
+    image: falldog/pyconcrete-tester:3.11
+
+  pye3.12:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile_3_12
+      args:
+        PY_VER: "3.12"
+    image: falldog/pyconcrete-tester:3.12

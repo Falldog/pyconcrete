@@ -1,0 +1,44 @@
+FROM ubuntu:22.04
+LABEL maintainer=falldog
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG PY_VER=3.12
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        # debug utility
+        vim \
+        less \
+        \
+        curl \
+        build-essential \
+        software-properties-common \
+        python3-distutils \
+        gpg \
+        gpg-agent \
+        \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python${PY_VER} \
+        python${PY_VER}-dev \
+        pkg-config \
+        \
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    && curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER}
+
+RUN set -ex \
+    && mkdir -p /code/tests \
+    && ln -sf /usr/bin/python${PY_VER} /usr/bin/python
+
+COPY tests/requirements.txt /code/tests
+RUN set -ex \
+    && python${PY_VER} -m pip install --no-cache-dir -r /code/tests/requirements.txt
+
+WORKDIR /code
