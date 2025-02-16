@@ -31,6 +31,7 @@ static const char _NR[] = {
 	0x4e,0x61,0x62,0x69,0x6c,0x20,0x53,0x2e,0x20,
 	0x41,0x6c,0x20,0x52,0x61,0x6d,0x6c,0x69,0x00 };
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <time.h>
@@ -40,6 +41,8 @@ static const char _NR[] = {
 #ifdef WIN32
 #include <process.h>
 #define getpid() (0)
+#else
+#include <unistd.h>
 #endif
 
 #include "oaes_config.h"
