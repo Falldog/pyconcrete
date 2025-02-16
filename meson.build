@@ -18,6 +18,10 @@ python_ver = python_ins.language_version()
 
 # pip install . -Csetup-args="-Dpassphrase=ABC"
 passphrase = get_option('passphrase')
+if passphrase == ''
+    error('Must assign a passphrase to build pyconcrete')
+endif
+
 prog_python = find_program('python')
 gen_secret_key = custom_target(
     'gen_secret_key',
