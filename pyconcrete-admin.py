@@ -19,7 +19,6 @@ import fnmatch
 import logging
 import os
 import py_compile
-import subprocess
 import sys
 from os.path import abspath, dirname, exists, isdir, isfile, join
 
@@ -81,11 +80,6 @@ class PyConcreteAdmin(object):
         )
         parser_compile.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
         parser_compile.set_defaults(func=self.compile)
-
-        # === release === #
-        parser_release = subparsers.add_parser('release', help='release pyconcrete for pypi')
-        parser_release.add_argument('-t', '--test', dest='test', action='store_true', help='test on testpypi')
-        parser_release.set_defaults(func=self.release)
 
         if len(sys.argv) == 1:
             parser.print_help()
@@ -183,29 +177,6 @@ class PyConcreteAdmin(object):
             os.remove(pyc_file)
         if args.remove_py:
             os.remove(py_file)
-
-    def release(self, args):
-        try:
-            import pypandoc
-
-            readme = pypandoc.convert('README.md', 'rst')
-            with open('README.rst', 'wb') as f:
-                f.write(readme.encode('utf8'))
-        except ImportError:
-            print('you need to install `pypandoc` before release pyconcrete')
-            raise
-
-        subprocess.call('python setup.py sdist', shell=True)  # ignore can't found README error
-        if args.test:
-            # could be testing by pypi
-            # $ pip install -i https://test.pypi.org/simple/ pyconcrete==xxx
-            # note: `testpypi` should be appear on ~/.pypirc
-            subprocess.check_output('twine upload -r testpypi dist/*', shell=True)
-        else:
-            subprocess.check_output('twine upload dist/*', shell=True)
-        subprocess.check_output('rm README.rst', shell=True)
-        subprocess.check_output('rm -rf build', shell=True)
-        subprocess.check_output('rm -rf dist', shell=True)
 
     @staticmethod
     def _fnmatch(name, patterns):
