@@ -87,15 +87,8 @@ src/*.pye  # your libs
 
 
 ### Partial encrypted (pyconcrete as lib) -> (DEPRECATED and not Safe)
-* download pyconcrete source and install by setup.py
-```sh
-$ python setup.py install \
-  --install-lib=<your project path> \
-  --install-scripts=<where you want to execute pyconcrete-admin.py and pyconcrete(exe)>
-```
-
 * import pyconcrete in your main script
-  * recommendation project layout
+  * project layout
 ```sh
 main.py       # import pyconcrete and your lib
 pyconcrete/*  # put pyconcrete lib in project root, keep it as original files
