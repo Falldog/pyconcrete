@@ -1,7 +1,7 @@
 [project]
 name = 'pyconcrete'
 description = 'Protect your python script, encrypt .pyc to .pye and decrypt when import it'
-version = '0.15.2'
+version = '1.0.0'
 readme = 'README.md'
 license = {file = 'LICENSE'}
 authors = [
