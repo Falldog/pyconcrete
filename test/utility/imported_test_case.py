@@ -1,18 +1,29 @@
 #!/usr/bin/env python
-# -*- coding: utf8 -*-
-# Create on : 2019/07/13
+#
+# Copyright 2015 Falldog Hsieh <falldog7@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import unicode_literals
 
 import imp
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
-from os.path import abspath, basename, dirname, isdir, join
+from os.path import basename, isdir, join
 
-ROOT_DIR = abspath(join(dirname(__file__), '..'))
-
+from .compile_tools import lib_compile_pye
 
 SOURCE_DIR_NAME = 'src'
 MODULE_PREFIX = 'test_'
@@ -102,28 +113,3 @@ class ImportedTestCase(object):
             )
         except Exception as e:
             raise ImportedTestCaseError(ret_data['output_lines'], ret_data['return_code'], str(e))
-
-
-def lib_compile_pyc(folder, remove_py=False):
-    from test.base import get_pyconcrete_env_path
-
-    admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
-    arg_remove_py = '--remove-py' if remove_py else ''
-    subprocess.check_call(
-        '%s %s compile --source=%s --pyc %s' % (sys.executable, admin_path, folder, arg_remove_py),
-        env=get_pyconcrete_env_path(),
-        shell=True,
-    )
-
-
-def lib_compile_pye(folder, remove_py=False, remove_pyc=False):
-    from test.base import get_pyconcrete_env_path
-
-    admin_path = join(ROOT_DIR, 'pyconcrete-admin.py')
-    arg_remove_py = '--remove-py' if remove_py else ''
-    arg_remove_pyc = '--remove-pyc' if remove_pyc else ''
-    subprocess.check_call(
-        '%s %s compile --source=%s --pye %s %s' % (sys.executable, admin_path, folder, arg_remove_py, arg_remove_pyc),
-        env=get_pyconcrete_env_path(),
-        shell=True,
-    )

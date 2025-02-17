@@ -21,6 +21,8 @@ import sys
 import unittest
 from os.path import abspath, dirname, exists, join
 from test import base
+from test.utility.gen_code_tools import lib_gen_py
+from test.utility.pyconcrete_builder import get_pyconcrete_env_path
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 SAMPLE_PACKAGE_DIR = join(ROOT_DIR, 'test', 'data')
@@ -44,7 +46,7 @@ class TestAdminScript(base.TestPyConcreteBase):
 
         subprocess.check_call(
             '%s pyconcrete-admin.py compile --source=%s --pye' % (sys.executable, target_file),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -59,7 +61,7 @@ class TestAdminScript(base.TestPyConcreteBase):
 
         subprocess.check_call(
             '%s pyconcrete-admin.py compile --source=%s --pye' % (sys.executable, target_dir),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -70,11 +72,11 @@ class TestAdminScript(base.TestPyConcreteBase):
 class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
     def setUp(self):
         super(TestAdminIgnoreFilesScript, self).setUp()
-        self.lib_gen_py("", "test1.py")
-        self.lib_gen_py("", "test2.py")
-        self.lib_gen_py("", "test.py")
-        self.lib_gen_py("", "a_test.py")
-        self.lib_gen_py("", "b_test.py")
+        lib_gen_py("", "test1.py", self.tmp_dir)
+        lib_gen_py("", "test2.py", self.tmp_dir)
+        lib_gen_py("", "test.py", self.tmp_dir)
+        lib_gen_py("", "a_test.py", self.tmp_dir)
+        lib_gen_py("", "b_test.py", self.tmp_dir)
 
     def test_ignore_file_list_match(self):
         target_dir = join(self.tmp_dir, 'data')
@@ -92,7 +94,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
                 '%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/util.py'
                 % (sys.executable, target_dir)
             ),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -113,7 +115,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
         subprocess.check_call(
             ('%s pyconcrete-admin.py compile --source=%s --pye -i relative_import/*' % (sys.executable, target_dir)),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -136,7 +138,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
         def test_pattern(pat):
             subprocess.check_call(
                 ('%s pyconcrete-admin.py compile --source=%s --pye -i "%s"' % (sys.executable, self.tmp_dir, pat)),
-                env=base.get_pyconcrete_env_path(),
+                env=get_pyconcrete_env_path(),
                 shell=True,
             )
 
@@ -161,7 +163,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
 
         subprocess.check_call(
             ('%s pyconcrete-admin.py compile --source=%s --pye -i main.py test?.py' % (sys.executable, self.tmp_dir)),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -179,7 +181,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
                 '%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[1,3].py'
                 % (sys.executable, self.tmp_dir)
             ),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 
@@ -195,7 +197,7 @@ class TestAdminIgnoreFilesScript(base.TestPyConcreteBase):
                 '%s pyconcrete-admin.py compile --source=%s --pye -i main.py test[!1,3].py'
                 % (sys.executable, self.tmp_dir)
             ),
-            env=base.get_pyconcrete_env_path(),
+            env=get_pyconcrete_env_path(),
             shell=True,
         )
 

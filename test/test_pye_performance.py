@@ -22,6 +22,8 @@ import unittest
 from multiprocessing import Process, Queue
 from os.path import abspath, dirname, join
 from test import base
+from test.utility.compile_tools import lib_compile_pyc, lib_compile_pye
+from test.utility.shell_tools import touch
 from zipfile import ZipFile
 
 CUR_DIR = abspath(dirname(__file__))
@@ -41,7 +43,7 @@ def main_requests(import_concrete, q):
     purpose: testing import without exception
     """
     if import_concrete:
-        import pyconcrete  # noqa: F401
+        from src import pyconcrete  # noqa: F401
 
     t = time.time()
     import requests  # noqa: F401
@@ -77,7 +79,7 @@ class TestPerformance(base.TestPyConcreteBase):
         zip.close()
 
         self.req_dir = join(self.tmp_dir, 'requests')
-        base.touch(join(self.req_dir, '__init__.py'))
+        touch(join(self.req_dir, '__init__.py'))
 
     def _test_requests(self, import_concrete):
         sys.path.insert(0, self.req_dir)
@@ -94,7 +96,7 @@ class TestPerformance(base.TestPyConcreteBase):
         return t
 
     def test_requests_pye(self):
-        self.lib_compile_pye(self.req_dir, remove_py=True, remove_pyc=True)
+        lib_compile_pye(self.req_dir, remove_py=True, remove_pyc=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)
@@ -103,7 +105,7 @@ class TestPerformance(base.TestPyConcreteBase):
         )
 
     def test_requests_pyc(self):
-        self.lib_compile_pyc(self.req_dir, remove_py=True)
+        lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(False)
@@ -112,7 +114,7 @@ class TestPerformance(base.TestPyConcreteBase):
         )
 
     def test_requests_pyc_with_import_hooker(self):
-        self.lib_compile_pyc(self.req_dir, remove_py=True)
+        lib_compile_pyc(self.req_dir, remove_py=True)
         t = 0.0
         for i in range(RUN_COUNT):
             t += self._test_requests(True)

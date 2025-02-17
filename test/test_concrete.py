@@ -18,13 +18,15 @@ from __future__ import unicode_literals
 import logging
 import unittest
 from test import base
+from test.utility.gen_code_tools import lib_gen_py
+from test.utility.pyconcrete_builder import import_pyconcrete_in_test
 
 logger = logging.getLogger('pyconcrete')
 
 
 class TestConcrete(base.TestPyConcreteBase):
     def test_decrypt_exception(self):
-        import pyconcrete
+        pyconcrete = import_pyconcrete_in_test()
 
         logger.info(pyconcrete.__file__)
         data = 'abc'
@@ -34,10 +36,10 @@ class TestConcrete(base.TestPyConcreteBase):
             pyconcrete.decrypt_buffer(data)
 
     def __do_encrypt_decrypt_file(self, py_code):
-        py_filepath = self.lib_gen_py(py_code, 'test.py')
+        py_filepath = lib_gen_py(py_code, 'test.py', self.tmp_dir)
         pye_filepath = py_filepath + 'e'
 
-        import pyconcrete
+        pyconcrete = import_pyconcrete_in_test()
 
         pyconcrete.encrypt_file(py_filepath, pye_filepath)
 

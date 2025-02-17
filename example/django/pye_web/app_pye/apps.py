@@ -5,4 +5,4 @@ from django.apps import AppConfig
 
 
 class PyeConfig(AppConfig):
-    name = 'pye'
+    name = 'app_pye'
