@@ -7,6 +7,7 @@ project(
 INSTALL_DIR = 'pyconcrete'
 PYCONCRETE_EXE_NAME = 'pyconcrete'
 BUILD_UTILITY_DIR = './meson_utility/'
+
 version = run_command('cat', 'VERSION', check: true).stdout().strip()
 python_ins = import('python').find_installation(pure: false)
 python_ver = python_ins.language_version()
@@ -16,7 +17,6 @@ python_ver = python_ins.language_version()
 # secret_key.h
 #----------------------------
 
-# pip install . -Csetup-args="-Dpassphrase=ABC"
 passphrase = get_option('passphrase')
 if passphrase == ''
     error('Must assign a passphrase to build pyconcrete')
@@ -100,3 +100,13 @@ executable(
     dependencies: python_dep,
     install: true,
 )
+
+
+#----------------------------
+# sdist
+#----------------------------
+
+# Meson dist not allow to config include/exclude file rules.
+# And it only clone the sources in .git revision, not including the uncommitted files in local.
+# So, we need to add dist_cleanup.sh to cleanup redundant files in dist/.
+meson.add_dist_script(join_paths(BUILD_UTILITY_DIR, 'dist_cleanup.sh'))
