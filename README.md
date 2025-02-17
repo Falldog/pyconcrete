@@ -13,7 +13,8 @@ Protect your python script, encrypt .pyc to .pye and decrypt when import it
 
 Protect python script work flow
 --------------
-* your_script.py `import pyconcrete`
+* Build the execution `pyconcrete` and read the `MAIN.pye` which encrypted by your passphrase.
+* pyconcrete will decrypt the source file and then launch python interpreter to do the normal python behavior.
 * pyconcrete will hook import module
 * when your script do `import MODULE`, pyconcrete import hook will try to find `MODULE.pye` first
   and then decrypt `MODULE.pye` via `_pyconcrete.pyd` and execute decrypted data (as .pyc content)
@@ -27,36 +28,42 @@ Encryption
 * encrypt & decrypt by library OpenAES
 
 
+Compatibility
+--------------
+Pyconcrete has transitioned to using [meson-python](https://github.com/mesonbuild/meson-python) as its build backend
+starting from version 1.0.0. This provides a more powerful build mechanism and supports newer Python versions.
+
+For older Python support:
+* Pyconcrete versions prior to 0.15.2 only support up to Python 3.10.
+* If you need support for Python 3.6 or Python 2.7, please use versions before 0.15.2.
+* Pyconcrete no longer supports Python versions earlier than 3.6.
+
+
+Requirements
+--------------
+For unix base
+* apt: pkg-config, build-essential, python{version}-dev
+* pip: 23.1+
+
+
 Installation
 --------------
-  * need to input your passphrase create secret key for encrypt python script.
-  * same passphrase will generate the same secret key
-  * installation will add `pyconcrete.pth` into your `site-packages` for execute `sitecustomize.py` under pyconcrete which will automatic import pyconcrete
+Due to security considerations, you must provide a passphrase to create a secret key for encrypting Python scripts:
+* The same passphrase will generate the same secret key.
+* Pre-built packages are not provided, so users must build the package yourself.
+
+Build Process
+* Pyconcrete relies on Meson to compile the C extension.
+* The installation process will add a `pyconcrete.pth` file to your `site-packages`, enabling `sitecustomize.py` to automatically import Pyconcrete.
 
 ### pip
-You must set up environment variable `PYCONCRETE_PASSPHRASE` for installation continuously.
+* Need to config the passphrase for installation. And only pip 23.1+ support passing argument via `-C` or `--config-settings`.
+* Remember to assign `--no-cache-dir` to avoid use pip's cached package which already built by old passphrase.
 ```sh
-$ PYCONCRETE_PASSPHRASE=<your passphrase here> pip install pyconcrete
+$ pip install pyconcrete \
+  --no-cache-dir \
+  --config-settings=setup-args="-Dpassphrase=<Your_Passphrase>"
 ```
-
-or, if you use an old pip version that supports --egg:
-
-```sh
-$ pip install pyconcrete --egg --install-option="--passphrase=<your passphrase>"
-```
-  > pyconcrete installed as egg, if you want to uninstall pyconcrete will need to manually delete `pyconcrete.pth`.
-
-### source
-* get the pyconcrete source code
-```sh
-$ git clone <pyconcrete repo> <pyconcre dir>
-```
-
-* install pyconcrete
-```sh
-$ python setup.py install
-```
-
 
 Usage
 --------------
@@ -79,7 +86,7 @@ src/*.pye  # your libs
 ```
 
 
-### Partial encrypted (pyconcrete as lib)
+### Partial encrypted (pyconcrete as lib) -> (DEPRECATED and not Safe)
 * download pyconcrete source and install by setup.py
 ```sh
 $ python setup.py install \
@@ -100,70 +107,23 @@ Test
 --------------
 * test in local
 ```sh
-$ ./pyconcrete-admin.py test
+$ pytest tests
 ```
 
 * test in docker environment
 ```sh
-$ ./bin/run-test.sh
+$ make test
 ```
 
-* add test case for pyconcrete.exe
-  * reference exists test case
-  * add folder in `test/exe_testcases/`
-  * add testing code at `test/exe_testcases/src/main.py`
-  * add validator at `test/exe_testcases/validator.py`
+* test in docker environment for specific python version
+```sh
+$ make test 3.10
+```
 
 Example
 --------------
 
 [Django with pyconcrete](example/django)
-
-
-
-Building on Linux
---------------
-
-### Python 3.7 - fix Ubuntu 14.04 build error
-```bash
-x86_64-linux-gnu-gcc: error: unrecognized command line option `-fstack-protector-strong`
-```
-Reference by [Stackoverflow solution](https://stackoverflow.com/questions/27182042/pip-error-unrecognized-command-line-option-fstack-protector-strong)
-* you should install `gcc-4.9` first
-* symlink `/usr/bin/x86_64-linux-gnu-gcc` to `gcc-4.9`
-* build pycocnrete again
-* rollback symlink
-
-
-Building on Windows
---------------
-
-### Python 2.7 - Visual Studio 2008
-https://www.microsoft.com/en-us/download/details.aspx?id=44266
-
-* Open VS2008 Command Prompt
-* `set DISTUTILS_USE_SDK=1`
-* `set SET MSSdk=1`
-* create `distutils.cfg` and put inside
-    ```text
-    [build]
-    compiler=msvc
-    ```
-
-### Python 3.5, 3.6, 3.7 - Visual Studio 2015
-
-[MSVC 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
-
-[Document](https://matthew-brett.github.io/pydagogue/python_msvc.html#python-3-5-3-6)
-
-* make sure setuptools >= 24.0
-    ```sh
-    python -c 'import setuptools; print(setuptools.__version__)'
-    ```
-
-* Open VS2015 Build Tools Command Prompt
-* `set DISTUTILS_USE_SDK=1 `
-* `setenv /x64 /release`  or `setenv /x86 /release`
 
 
 ### Reference
