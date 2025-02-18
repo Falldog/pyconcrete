@@ -19,8 +19,12 @@ def main():
     for w in worker:
         w.join()
 
+    res = []
     while not q.empty():
-        print(q.get())
+        res.append(q.get())
+
+    # sort the result
+    print(' '.join(str(n) for n in sorted(res)))
 
 
 def sqrt(q, n):
