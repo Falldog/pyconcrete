@@ -2,13 +2,15 @@ project(
     'pyconcrete',
     'c',
     meson_version: '>= 1.1',
+    version: files('VERSION'),
 )
 
 INSTALL_DIR = 'pyconcrete'
 PYCONCRETE_EXE_NAME = 'pyconcrete'
 BUILD_UTILITY_DIR = './meson_utility/'
 
-version = run_command('cat', 'VERSION', check: true).stdout().strip()
+version = meson.project_version()
+
 # The python version will follow which user invoke menson-python
 # Such as `python -m pip install ...` or `python -m build ...`
 python_ins = import('python').find_installation(pure: false)
