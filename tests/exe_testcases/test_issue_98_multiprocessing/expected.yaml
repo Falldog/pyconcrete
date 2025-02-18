@@ -1,0 +1,3 @@
+expected:
+  return_code: 0
+  stdout: "0\n1\n4\n9\n16\n"

@@ -19,15 +19,12 @@ import fnmatch
 import logging
 import os
 import py_compile
-import subprocess
 import sys
-import unittest
 from os.path import abspath, dirname, exists, isdir, isfile, join
 
 CUR_DIR = dirname(abspath(__file__))
 
 IGNORE_FILES = ['.', '..', '.git', '.svn', 'pyconcrete']
-IS_TEST_VERBOSE = os.environ.get('TEST_VERBOSE', None)
 logger = logging.getLogger('pyconcrete')
 
 
@@ -84,24 +81,13 @@ class PyConcreteAdmin(object):
         parser_compile.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
         parser_compile.set_defaults(func=self.compile)
 
-        # === test === #
-        parser_test = subparsers.add_parser('test', help='test pycocnrete')
-        parser_test.add_argument('-m', '--module', dest='test_module', default=None, help='test on single module')
-        parser_test.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
-        parser_test.set_defaults(func=self.test)
-
-        # === release === #
-        parser_release = subparsers.add_parser('release', help='release pyconcrete for pypi')
-        parser_release.add_argument('-t', '--test', dest='test', action='store_true', help='test on testpypi')
-        parser_release.set_defaults(func=self.release)
-
         if len(sys.argv) == 1:
             parser.print_help()
 
         else:
             try:
                 args = parser.parse_args()
-                self.verbose = getattr(args, 'verbose', False) or IS_TEST_VERBOSE
+                self.verbose = getattr(args, 'verbose', False)
                 args.func(args)
             except PyConcreteError as e:
                 print('Error: ' + str(e))
@@ -191,57 +177,6 @@ class PyConcreteAdmin(object):
             os.remove(pyc_file)
         if args.remove_py:
             os.remove(py_file)
-
-    def test(self, args):
-        test_dir = join(CUR_DIR, 'test')
-        sys.path.insert(0, test_dir)  # for loadTestsFromName
-
-        if args.test_module:
-            suite = unittest.TestLoader().loadTestsFromName(args.test_module)
-        else:
-            suite = unittest.TestLoader().discover(test_dir)
-
-        if self.verbose:
-            # unittest setup
-            verbosity = 2
-
-            # stdout logger setup
-            handler = logging.StreamHandler(sys.stdout)
-            handler.setLevel(logging.DEBUG)
-            handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-            logger.setLevel(logging.DEBUG)
-            logger.addHandler(handler)
-
-            # for by-pass to subprocess call on pyconcrete-admin.py
-            os.environ['TEST_VERBOSE'] = '1'
-        else:
-            verbosity = 1
-        result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-        if not result.wasSuccessful():
-            sys.exit(1)
-
-    def release(self, args):
-        try:
-            import pypandoc
-
-            readme = pypandoc.convert('README.md', 'rst')
-            with open('README.rst', 'wb') as f:
-                f.write(readme.encode('utf8'))
-        except ImportError:
-            print('you need to install `pypandoc` before release pyconcrete')
-            raise
-
-        subprocess.call('python setup.py sdist', shell=True)  # ignore can't found README error
-        if args.test:
-            # could be testing by pypi
-            # $ pip install -i https://test.pypi.org/simple/ pyconcrete==xxx
-            # note: `testpypi` should be appear on ~/.pypirc
-            subprocess.check_output('twine upload -r testpypi dist/*', shell=True)
-        else:
-            subprocess.check_output('twine upload dist/*', shell=True)
-        subprocess.check_output('rm README.rst', shell=True)
-        subprocess.check_output('rm -rf build', shell=True)
-        subprocess.check_output('rm -rf dist', shell=True)
 
     @staticmethod
     def _fnmatch(name, patterns):

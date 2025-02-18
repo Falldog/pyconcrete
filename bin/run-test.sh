@@ -33,7 +33,7 @@ run_test() {
         /bin/bash -c \
         " \
             pip list && \
-            python /code/pyconcrete-admin.py test \
+            pytest tests \
         "
 }
 
