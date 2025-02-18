@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import importlib
+import importlib.util
 import marshal
 import struct
 import sys
