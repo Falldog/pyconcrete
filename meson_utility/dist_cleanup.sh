@@ -13,5 +13,4 @@ rm -rf ${DIST_DIR}/appveyor/
 rm -rf ${DIST_DIR}/bin/
 rm -rf ${DIST_DIR}/docker/
 rm -rf ${DIST_DIR}/example/
-rm -rf ${DIST_DIR}/test_legacy/
 rm -rf ${DIST_DIR}/tests/
