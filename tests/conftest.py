@@ -47,7 +47,7 @@ class Venv:
         return subprocess.check_output([self.pyconcrete_exe, *args]).decode()
 
     def pyconcrete_cli(self, *args: [str]):
-        cli_script = join(ROOT_DIR, 'pyconcrete-admin.py')  # TODO: refactor
+        cli_script = join(ROOT_DIR, 'pyecli')
         return subprocess.check_output([self.executable, cli_script, *args]).decode()
 
 

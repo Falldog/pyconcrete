@@ -71,8 +71,8 @@ Usage
 ### Full encrypted
 * convert all of your `.py` to `*.pye`
 ```sh
-$ pyconcrete-admin.py compile --source=<your py script>  --pye
-$ pyconcrete-admin.py compile --source=<your py module dir> --pye
+$ pyecli compile --pye -s=<your py script>
+$ pyecli compile --pye -s=<your py module dir>
 ```
 
 * remove `*.py` `*.pyc` or copy `*.pye` to other folder

@@ -32,7 +32,7 @@ class PyConcreteError(Exception):
     pass
 
 
-class PyConcreteAdmin(object):
+class PyConcreteCli(object):
     def __init__(self):
         self.parser = None
         self.args = None
@@ -43,12 +43,12 @@ class PyConcreteAdmin(object):
         """
         Example:
             compile file/dir to .pye
-            pyconcrete-admin.py compile --source={file} --pye
+            pyecli compile --source={file} --pye
 
             compile file/dir to .pyc
-            pyconcrete-admin.py compile --source={file} --pyc
+            pyecli compile --source={file} --pyc
         """
-        parser = argparse.ArgumentParser(description='PyConcreteAdmin')
+        parser = argparse.ArgumentParser(description='PyConcreteCli')
         subparsers = parser.add_subparsers()
 
         # === compile === #
@@ -192,5 +192,4 @@ class PyConcreteAdmin(object):
 
 
 if __name__ == '__main__':
-    admin = PyConcreteAdmin()
-    # admin.run()
+    cli = PyConcreteCli()

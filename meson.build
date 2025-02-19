@@ -111,7 +111,7 @@ executable(
 #   https://github.com/mesonbuild/meson-python/blob/0.17.1/mesonpy/__init__.py#L83
 #   https://docs.python.org/3/library/sysconfig.html#installation-paths
 install_data(
-    './pyconcrete-admin.py',
+    './pyecli',
     install_mode: 'rwxr-xr-x',
     install_dir: get_option('bindir'),
 )
