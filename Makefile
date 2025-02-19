@@ -13,6 +13,7 @@ help:
 	@printf "build-dist\n"
 	@printf "upload-dist\n"
 	@printf "upload-dist-for-test\n"
+	@printf "install {ENV: PASSPHRASE=}\n"
 	@printf "testpypi-install {ENV: VERSION= PASSPHRASE=}\n"
 
 test:
@@ -38,6 +39,13 @@ attach:
 
 run-example-django:
 	./bin/run-example-django.sh
+
+install:
+	python3 -m pip install \
+		--no-cache-dir \
+	    -v \
+		. \
+		-Csetup-args="-Dpassphrase=$(PASSPHRASE)"
 
 build-dist:
 	rm -rf dist/
