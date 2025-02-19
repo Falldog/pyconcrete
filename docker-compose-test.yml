@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   # meson-python not support python3.6, drop the support
   #  pye3.6:
