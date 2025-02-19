@@ -1,10 +1,12 @@
 DEFAULT_TEST_PY_VER = 3.10
+PY_VERSIONS = 3.7 3.8 3.9 3.10 3.11 3.12 3.13
 
 .PHONY: help test attach
 
 help:
 	@printf "Usage: make [OPTION]\n"
 	@printf "\n"
+	@printf "test-all\n"
 	@printf "test [version: 3.7|3.8|3.9|3.10|...]\n"
 	@printf "attach [version: 3.7|3.8|3.9|3.10|...]\n"
 	@printf "run-example-django\n"
@@ -20,6 +22,11 @@ test:
 	fi; \
 	\
 	PY_VER=$$VER ./bin/run-test.sh
+
+test-all :
+	for ver in $(PY_VERSIONS); do \
+	    PY_VER=$$ver ./bin/run-test.sh; \
+	done
 
 attach:
 	VER="$(filter-out $@,$(MAKECMDGOALS))"; \
