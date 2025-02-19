@@ -14,69 +14,6 @@
 import subprocess
 
 
-def test_exe__stdout(venv, pye_cli, tmpdir):
-    # prepare
-    pye_path = (
-        pye_cli.setup(tmpdir, 'test_stdout')
-        .source_code(
-            """
-v = 123
-print(v)
-            """.strip()
-        )
-        .get_encrypt_path()
-    )
-
-    # execution
-    output = venv.pyconcrete(pye_path)
-
-    # verification
-    assert output == '123\n'  # without output.strip() to make sure the output is exactly what we want
-
-
-def test_exe__stdout__calculation(venv, pye_cli, tmpdir):
-    # prepare
-    pye_path = (
-        pye_cli.setup(tmpdir, 'test_stdout')
-        .source_code(
-            """
-def fibonacci(n):
-    if n > 1:
-        return fibonacci(n-1) + fibonacci(n-2)
-    return n
-print(fibonacci(10))
-            """.strip()
-        )
-        .get_encrypt_path()
-    )
-
-    # execution
-    output = venv.pyconcrete(pye_path)
-
-    # verification
-    assert output == '55\n'  # without output.strip() to make sure the output is exactly what we want
-
-
-def test_exe__main_module(venv, pye_cli, tmpdir):
-    # prepare
-    pye_path = (
-        pye_cli.setup(tmpdir, 'test_main')
-        .source_code(
-            """
-if __name__ == '__main__':
-    print("Hello World")
-            """.strip()
-        )
-        .get_encrypt_path()
-    )
-
-    # execution
-    output = venv.pyconcrete(pye_path)
-
-    # verification
-    assert output == 'Hello World\n'  # without output.strip() to make sure the output is exactly what we want
-
-
 def test_exe__execute_an_non_exist_file(venv):
     return_code = subprocess.check_call([venv.pyconcrete_exe, 'non_existing_file.txt'])
     assert return_code == 0
@@ -145,26 +82,6 @@ print(" ".join(sys.argv))
 
     # verification
     assert output == f'{pye_path} -a -b -c'
-
-
-def test_exe__name__be__main__(venv, pye_cli, tmpdir):
-    # prepare
-    pye_path = (
-        pye_cli.setup(tmpdir, 'test__name__')
-        .source_code(
-            """
-print(__name__)
-            """.strip()
-        )
-        .get_encrypt_path()
-    )
-
-    # execution
-    output = venv.pyconcrete(pye_path)
-    output = output.strip()
-
-    # verification
-    assert output == "__main__"
 
 
 def test_exe__import_pyconcrete__validate__file__(venv, pye_cli, tmpdir):

@@ -1,0 +1,3 @@
+expected:
+  return_code: 0
+  stdout: "Hello World\n"
