@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 LABEL maintainer=falldog
 
 ARG PY_VER=3.10
+ARG PASSPHRASE=TEST_FOR_DJANGO
 
 RUN set -ex \
     && apt-get update \
@@ -14,6 +15,7 @@ RUN set -ex \
         build-essential \
         software-properties-common \
         python3-distutils \
+        pkg-config \
         \
     && rm -rf /var/lib/apt/lists/*
 
@@ -44,8 +46,8 @@ COPY . \
 # install pyconcrete && compile .pye
 RUN set -ex \
     && cd /pyconcrete-code/ \
-    && python setup.py install --passphrase=PASSPHARE \
-    && pyconcrete-admin.py compile \
+    && pip install --config-settings=setup-args=-Dpassphrase=${PASSPHARE} . \
+    && python pyecli compile \
         --source=/code/ \
         --pye \
         --remove-py \

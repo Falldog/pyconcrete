@@ -1,3 +1,44 @@
+[project]
+name = 'pyconcrete'
+description = 'Protect your python script, encrypt .pyc to .pye and decrypt when import it'
+dynamic = ["version"]  # it will provide by meson.build
+readme = 'README.md'
+license = {file = 'LICENSE'}
+authors = [
+  {name = 'Falldog', email = 'falldog7@gmail.com'},
+]
+classifiers = [
+  'Development Status :: 5 - Production/Stable',
+  'Intended Audience :: Developers',
+  'Intended Audience :: System Administrators',
+  'Topic :: Software Development :: Build Tools',
+  'Topic :: Security',
+  'Topic :: Security :: Cryptography',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.7',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'License :: OSI Approved :: Apache Software License',
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest==7.4.4",
+  "virtualenv==20.26.6",
+]
+
+[build-system]
+build-backend = 'mesonpy'
+requires = [
+  'meson-python',
+  'meson >= 1.1.0',
+]
+
 [tool.black]
 line-length = 120
 skip-string-normalization = true

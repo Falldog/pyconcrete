@@ -29,4 +29,4 @@ before_install:
 #  - pip install -r requirements.txt
 
 script:
-  - python$PY_VER pyconcrete-admin.py test
+  - python$PY_VER pyecli test
