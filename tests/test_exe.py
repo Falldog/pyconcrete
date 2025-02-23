@@ -14,9 +14,9 @@
 import subprocess
 
 
-def test_exe__execute_an_non_exist_file(venv):
-    return_code = subprocess.check_call([venv.pyconcrete_exe, 'non_existing_file.txt'])
-    assert return_code == 0
+def test_exe__execute_an_non_exist_file(venv, pye_cli):
+    return_code = subprocess.call([venv.pyconcrete_exe, 'non_existing_file.txt'])
+    assert return_code == 1
 
 
 def test_exe__sys_path__should_contain_pye_file_dir(venv, pye_cli, tmpdir):
