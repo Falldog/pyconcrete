@@ -22,43 +22,34 @@ import sys
 from importlib._bootstrap_external import _get_supported_file_loaders
 from importlib.machinery import SOURCE_SUFFIXES, FileFinder, SourceFileLoader
 
-EXT_PYE = '.pye'
+from . import _pyconcrete  # noqa: E402
 
 __all__ = ["info"]
 
-_pyconcrete_module = None
-
-
-def import_pyconcrete_pyd():
-    """delay import _pyconcrete for testing"""
-    global info, _pyconcrete_module
-    if _pyconcrete_module:
-        return
-
-    from . import _pyconcrete  # noqa: E402
-
-    _pyconcrete_module = _pyconcrete
+_pyconcrete_module = _pyconcrete
 
 
 def decrypt_buffer(data):
-    import_pyconcrete_pyd()
     return _pyconcrete_module.decrypt_buffer(data)
 
 
 def encrypt_file(pyc_filepath, pye_filepath):
-    import_pyconcrete_pyd()
     return _pyconcrete_module.encrypt_file(pyc_filepath, pye_filepath)
 
 
 def info():
-    import_pyconcrete_pyd()
     return _pyconcrete_module.info()
+
+
+def get_ext():
+    """get supported file extension, default should be .pye"""
+    return _pyconcrete_module.get_ext()
 
 
 # We need to modify SOURCE_SUFFIXES, because it used in importlib.machinery.all_suffixes function which
 # called by inspect.getmodulename and we need to be able to detect the module name relative to .pye files
 # because .py can be deleted by us
-SOURCE_SUFFIXES.append(EXT_PYE)
+SOURCE_SUFFIXES.append(get_ext())
 
 
 class PyeLoader(SourceFileLoader):
@@ -92,7 +83,7 @@ class PyeLoader(SourceFileLoader):
             raise ValueError("Python version doesn't match with magic: python(%d) != pye(%d)" % (py_magic, pye_magic))
 
     def get_code(self, fullname):
-        if not self.path.endswith(EXT_PYE):
+        if not self.path.endswith(get_ext()):
             return super().get_code(fullname)
 
         path = self.get_filename(fullname)
@@ -101,7 +92,7 @@ class PyeLoader(SourceFileLoader):
         return marshal.loads(data[self.magic :])
 
     def get_source(self, fullname):
-        if self.path.endswith(EXT_PYE):
+        if self.path.endswith(get_ext()):
             return None
         return super().get_source(fullname)
 
