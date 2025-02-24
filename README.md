@@ -65,6 +65,10 @@ $ pip install pyconcrete \
   --config-settings=setup-args="-Dpassphrase=<Your_Passphrase>"
 ```
 
+* Available arguments. Setup by `--config-settings=setup-args="-D<argurment_name>=<value>"`
+  * `passphrase`: (Mandatory) To generate secret key for encryption.
+  * `ext`: Able to assign customized encrypted file extension. Which default is `.pye`.
+
 Usage
 --------------
 
@@ -73,6 +77,7 @@ Usage
 ```sh
 $ pyecli compile --pye -s=<your py script>
 $ pyecli compile --pye -s=<your py module dir>
+$ pyecli compile --pye -s=<your py module dir> -e=<your file extension>
 ```
 
 * remove `*.py` `*.pyc` or copy `*.pye` to other folder
