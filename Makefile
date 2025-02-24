@@ -16,6 +16,10 @@ help:
 	@printf "install {ENV: PASSPHRASE=}\n"
 	@printf "testpypi-install {ENV: VERSION= PASSPHRASE=}\n"
 
+
+clean:
+	find . -type f -name "*.pyc" -exec rm -f {} \;
+
 test:
 	VER="$(filter-out $@,$(MAKECMDGOALS))"; \
 	if [ -z "$$VER" ]; then \
