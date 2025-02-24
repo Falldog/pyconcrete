@@ -20,7 +20,7 @@ import logging
 import os
 import py_compile
 import sys
-from os.path import abspath, dirname, exists, isdir, isfile, join
+from os.path import abspath, dirname, exists, isdir, isfile, join, splitext
 
 CUR_DIR = dirname(abspath(__file__))
 
@@ -63,6 +63,7 @@ class PyConcreteCli(object):
         )
         parser_compile.add_argument('--pye', dest='pye', action='store_true', help='process on .pye')
         parser_compile.add_argument('--pyc', dest='pyc', action='store_true', help='process on .pyc')
+        parser_compile.add_argument('-e', '--ext', dest='ext', default='.pye', help='file extension, default is .pye')
         parser_compile.add_argument(
             '--remove-py', dest='remove_py', action='store_true', help='remove .py after compile pye'
         )
@@ -139,7 +140,8 @@ class PyConcreteCli(object):
                     self._compile_pyc_file(args, fullpath)
 
     def _compile_pyc_file(self, args, py_file):
-        pyc_file = py_file + 'c'
+        filename, ext = splitext(py_file)
+        pyc_file = filename + '.pyc'
         pyc_exists = exists(pyc_file)
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
             py_compile.compile(py_file, cfile=pyc_file)
@@ -159,8 +161,9 @@ class PyConcreteCli(object):
         """
         import pyconcrete
 
-        pyc_file = py_file + 'c'
-        pye_file = py_file + 'e'
+        filename, ext = splitext(py_file)
+        pyc_file = filename + '.pyc'
+        pye_file = filename + args.ext
         pyc_exists = exists(pyc_file)
         if not pyc_exists or os.stat(py_file).st_mtime != os.stat(pyc_file).st_mtime:
             py_compile.compile(py_file, cfile=pyc_file)

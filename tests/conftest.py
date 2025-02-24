@@ -22,10 +22,11 @@ PASSPHRASE = 'TestPyconcrete'
 
 
 class Venv:
-    def __init__(self, env_dir):
+    def __init__(self, env_dir, pyconcrete_ext=None):
         self.executable = None
         self.bin_dir = None
         self.env_dir = env_dir
+        self._pyconcrete_ext = pyconcrete_ext
         self.create()
 
     def create(self):
@@ -58,12 +59,15 @@ class Venv:
         proc = subprocess.run(f'{self.executable} -m pip list | grep -c pyconcrete', shell=True)
         pyconcrete_exist = bool(proc.returncode == 0)
         if not pyconcrete_exist:
-            self.pip(
+            args = [
                 'install',
                 f'--config-settings=setup-args=-Dpassphrase={PASSPHRASE}',
+                f'--config-settings=setup-args=-Dext={self._pyconcrete_ext}' if self._pyconcrete_ext else '',
                 '--quiet',
                 ROOT_DIR,
-            )
+            ]
+            args = [arg for arg in args if arg]  # filter empty string
+            self.pip(*args)
 
 
 class PyeCli:
@@ -114,3 +118,8 @@ def venv(tmp_path_factory):
 @pytest.fixture
 def sample_module_path():
     return join(ROOT_DIR, 'tests', 'fixtures', 'sample_module')
+
+
+@pytest.fixture
+def sample_import_sub_module_path():
+    return join(ROOT_DIR, 'tests', 'exe_testcases', 'test_import_sub_module')

@@ -1,1 +1,2 @@
 option('passphrase', type: 'string', description: 'User-defined passphrase for secret key')
+option('ext', type: 'string', description: 'User-defined file extension, default is .pye')
