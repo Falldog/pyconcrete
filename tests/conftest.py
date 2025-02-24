@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import subprocess
 import sys
 from os.path import abspath, dirname, join
@@ -33,6 +34,10 @@ class Venv:
         self.bin_dir = join(self.env_dir, 'bin')
         self.executable = join(self.bin_dir, 'python')
 
+    def raise_if_pyconcrete_not_installed(self):
+        if not os.path.exists(join(self.bin_dir, 'pyconcrete')):
+            raise Exception("pyconcrete not been installed yet, please make sure you setup pye_cli before use the venv")
+
     def python(self, *args: [str]):
         return subprocess.check_output([self.executable, *args]).decode()
 
@@ -41,12 +46,15 @@ class Venv:
 
     @property
     def pyconcrete_exe(self):
+        self.raise_if_pyconcrete_not_installed()
         return join(self.bin_dir, 'pyconcrete')
 
     def pyconcrete(self, *args: [str]):
+        self.raise_if_pyconcrete_not_installed()
         return subprocess.check_output([self.pyconcrete_exe, *args]).decode()
 
     def pyconcrete_cli(self, *args: [str]):
+        self.raise_if_pyconcrete_not_installed()
         cli_script = join(ROOT_DIR, 'pyecli')
         return subprocess.check_output([self.executable, cli_script, *args]).decode()
 

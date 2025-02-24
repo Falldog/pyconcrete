@@ -5,6 +5,9 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
+#define RET_OK 0
+#define RET_FAIL 1
+
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=7
     #define MAGIC_OFFSET 16
 #elif PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
@@ -14,14 +17,15 @@
 #endif
 
 
-void execPycContent(PyObject* pyc_content);
-void runFile(const char* filepath);
+int execPycContent(PyObject* pyc_content);
+int runFile(const char* filepath);
 
 
 int main(int argc, char *argv[])
 {
 #if PY_MAJOR_VERSION >= 3
     int i, len;
+    int ret = RET_OK;
     wchar_t** argv_ex = NULL;
     argv_ex = (wchar_t**) malloc(sizeof(wchar_t*) * argc);
     for(i=0 ; i<argc ; ++i)
@@ -48,13 +52,14 @@ int main(int argc, char *argv[])
         else
         {
             PySys_SetArgv(argc-1, argv_ex+1);
-            runFile(argv[1]);
+            ret = runFile(argv[1]);
         }
     }
 
     PyGILState_Ensure();
 
     if (PyErr_Occurred()) {
+        ret = RET_FAIL;
         PyErr_Print();
     }
 
@@ -77,11 +82,12 @@ int main(int argc, char *argv[])
     }
     free(argv_ex);
 #endif
-    return 0;
+    return ret;
 }
 
-void execPycContent(PyObject* pyc_content)
+int execPycContent(PyObject* pyc_content)
 {
+    int ret = RET_OK;
     PyObject* py_marshal = NULL;
     PyObject* py_marshal_loads = NULL;
     PyObject* pyc_content_wo_magic = NULL;
@@ -106,6 +112,7 @@ void execPycContent(PyObject* pyc_content)
     py_code = PyObject_CallFunctionObjArgs(py_marshal_loads, pyc_content_wo_magic, NULL);
     if(py_code == NULL && PyErr_Occurred() != NULL)
     {
+        ret = RET_FAIL;
         PyErr_Print();
         goto ERROR;
     }
@@ -121,12 +128,14 @@ ERROR:
     Py_XDECREF(pyc_content_wo_magic);
     Py_XDECREF(py_marshal_loads);
     Py_XDECREF(py_marshal);
+    return ret;
 }
 
-void runFile(const char* filepath)
+int runFile(const char* filepath)
 {
     FILE* src = NULL;
     char* content = NULL;
+    int ret = RET_OK;
     size_t s, size;
     PyObject* py_content = NULL;
     PyObject* py_plaint_content = NULL;
@@ -135,7 +144,7 @@ void runFile(const char* filepath)
     src = fopen(filepath, "rb");
     if(src == NULL)
     {
-        return;
+        return RET_FAIL;
     }
 
     // read & parse file
@@ -148,7 +157,7 @@ void runFile(const char* filepath)
         s = fread(content, 1, size, src);
         if(s != size)
         {
-            return;
+            return RET_FAIL;
         }
         py_content = PyBytes_FromStringAndSize(content, size);
         py_args = PyTuple_New(1);
@@ -160,7 +169,8 @@ void runFile(const char* filepath)
     }
     fclose(src);
 
-    execPycContent(py_plaint_content);
+    ret = execPycContent(py_plaint_content);
 
     Py_DECREF(py_plaint_content);
+    return ret;
 }
