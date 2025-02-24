@@ -30,7 +30,7 @@ test:
 
 test-all :
 	for ver in $(PY_VERSIONS); do \
-	    PY_VER=$$ver ./bin/run-test.sh; \
+	    PY_VER=$$ver ./bin/run-test.sh || exit 1; \
 	done
 
 attach:
