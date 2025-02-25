@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 import subprocess
 import sys
 from os.path import abspath, dirname, join
@@ -23,20 +22,18 @@ PASSPHRASE = 'TestPyconcrete'
 
 
 class Venv:
-    def __init__(self, env_dir):
+    def __init__(self, env_dir, pyconcrete_ext=None):
         self.executable = None
         self.bin_dir = None
         self.env_dir = env_dir
+        self._pyconcrete_ext = pyconcrete_ext
         self.create()
 
     def create(self):
         subprocess.check_call([sys.executable, '-m', 'virtualenv', self.env_dir])
         self.bin_dir = join(self.env_dir, 'bin')
         self.executable = join(self.bin_dir, 'python')
-
-    def raise_if_pyconcrete_not_installed(self):
-        if not os.path.exists(join(self.bin_dir, 'pyconcrete')):
-            raise Exception("pyconcrete not been installed yet, please make sure you setup pye_cli before use the venv")
+        self._ensure_pyconcrete_exist()
 
     def python(self, *args: [str]):
         return subprocess.check_output([self.executable, *args]).decode()
@@ -46,17 +43,31 @@ class Venv:
 
     @property
     def pyconcrete_exe(self):
-        self.raise_if_pyconcrete_not_installed()
+        self._ensure_pyconcrete_exist()
         return join(self.bin_dir, 'pyconcrete')
 
     def pyconcrete(self, *args: [str]):
-        self.raise_if_pyconcrete_not_installed()
+        self._ensure_pyconcrete_exist()
         return subprocess.check_output([self.pyconcrete_exe, *args]).decode()
 
     def pyconcrete_cli(self, *args: [str]):
-        self.raise_if_pyconcrete_not_installed()
+        self._ensure_pyconcrete_exist()
         cli_script = join(ROOT_DIR, 'pyecli')
         return subprocess.check_output([self.executable, cli_script, *args]).decode()
+
+    def _ensure_pyconcrete_exist(self):
+        proc = subprocess.run(f'{self.executable} -m pip list | grep -c pyconcrete', shell=True)
+        pyconcrete_exist = bool(proc.returncode == 0)
+        if not pyconcrete_exist:
+            args = [
+                'install',
+                f'--config-settings=setup-args=-Dpassphrase={PASSPHRASE}',
+                f'--config-settings=setup-args=-Dext={self._pyconcrete_ext}' if self._pyconcrete_ext else '',
+                '--quiet',
+                ROOT_DIR,
+            ]
+            args = [arg for arg in args if arg]  # filter empty string
+            self.pip(*args)
 
 
 class PyeCli:
@@ -65,7 +76,6 @@ class PyeCli:
         self._tmp_dir = None
         self._module_name = None
         self._source_code = None
-        self._ensure_pyconcrete_exist()
 
     def setup(self, tmp_dir, module_name):
         self._tmp_dir = tmp_dir
@@ -76,17 +86,6 @@ class PyeCli:
     def tmp_dir(self):
         """tmp dir to do the encryption"""
         return self._tmp_dir
-
-    def _ensure_pyconcrete_exist(self):
-        proc = subprocess.run(f'{self._venv.executable} -m pip list | grep -c pyconcrete', shell=True)
-        pyconcrete_exist = bool(proc.returncode == 0)
-        if not pyconcrete_exist:
-            self._venv.pip(
-                'install',
-                f'--config-settings=setup-args=-Dpassphrase={PASSPHRASE}',
-                '--quiet',
-                ROOT_DIR,
-            )
 
     def source_code(self, code):
         self._source_code = code
@@ -119,3 +118,8 @@ def venv(tmp_path_factory):
 @pytest.fixture
 def sample_module_path():
     return join(ROOT_DIR, 'tests', 'fixtures', 'sample_module')
+
+
+@pytest.fixture
+def sample_import_sub_module_path():
+    return join(ROOT_DIR, 'tests', 'exe_testcases', 'test_import_sub_module')

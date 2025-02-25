@@ -10,13 +10,23 @@
 #define IS_PY3K
 #endif
 
+#ifndef PYCONCRETE_EXT
+#define PYCONCRETE_EXT ".pye"
+#endif
+
 static PyObject * fnInfo(PyObject *self, PyObject* null)
 {
     return Py_BuildValue("s", "PyConcrete Info() AES 128bit");
 }
 
+static PyObject * fnExt(PyObject *self, PyObject* null)
+{
+    return Py_BuildValue("s", PYCONCRETE_EXT);
+}
+
 static PyMethodDef PyConcreteMethods[] = {
     {"info", fnInfo, METH_NOARGS, "Display PyConcrete info"},
+    {"get_ext", fnExt, METH_NOARGS, "PyConcrete file ext"},
     {"encrypt_file", fnEncryptFile, METH_VARARGS, "Encrypt whole file"},
     {"decrypt_file", fnDecryptFile, METH_VARARGS, "Decrypt whole file (not ready)"},
     {"decrypt_buffer", fnDecryptBuffer, METH_VARARGS, "Decrypt buffer"},

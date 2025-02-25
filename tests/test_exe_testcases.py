@@ -78,7 +78,7 @@ def _read_expected_yaml(expected_yaml: str) -> ExpectedConfig:
     "sub_test_case_folder",
     _discover_exe_testcases_folder(),
 )
-def test_exe__testcases(venv, pye_cli, tmpdir, sub_test_case_folder: str):
+def test_exe__testcases(venv, tmpdir, sub_test_case_folder: str):
     """
     Dynamic load testcases from tests/exe_testcases folder.
 

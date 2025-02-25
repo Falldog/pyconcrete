@@ -1,5 +1,15 @@
 # Pyconcrete Changelog
 
+## 1.0.1 (2025-??-??)
+
+### Features
+* Support to assign customized file extension. Which default is .pye https://github.com/Falldog/pyconcrete/pull/115
+
+### Bug fixes
+* Fix return code should not be 0 when python script is exception https://github.com/Falldog/pyconcrete/pull/114
+
+
+
 ## 1.0.0 (2025-02-23)
 
 ### Features

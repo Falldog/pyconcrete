@@ -3,6 +3,7 @@ project(
     'c',
     meson_version: '>= 1.1',
     version: files('VERSION'),
+    default_options: ['ext=.pye'],
 )
 
 INSTALL_DIR = 'pyconcrete'
@@ -17,6 +18,9 @@ python_ins = import('python').find_installation(pure: false)
 python_ver = python_ins.language_version()
 python_exe_path = python_ins.full_path()
 python_dependency = python_ins.dependency(embed: true)
+
+macro_ext = '-D PYCONCRETE_EXT="@0@"'.format(get_option('ext'))
+macro_version = '-D PYCONCRETE_VERSION=@0@'.format(version)
 
 
 #----------------------------
@@ -54,6 +58,7 @@ ext_srcs = [
 python_ins.extension_module(
     '_pyconcrete',
     ext_srcs,
+    c_args: [macro_ext],
     subdir: INSTALL_DIR,
     install: true,
     include_directories: ext_includes,
@@ -94,7 +99,10 @@ exe_srcs = [
 executable(
     PYCONCRETE_EXE_NAME,
     exe_srcs,
-    c_args: '-D PYCONCRETE_VERSION=@0@'.format(version),
+    c_args: [
+        macro_ext,
+        macro_version,
+    ],
     include_directories: exe_includes,
     dependencies: python_dependency,
     install: true,
