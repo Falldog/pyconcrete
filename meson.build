@@ -50,6 +50,7 @@ ext_includes = [
     './src/pyconcrete_ext/openaes/inc/',
 ]
 ext_srcs = [
+    gen_secret_key,  # make sure building dependency
     './src/pyconcrete_ext/pyconcrete.c',
     './src/pyconcrete_ext/pyconcrete_module.c',
     './src/pyconcrete_ext/openaes/src/oaes_base64.c',
@@ -91,6 +92,7 @@ exe_includes = [
     './src/pyconcrete_ext/openaes/inc/',
 ]
 exe_srcs = [
+    gen_secret_key,  # make sure building dependency
     './src/pyconcrete_exe/pyconcrete_exe.c',
     './src/pyconcrete_ext/pyconcrete.c',
     './src/pyconcrete_ext/openaes/src/oaes_base64.c',
