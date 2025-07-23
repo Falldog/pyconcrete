@@ -33,6 +33,8 @@ RUN set -ex \
 # install pip
 RUN if [ "${PY_VER}" = "3.7" ] ; then \
         curl https://bootstrap.pypa.io/pip/3.7/get-pip.py | python3.7 ; \
+    elif [ "${PY_VER}" = "3.8" ] ; then \
+        curl https://bootstrap.pypa.io/pip/3.8/get-pip.py | python3.8 ; \
     else \
         curl https://bootstrap.pypa.io/get-pip.py | python${PY_VER} ; \
     fi
