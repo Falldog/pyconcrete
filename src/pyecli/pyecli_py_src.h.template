@@ -1,0 +1,7 @@
+#ifndef __PYECLI_PY_SRC_H__
+#define __PYECLI_PY_SRC_H__
+
+// here will be fill by meson when building
+const char pyecli_py_source[] = "@DATA@";
+
+#endif // __PYECLI_PY_SRC_H__
