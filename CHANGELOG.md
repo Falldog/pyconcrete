@@ -4,9 +4,14 @@
 
 ### Features
 * Support to assign customized file extension. Which default is .pye https://github.com/Falldog/pyconcrete/pull/115
+* Make pyconcrete exe & cli as standalone
+  * https://github.com/Falldog/pyconcrete/pull/119
+  * Installation support to assign `mode` as `exe` or `lib`
+  * Installation support to determine `install-cli` or not
 
 ### Bug fixes
 * Fix return code should not be 0 when python script is exception https://github.com/Falldog/pyconcrete/pull/114
+* Fix building dependency issue for secret_key.h https://github.com/Falldog/pyconcrete/pull/117
 
 
 
