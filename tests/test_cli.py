@@ -23,7 +23,7 @@ YES = 'yes'
 NO = 'no'
 
 
-def test_cli__encrypt_single_file(venv, pye_cli, tmpdir, sample_module_path):
+def test_cli__encrypt_single_file(venv_cli, tmpdir, sample_module_path):
     # prepare
     source_file = join(tmpdir, 'm.py')
     encrypt_file = join(tmpdir, 'm.pye')
@@ -32,19 +32,19 @@ def test_cli__encrypt_single_file(venv, pye_cli, tmpdir, sample_module_path):
         f.write("""print('hello world')""")
 
     # execution
-    venv.pyconcrete_cli('compile', f'--source={source_file}', '--pye')
+    venv_cli.pyconcrete_cli('compile', f'--source={source_file}', '--pye')
 
     # validation
     assert os.path.exists(encrypt_file)
 
 
-def test_cli__encrypt_whole_folder(venv, pye_cli, tmpdir, sample_module_path):
+def test_cli__encrypt_whole_folder(venv_cli, tmpdir, sample_module_path):
     # prepare
     source_dir = join(tmpdir, 'sample_module')
     shutil.copytree(sample_module_path, source_dir)
 
     # execution
-    venv.pyconcrete_cli('compile', f'--source={source_dir}', '--pye')
+    venv_cli.pyconcrete_cli('compile', f'--source={source_dir}', '--pye')
 
     # validation
     for root, dirs, files in os.walk(sample_module_path):
@@ -72,7 +72,7 @@ _f_ri__util = join('relative_import', 'util.pye')
         ("main.py util.py", {_f_main: NO, _f_ri__main: NO, _f_ri__util: NO}),
     ],
 )
-def test_cli__ignore_rule__in_deep_folder(venv, tmpdir, sample_module_path, pattern, expect_result_map):
+def test_cli__ignore_rule__in_deep_folder(venv_cli, tmpdir, sample_module_path, pattern, expect_result_map):
     # prepare
     source_dir = join(tmpdir, 'sample_module')
     shutil.copytree(sample_module_path, source_dir)
@@ -82,7 +82,7 @@ def test_cli__ignore_rule__in_deep_folder(venv, tmpdir, sample_module_path, patt
     if pattern is not None:
         ignore_args.append('-i')
         ignore_args.extend(pattern.split(' '))
-    venv.pyconcrete_cli('compile', f'--source={source_dir}', '--pye', *ignore_args)
+    venv_cli.pyconcrete_cli('compile', f'--source={source_dir}', '--pye', *ignore_args)
 
     # validation
     for f, encrypted in expect_result_map.items():
@@ -136,7 +136,7 @@ _f_b_test = join('b_test.pye')
         ),
     ],
 )
-def test_cli__ignore_rule__in_same_folder(venv, pye_cli, tmpdir, pattern, expect_result_map):
+def test_cli__ignore_rule__in_same_folder(venv_cli, tmpdir, pattern, expect_result_map):
     # prepare
     source_dir = tmpdir
     # create the files which list on parametrize
@@ -150,7 +150,7 @@ def test_cli__ignore_rule__in_same_folder(venv, pye_cli, tmpdir, pattern, expect
     if pattern is not None:
         ignore_args.append('-i')
         ignore_args.extend(pattern.split(' '))
-    venv.pyconcrete_cli('compile', f'--source={source_dir}', '--pye', *ignore_args)
+    venv_cli.pyconcrete_cli('compile', f'--source={source_dir}', '--pye', *ignore_args)
 
     # validation
     for f, encrypted in expect_result_map.items():

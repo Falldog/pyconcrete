@@ -11,17 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pytest
 
 
-@pytest.mark.parametrize("text", ["早安", "¡Buenos días!", "おはようございます"])
-def test_encoding(venv_exe, pye_cli, tmpdir, text):
+def test_lib__import_pyconcrete__venv_lib__validate__file__(venv_lib, pye_cli, tmpdir):
+    """
+    compare to test_exe__import_pyconcrete__venv_exe__validate__file__
+    pyconcrete lib mode, the `pyconcrete` module contain`__file__` attribute
+    """
     # prepare
-    pye_path = pye_cli.setup(tmpdir, 'test_encoding').source_code(f"print('{text}')").get_encrypt_path()
+    plain_src = """
+import pyconcrete;
+print(pyconcrete.__file__)
+    """.strip()
 
     # execution
-    output = venv_exe.pyconcrete(pye_path)
+    output = venv_lib.python('-c', plain_src)
     output = output.strip()
+    pyconcrete__file__ = output
 
     # verification
-    assert output == text
+    assert pyconcrete__file__.startswith(str(venv_lib.env_dir))
