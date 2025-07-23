@@ -1,6 +1,8 @@
 #include <Python.h>
 #include <stdlib.h>
 #include "pyconcrete.h"
+#include "pyconcrete_module.h"
+#include "pyconcrete_py_src.h"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -17,6 +19,7 @@
 #endif
 
 
+int createAndInitPyconcreteModule();
 int execPycContent(PyObject* pyc_content);
 int runFile(const char* filepath);
 
@@ -40,8 +43,21 @@ int main(int argc, char *argv[])
 #endif
 
     Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
+    // PyImport_AppendInittab must set up before Py_Initialize
+    if (PyImport_AppendInittab("_pyconcrete", PyInit__pyconcrete) == -1)
+    {
+        fprintf(stderr, "Error, can't load embedded _pyconcrete correctly!\n");
+        return RET_FAIL;
+    }
     Py_Initialize();
     PyGILState_Ensure();
+
+    if (createAndInitPyconcreteModule() == -1)
+    {
+        fprintf(stderr, "Error: Failed to import embedded pyconcrete.\n");
+        Py_Finalize();
+        return RET_FAIL;
+    }
 
     if(argc >= 2)
     {
@@ -82,6 +98,41 @@ int main(int argc, char *argv[])
     }
     free(argv_ex);
 #endif
+    return ret;
+}
+
+int createAndInitPyconcreteModule()
+{
+    int ret = 0;
+    PyObject* module_name = PyUnicode_FromString("pyconcrete");
+    PyObject* module = PyModule_New("pyconcrete");
+    PyObject* module_dict = PyModule_GetDict(module);
+
+    // Ensure built-ins are available in the module dict
+    PyDict_SetItemString(module_dict, "__builtins__", PyEval_GetBuiltins());
+
+    // assign module dict into run_string result
+    PyObject* module_result = PyRun_String(pyconcrete_py_source, Py_file_input, module_dict, module_dict);
+    if (!module_result)
+    {
+        PyErr_Print();
+        ret = -1;
+        goto ERROR;
+    }
+
+    // Add the module to sys.modules, making it available for import
+    PyObject* sys_modules = PyImport_GetModuleDict();
+    PyDict_SetItem(sys_modules, module_name, module);
+
+    // Import the module to initialize pyconcrete file loader
+    PyObject* imported_module = PyImport_ImportModule("pyconcrete");
+
+ERROR:
+    Py_XDECREF(imported_module);
+    Py_XDECREF(module);
+    Py_XDECREF(module_result);
+    Py_XDECREF(module_name);
+    Py_XDECREF(module_dict);
     return ret;
 }
 

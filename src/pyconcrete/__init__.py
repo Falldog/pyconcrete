@@ -22,7 +22,12 @@ import sys
 from importlib._bootstrap_external import _get_supported_file_loaders
 from importlib.machinery import SOURCE_SUFFIXES, FileFinder, SourceFileLoader
 
-from . import _pyconcrete  # noqa: E402
+try:
+    # for import the module which installed at site-packages
+    from . import _pyconcrete  # noqa: E402
+except ImportError:
+    # for import the module which embedded in pyconcrete exe
+    import _pyconcrete  # noqa: E402
 
 __all__ = ["info"]
 
