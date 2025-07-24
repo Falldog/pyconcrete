@@ -46,8 +46,13 @@ COPY . \
 # install pyconcrete && compile .pye
 RUN set -ex \
     && cd /pyconcrete-code/ \
-    && pip install --config-settings=setup-args=-Dpassphrase=${PASSPHARE} . \
-    && python pyecli compile \
+    && pip \
+      install \
+      --config-settings=setup-args=-Dpassphrase=${PASSPHRASE} \
+      --config-settings=setup-args=-Dmode=lib \
+      --config-settings=setup-args=-Dinstall-cli=true \
+      . \
+    && pyecli compile \
         --source=/code/ \
         --pye \
         --remove-py \

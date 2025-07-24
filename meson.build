@@ -6,8 +6,11 @@ project(
     default_options: ['ext=.pye'],
 )
 
+fs = import('fs')
+
 INSTALL_DIR = 'pyconcrete'
 PYCONCRETE_EXE_NAME = 'pyconcrete'
+PYECLI_EXE_NAME = 'pyecli'
 BUILD_UTILITY_DIR = './meson_utility/'
 
 version = meson.project_version()
@@ -42,89 +45,127 @@ gen_secret_key = custom_target(
 
 
 #----------------------------
-# _pyconcrete ext
+# pyconcrete lib w/ _pyconcrete ext
 #----------------------------
 
-ext_includes = [
-    './src/pyconcrete_ext/',
-    './src/pyconcrete_ext/openaes/inc/',
-]
-ext_srcs = [
-    gen_secret_key,  # make sure building dependency
-    './src/pyconcrete_ext/pyconcrete.c',
-    './src/pyconcrete_ext/pyconcrete_module.c',
-    './src/pyconcrete_ext/openaes/src/oaes_base64.c',
-    './src/pyconcrete_ext/openaes/src/oaes_lib.c',
-]
-python_ins.extension_module(
-    '_pyconcrete',
-    ext_srcs,
-    c_args: [macro_ext],
-    subdir: INSTALL_DIR,
-    install: true,
-    include_directories: ext_includes,
-)
+if get_option('mode') == 'lib'
+    ext_includes = [
+        './src/pyconcrete_ext/',
+        './src/pyconcrete_ext/openaes/inc/',
+    ]
+    ext_srcs = [
+        gen_secret_key,  # make sure building dependency
+        './src/pyconcrete_ext/pyconcrete.c',
+        './src/pyconcrete_ext/pyconcrete_module.c',
+        './src/pyconcrete_ext/openaes/src/oaes_base64.c',
+        './src/pyconcrete_ext/openaes/src/oaes_lib.c',
+    ]
+    python_ins.extension_module(
+        '_pyconcrete',
+        ext_srcs,
+        c_args: [macro_ext],
+        subdir: INSTALL_DIR,
+        install: true,
+        include_directories: ext_includes,
+    )
 
-python_ins.install_sources(
-    [
-        'src/pyconcrete/__init__.py',
-        'src/pyconcrete/version.py',
-        'VERSION',
-    ],
-    pure: false,
-    subdir: INSTALL_DIR,
-)
-
-python_ins.install_sources(
-    join_paths(BUILD_UTILITY_DIR, 'pyconcrete.pth'),
-    pure: false,
-    # subdir: <install on the dist-packages>
-)
+    python_ins.install_sources(
+        [
+            'src/pyconcrete/__init__.py',
+            'src/pyconcrete/version.py',
+            'VERSION',
+        ],
+        pure: false,
+        subdir: INSTALL_DIR,
+    )
+endif
 
 
 #----------------------------
 # pyconcrete exe
 #----------------------------
 
-exe_includes = [
-    './src/pyconcrete_exe/',
-    './src/pyconcrete_ext/',
-    './src/pyconcrete_ext/openaes/inc/',
-]
-exe_srcs = [
-    gen_secret_key,  # make sure building dependency
-    './src/pyconcrete_exe/pyconcrete_exe.c',
-    './src/pyconcrete_ext/pyconcrete.c',
-    './src/pyconcrete_ext/openaes/src/oaes_base64.c',
-    './src/pyconcrete_ext/openaes/src/oaes_lib.c',
-]
-executable(
-    PYCONCRETE_EXE_NAME,
-    exe_srcs,
-    c_args: [
-        macro_ext,
-        macro_version,
-    ],
-    include_directories: exe_includes,
-    dependencies: python_dependency,
-    install: true,
+pyconcrete_src = fs.read('./src/pyconcrete/__init__.py')
+pyconcrete_src = pyconcrete_src.strip().replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+pyconcrete_src_file = configure_file(
+    input: './src/pyconcrete_exe/pyconcrete_py_src.h.template',
+    output: 'pyconcrete_py_src.h',
+    configuration: {
+        'DATA': '@0@'.format(pyconcrete_src)
+    }
 )
+
+if get_option('mode') == 'exe'
+    exe_includes = [
+        './src/pyconcrete_exe/',
+        './src/pyconcrete_ext/',
+        './src/pyconcrete_ext/openaes/inc/',
+    ]
+    exe_srcs = [
+        gen_secret_key,  # make sure building dependency
+        pyconcrete_src_file,
+        './src/pyconcrete_exe/pyconcrete_exe.c',
+        './src/pyconcrete_ext/pyconcrete.c',
+        './src/pyconcrete_ext/pyconcrete_module.c',
+        './src/pyconcrete_ext/openaes/src/oaes_base64.c',
+        './src/pyconcrete_ext/openaes/src/oaes_lib.c',
+    ]
+    executable(
+        PYCONCRETE_EXE_NAME,
+        exe_srcs,
+        c_args: [
+            macro_ext,
+            macro_version,
+        ],
+        include_directories: exe_includes,
+        dependencies: python_dependency,
+        install: true,
+    )
+endif
 
 
 #----------------------------
 # pyconcrete cli
 #----------------------------
 
-# for install the executable cli scripts, we use bindir here.
-# meson-python will mapping `bindir`(meson) to `scripts`(python)
-# ref:
-#   https://github.com/mesonbuild/meson-python/blob/0.17.1/mesonpy/__init__.py#L83
-#   https://docs.python.org/3/library/sysconfig.html#installation-paths
-install_data(
-    './pyecli',
-    install_mode: 'rwxr-xr-x',
-    install_dir: get_option('bindir'),
-)
+if get_option('install-cli')
+    pyecli_src = fs.read('./src/pyecli/pyecli.py')
+    pyecli_src = pyecli_src.strip().replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"')
+    pyecli_src_file = configure_file(
+        input: './src/pyecli/pyecli_py_src.h.template',
+        output: 'pyecli_py_src.h',
+        configuration: {
+            'DATA': '@0@'.format(pyecli_src)
+        }
+    )
+
+    cli_includes = [
+        './src/pyecli/',
+        './src/pyconcrete_ext/',
+        './src/pyconcrete_ext/openaes/inc/',
+    ]
+    cli_srcs = [
+        gen_secret_key,  # make sure building dependency
+        pyecli_src_file,
+        pyconcrete_src_file,
+        './src/pyecli/pyecli_wrap.c',
+        './src/pyconcrete_ext/pyconcrete.c',
+        './src/pyconcrete_ext/pyconcrete_module.c',
+        './src/pyconcrete_ext/openaes/src/oaes_base64.c',
+        './src/pyconcrete_ext/openaes/src/oaes_lib.c',
+    ]
+    executable(
+        PYECLI_EXE_NAME,
+        cli_srcs,
+        c_args: [
+            macro_ext,
+            macro_version,
+        ],
+        include_directories: cli_includes,
+        dependencies: python_dependency,
+        install: true,
+    )
+endif
 
 
 #----------------------------

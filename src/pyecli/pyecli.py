@@ -20,12 +20,20 @@ import logging
 import os
 import py_compile
 import sys
-from os.path import abspath, dirname, exists, isdir, isfile, join, splitext
-
-CUR_DIR = dirname(abspath(__file__))
+from os.path import exists, isdir, isfile, join, splitext
 
 IGNORE_FILES = ['.', '..', '.git', '.svn', 'pyconcrete']
 logger = logging.getLogger('pyconcrete')
+
+
+def _import_pyconcrete():
+    try:
+        # Import by default behavior, search by system builtin path
+        import pyconcrete
+    except ImportError:
+        print("import embedded pyconcrete fail!")
+        sys.exit(1)
+    return pyconcrete
 
 
 class PyConcreteError(Exception):
@@ -159,8 +167,7 @@ class PyConcreteCli(object):
         if there is no .pyc file, compile .pyc first
         then compile .pye
         """
-        import pyconcrete
-
+        pyconcrete = _import_pyconcrete()
         filename, ext = splitext(py_file)
         pyc_file = filename + '.pyc'
         pye_file = filename + args.ext
@@ -175,7 +182,7 @@ class PyConcreteCli(object):
             if self.verbose:
                 print('* skip %s' % pye_file)
 
-        # .pyc doesn't exists at beginning, remove it after .pye created
+        # .pyc doesn't exist at beginning, remove it after .pye created
         if not pyc_exists or args.remove_pyc:
             os.remove(pyc_file)
         if args.remove_py:

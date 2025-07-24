@@ -17,7 +17,7 @@ from subprocess import PIPE, Popen
 import pytest
 
 
-def _encrypt_plain_buffer_and_decrypt(venv, tmpdir, plain_buffer):
+def _encrypt_plain_buffer_and_decrypt(venv_lib, tmpdir, plain_buffer):
     """
     pye_cli will always transform .py to .pyc and then encrypt it as .pye
     here want to test AES encryption, We should not convert it to .pyc. or it will chnage the text length to encryption.
@@ -46,7 +46,7 @@ print(pyconcrete.decrypt_buffer(data).decode('utf-8'))
         f.write(plain_buffer)
 
     # run executor py file to encrypt as file and decrypt via buffer
-    cmds = [venv.executable, executor_py, plain_file, encrypted_file]
+    cmds = [venv_lib.executable, executor_py, plain_file, encrypted_file]
     p = Popen(cmds, stdout=PIPE, stdin=PIPE, stderr=PIPE, text=True)
     stdout, stderr = p.communicate(input=plain_buffer)
     return stdout
@@ -67,9 +67,9 @@ print(pyconcrete.decrypt_buffer(data).decode('utf-8'))
         "1234567890ABCDEF,\n" * 10,
     ],
 )
-def test_encryption__aes_block_testing(venv, pye_cli, tmpdir, plain_buffer):
+def test_encryption__aes_block_testing(venv_lib, pye_cli, tmpdir, plain_buffer):
     # execution
-    output = _encrypt_plain_buffer_and_decrypt(venv, tmpdir, plain_buffer)
+    output = _encrypt_plain_buffer_and_decrypt(venv_lib, tmpdir, plain_buffer)
 
     # verification
     assert output == (plain_buffer + '\n')  # without output.strip() to make sure the output is exactly what we want

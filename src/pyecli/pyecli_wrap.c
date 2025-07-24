@@ -3,6 +3,7 @@
 #include "pyconcrete.h"
 #include "pyconcrete_module.h"
 #include "pyconcrete_py_src.h"
+#include "pyecli_py_src.h"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -10,23 +11,12 @@
 #define RET_OK 0
 #define RET_FAIL 1
 
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=7
-    #define MAGIC_OFFSET 16
-#elif PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >=3
-    #define MAGIC_OFFSET 12
-#else
-    #define MAGIC_OFFSET 8
-#endif
-
 
 int createAndInitPyconcreteModule();
-int execPycContent(PyObject* pyc_content);
-int runFile(const char* filepath);
 
 
 int main(int argc, char *argv[])
 {
-#if PY_MAJOR_VERSION >= 3
     int i, len;
     int ret = RET_OK;
     wchar_t** argv_ex = NULL;
@@ -38,9 +28,6 @@ int main(int argc, char *argv[])
         mbstowcs(argv_ex[i], argv[i], len);
         argv_ex[i][len] = 0;
     }
-#else
-    char** argv_ex = argv;
-#endif
 
     Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
     // PyImport_AppendInittab must set up before Py_Initialize
@@ -63,12 +50,12 @@ int main(int argc, char *argv[])
     {
         if(argc == 2 && (strncmp(argv[1], "-v", 3)==0 || strncmp(argv[1], "--version", 10)==0))
         {
-            printf("pyconcrete %s [Python %s]\n", TOSTRING(PYCONCRETE_VERSION), TOSTRING(PY_VERSION));  // defined by build-backend
+            printf("pyecli %s [Python %s]\n", TOSTRING(PYCONCRETE_VERSION), TOSTRING(PY_VERSION));  // defined by build-backend
         }
         else
         {
-            PySys_SetArgv(argc-1, argv_ex+1);
-            ret = runFile(argv[1]);
+            PySys_SetArgv(argc, argv_ex);
+            ret = PyRun_SimpleString(pyecli_py_source);
         }
     }
 
@@ -91,13 +78,11 @@ int main(int argc, char *argv[])
 
     Py_Finalize();
 
-#if PY_MAJOR_VERSION >= 3
     for(i=0 ; i<argc ; ++i)
     {
         free(argv_ex[i]);
     }
     free(argv_ex);
-#endif
     return ret;
 }
 
@@ -133,95 +118,5 @@ ERROR:
     Py_XDECREF(module_result);
     Py_XDECREF(module_name);
     Py_XDECREF(module_dict);
-    return ret;
-}
-
-int execPycContent(PyObject* pyc_content)
-{
-    int ret = RET_OK;
-    PyObject* py_marshal = NULL;
-    PyObject* py_marshal_loads = NULL;
-    PyObject* pyc_content_wo_magic = NULL;
-    PyObject* py_code = NULL;
-    PyObject* global = PyDict_New();
-    Py_ssize_t content_size = 0;
-    char* content = NULL;
-#if PY_MAJOR_VERSION >= 3
-    PyObject* main_name = PyUnicode_FromString("__main__");
-#else
-    PyObject* main_name = PyBytes_FromString("__main__");
-#endif
-
-    // load compiled source from .pyc content
-    py_marshal = PyImport_ImportModule("marshal");
-    py_marshal_loads = PyObject_GetAttrString(py_marshal, "loads");
-
-    content = PyBytes_AS_STRING(pyc_content);
-    content_size = PyBytes_Size(pyc_content);
-
-    pyc_content_wo_magic = PyBytes_FromStringAndSize(content+MAGIC_OFFSET, content_size-MAGIC_OFFSET);
-    py_code = PyObject_CallFunctionObjArgs(py_marshal_loads, pyc_content_wo_magic, NULL);
-    if(py_code == NULL && PyErr_Occurred() != NULL)
-    {
-        ret = RET_FAIL;
-        PyErr_Print();
-        goto ERROR;
-    }
-
-    // setup global and exec loaded py_code
-    PyDict_SetItemString(global, "__name__", main_name);
-    PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
-    PyEval_EvalCode(py_code, global, global);
-
-ERROR:
-    Py_XDECREF(py_code);
-    Py_XDECREF(global);
-    Py_XDECREF(pyc_content_wo_magic);
-    Py_XDECREF(py_marshal_loads);
-    Py_XDECREF(py_marshal);
-    return ret;
-}
-
-int runFile(const char* filepath)
-{
-    FILE* src = NULL;
-    char* content = NULL;
-    int ret = RET_OK;
-    size_t s, size;
-    PyObject* py_content = NULL;
-    PyObject* py_plaint_content = NULL;
-    PyObject* py_args = NULL;
-
-    src = fopen(filepath, "rb");
-    if(src == NULL)
-    {
-        return RET_FAIL;
-    }
-
-    // read & parse file
-    {
-        fseek(src, 0, SEEK_END);
-        size = ftell(src);
-
-        fseek(src, 0, SEEK_SET);
-        content = malloc(size * sizeof(char));
-        s = fread(content, 1, size, src);
-        if(s != size)
-        {
-            return RET_FAIL;
-        }
-        py_content = PyBytes_FromStringAndSize(content, size);
-        py_args = PyTuple_New(1);
-        PyTuple_SetItem(py_args, 0, py_content);
-        py_plaint_content = fnDecryptBuffer(NULL, py_args);
-
-        Py_DECREF(py_args);
-        free(content);
-    }
-    fclose(src);
-
-    ret = execPycContent(py_plaint_content);
-
-    Py_DECREF(py_plaint_content);
     return ret;
 }

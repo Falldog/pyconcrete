@@ -22,11 +22,14 @@ PASSPHRASE = 'TestPyconcrete'
 
 
 class Venv:
-    def __init__(self, env_dir, pyconcrete_ext=None):
+    def __init__(self, env_dir, pyconcrete_ext=None, install_mode='exe', install_cli=False):
+        assert install_mode in ('lib', 'exe')
         self.executable = None
         self.bin_dir = None
         self.env_dir = env_dir
         self._pyconcrete_ext = pyconcrete_ext
+        self._install_mode = install_mode
+        self._install_cli = install_cli
         self.create()
 
     def create(self):
@@ -35,8 +38,11 @@ class Venv:
         self.executable = join(self.bin_dir, 'python')
         self._ensure_pyconcrete_exist()
 
-    def python(self, *args: [str]):
-        return subprocess.check_output([self.executable, *args]).decode()
+    def python(self, *args: [str], shell=False):
+        cmd = [self.executable, *args]
+        if shell:
+            cmd = ' '.join(cmd)
+        return subprocess.check_output(cmd, shell=shell).decode()
 
     def pip(self, *args: [str]):
         return self.python('-m', 'pip', *args)
@@ -52,8 +58,8 @@ class Venv:
 
     def pyconcrete_cli(self, *args: [str]):
         self._ensure_pyconcrete_exist()
-        cli_script = join(ROOT_DIR, 'pyecli')
-        return subprocess.check_output([self.executable, cli_script, *args]).decode()
+        cli = join(self.bin_dir, 'pyecli')
+        return subprocess.check_output([cli, *args]).decode()
 
     def _ensure_pyconcrete_exist(self):
         proc = subprocess.run(f'{self.executable} -m pip list | grep -c pyconcrete', shell=True)
@@ -63,6 +69,8 @@ class Venv:
                 'install',
                 f'--config-settings=setup-args=-Dpassphrase={PASSPHRASE}',
                 f'--config-settings=setup-args=-Dext={self._pyconcrete_ext}' if self._pyconcrete_ext else '',
+                f'--config-settings=setup-args=-Dmode={self._install_mode}',
+                f'--config-settings=setup-args=-Dinstall-cli={"true" if self._install_cli else "false"}',
                 '--quiet',
                 ROOT_DIR,
             ]
@@ -106,13 +114,40 @@ class PyeCli:
 
 
 @pytest.fixture
-def pye_cli(venv: Venv):
-    return PyeCli(venv)
+def pye_cli(venv_cli: Venv):
+    return PyeCli(venv_cli)
 
 
 @pytest.fixture(scope='session')
-def venv(tmp_path_factory):
-    return Venv(tmp_path_factory.mktemp('venv_'))
+def venv_exe(tmp_path_factory):
+    """
+    the virtual environment for testing pyconcrete exe
+    """
+    return Venv(
+        env_dir=tmp_path_factory.mktemp('venv_exe_'),
+    )
+
+
+@pytest.fixture(scope='session')
+def venv_cli(tmp_path_factory):
+    """
+    the virtual environment for testing pyconcrete cli
+    """
+    return Venv(
+        env_dir=tmp_path_factory.mktemp('venv_cli_'),
+        install_cli=True,
+    )
+
+
+@pytest.fixture(scope='session')
+def venv_lib(tmp_path_factory):
+    """
+    the virtual environment for testing pyconcrete lib
+    """
+    return Venv(
+        env_dir=tmp_path_factory.mktemp('venv_lib_'),
+        install_mode='lib',
+    )
 
 
 @pytest.fixture

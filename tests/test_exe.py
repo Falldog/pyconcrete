@@ -14,12 +14,12 @@
 import subprocess
 
 
-def test_exe__execute_an_non_exist_file(venv):
-    return_code = subprocess.call([venv.pyconcrete_exe, 'non_existing_file.txt'])
+def test_exe__execute_an_non_exist_file(venv_exe):
+    return_code = subprocess.call([venv_exe.pyconcrete_exe, 'non_existing_file.txt'])
     assert return_code == 1
 
 
-def test_exe__sys_path__should_contain_pye_file_dir(venv, pye_cli, tmpdir):
+def test_exe__sys_path__should_contain_pye_file_dir(venv_exe, pye_cli, tmpdir):
     # prepare
     pye_path = (
         pye_cli.setup(tmpdir, 'test_sys_path')
@@ -33,7 +33,7 @@ print('\\n'.join(sys.path))
     )
 
     # execution
-    output = venv.pyconcrete(pye_path)
+    output = venv_exe.pyconcrete(pye_path)
     output = output.replace('\r\n', '\n')
     paths = output.split('\n')
     pye_file_dir = pye_cli.tmp_dir
@@ -42,7 +42,7 @@ print('\\n'.join(sys.path))
     assert pye_file_dir in paths, "the folder of pye-file should be contained in sys.path"
 
 
-def test_exe__sys_argv__first_arg_should_be_file_name(venv, pye_cli, tmpdir):
+def test_exe__sys_argv__first_arg_should_be_file_name(venv_exe, pye_cli, tmpdir):
     # prepare
     pye_path = (
         pye_cli.setup(tmpdir, 'test_sys_argv')
@@ -56,14 +56,14 @@ print(" ".join(sys.argv))
     )
 
     # execution
-    output = venv.pyconcrete(pye_path)
+    output = venv_exe.pyconcrete(pye_path)
     output = output.strip()
 
     # verification
     assert output == pye_path
 
 
-def test_exe__sys_argv__more_arguments(venv, pye_cli, tmpdir):
+def test_exe__sys_argv__more_arguments(venv_exe, pye_cli, tmpdir):
     # prepare
     pye_path = (
         pye_cli.setup(tmpdir, 'test_sys_argv')
@@ -77,30 +77,34 @@ print(" ".join(sys.argv))
     )
 
     # execution
-    output = venv.pyconcrete(pye_path, '-a', '-b', '-c')
+    output = venv_exe.pyconcrete(pye_path, '-a', '-b', '-c')
     output = output.strip()
 
     # verification
     assert output == f'{pye_path} -a -b -c'
 
 
-def test_exe__import_pyconcrete__validate__file__(venv, pye_cli, tmpdir):
+def test_exe__import_pyconcrete__venv_exe__validate__file__(venv_exe, pye_cli, tmpdir):
+    """
+    compare to test_lib__import_pyconcrete__venv_lib__validate__file__
+    pyconcrete exe embedded `pyconcrete` module doesn't have `__file__` attribute
+    """
     # prepare
     pye_path = (
         pye_cli.setup(tmpdir, 'test_import_pyconcrete')
         .source_code(
             """
 import pyconcrete
-print(pyconcrete.__file__)
+print(getattr(pyconcrete, '__file__', 'None'))
             """.strip()
         )
         .get_encrypt_path()
     )
 
     # execution
-    output = venv.pyconcrete(pye_path)
+    output = venv_exe.pyconcrete(pye_path)
     output = output.strip()
     pyconcrete__file__ = output
 
     # verification
-    assert pyconcrete__file__.startswith(str(venv.env_dir))
+    assert pyconcrete__file__ == 'None'

@@ -1,0 +1,7 @@
+#ifndef __PYCONCRETE_PY_SRC_H__
+#define __PYCONCRETE_PY_SRC_H__
+
+// here will be fill by meson when building
+const char pyconcrete_py_source[] = "@DATA@";
+
+#endif // __PYCONCRETE_PY_SRC_H__

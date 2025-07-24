@@ -78,7 +78,7 @@ def _read_expected_yaml(expected_yaml: str) -> ExpectedConfig:
     "sub_test_case_folder",
     _discover_exe_testcases_folder(),
 )
-def test_exe__testcases(venv, tmpdir, sub_test_case_folder: str):
+def test_exe__testcases(venv_cli, venv_exe, tmpdir, sub_test_case_folder: str):
     """
     Dynamic load testcases from tests/exe_testcases folder.
 
@@ -87,17 +87,16 @@ def test_exe__testcases(venv, tmpdir, sub_test_case_folder: str):
     2. Encrypt .py to .pye
     3. Execute main.pye by pyconcrete
     4. Validate expected result by expected.yaml
-
     """
     # prepare
     dest_dir = join(tmpdir, basename(sub_test_case_folder))
     shutil.copytree(sub_test_case_folder, dest_dir)
-    venv.pyconcrete_cli('compile', f'--source={dest_dir}', '--pye', '--remove-py', '--remove-pyc')
+    venv_cli.pyconcrete_cli('compile', f'--source={dest_dir}', '--pye', '--remove-py', '--remove-pyc')
 
     # execution
     main_pye = join(dest_dir, MAIN_PYE)
     p = subprocess.Popen(
-        [venv.pyconcrete_exe, main_pye],
+        [venv_exe.pyconcrete_exe, main_pye],
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

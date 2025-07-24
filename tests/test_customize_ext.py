@@ -28,7 +28,11 @@ def test_customize_ext(tmp_path_factory, tmpdir, sample_import_sub_module_path, 
     # prepare
     target_dir = join(tmpdir, 'for_ext_module')
     main_encrypted = join(target_dir, f'main{ext}')
-    venv = Venv(tmp_path_factory.mktemp('venv_ext_'), pyconcrete_ext=ext)
+    venv = Venv(
+        env_dir=tmp_path_factory.mktemp('venv_ext_'),
+        pyconcrete_ext=ext,
+        install_cli=True,
+    )
 
     # compile to customized extension
     shutil.copytree(sample_import_sub_module_path, target_dir)

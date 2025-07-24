@@ -1,2 +1,4 @@
 option('passphrase', type: 'string', description: 'User-defined passphrase for secret key')
 option('ext', type: 'string', description: 'User-defined file extension, default is .pye')
+option('mode', type: 'combo', choices:['exe', 'lib'], value: 'exe', description: 'Determine to install pyconcrete as exe or lib mode')
+option('install-cli', type: 'boolean', value: true, description: 'Determine to install pyecli')

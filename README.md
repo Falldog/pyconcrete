@@ -50,24 +50,36 @@ Installation
 --------------
 Due to security considerations, you must provide a passphrase to create a secret key for encrypting Python scripts:
 * The same passphrase will generate the same secret key.
-* Pre-built packages are not provided, so users must build the package yourself.
+* Pre-built packages are not provided, so users must build the package by yourself.
 
 Build Process
 * Pyconcrete relies on Meson to compile the C extension.
-* The installation process will add a `pyconcrete.pth` file to your `site-packages`, enabling `sitecustomize.py` to automatically import Pyconcrete.
+* Meson generate secret key header file which assign by user passphrase.
+* Meson build exe(pyconcrete executable) or lib(pyconcrete python module, for import only).
+* Meson build pyecli(command line tool).
 
 ### pip
 * Need to config the passphrase for installation. And only pip 23.1+ support passing argument via `-C` or `--config-settings`.
 * Remember to assign `--no-cache-dir` to avoid use pip's cached package which already built by old passphrase.
 ```sh
+# basic usage
 $ pip install pyconcrete \
-  --no-cache-dir \
-  --config-settings=setup-args="-Dpassphrase=<Your_Passphrase>"
+    --no-cache-dir \
+    --config-settings=setup-args="-Dpassphrase=<Your_Passphrase>"
+
+# assign multiple options
+$ pip install pyconcrete \
+    --no-cache-dir \
+    --config-settings=setup-args="-Dpassphrase=<Your_Passphrase>" \
+    --config-settings=setup-args="-Dmode=exe" \
+    --config-settings=setup-args="-Dinstall-cli=true"
 ```
 
 * Available arguments. Setup by `--config-settings=setup-args="-D<argurment_name>=<value>"`
   * `passphrase`: (Mandatory) To generate secret key for encryption.
   * `ext`: Able to assign customized encrypted file extension. Which default is `.pye`.
+  * `mode`: `exe` or `lib`. Which default is `exe`.
+  * `install-cli`: Determine to install `pyecli` or not. Which default is `true`
 
 Usage
 --------------
@@ -84,21 +96,23 @@ $ pyecli compile --pye -s=<your py module dir> -e=<your file extension>
 * *main*.py encrypted as *main*.pye, it can't be executed by normal `python`.
 You must use `pyconcrete` to process the *main*.pye script.
 `pyconcrete`(*exe*) will be installed in your system path (ex: /usr/local/bin)
+  * project layout as below
+  ```sh
+  pyconcrete main.pye
+  src/*.pye  # your libs
+  ```
 
-```sh
-pyconcrete main.pye
-src/*.pye  # your libs
-```
 
-
-### Partial encrypted (pyconcrete as lib) -> (DEPRECATED and not Safe)
-* import pyconcrete in your main script
-  * project layout
-```sh
-main.py       # import pyconcrete and your lib
-pyconcrete/*  # put pyconcrete lib in project root, keep it as original files
-src/*.pye     # your libs
-```
+### Partial encrypted (pyconcrete as lib)
+* This mode is not safe enough. If you want to use pyconcrete in this way, you need to understand the potential risk.
+* Need to assign `mode=lib` when installation
+* Import pyconcrete in your main script
+  * project layout as below
+  ```sh
+  main.py       # import pyconcrete and your lib
+  pyconcrete/*  # put pyconcrete lib in project root, keep it as original files
+  src/*.pye     # your libs
+  ```
 
 
 Test
