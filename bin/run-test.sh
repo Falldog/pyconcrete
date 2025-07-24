@@ -16,7 +16,7 @@ build() {
     ver=$1
     service="pye${ver}"
 
-    docker-compose -f docker-compose-test.yml build ${service}
+    docker compose -f docker-compose-test.yml build ${service}
 }
 
 run_test() {
