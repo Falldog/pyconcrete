@@ -17,6 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+
       - name: Set up Docker cache dirs
         run: |
           mkdir -p ~/.cache/pip
