@@ -1,6 +1,6 @@
 # Pyconcrete Changelog
 
-## 1.0.1 (2025-??-??)
+## 1.1.0 (2025-07-24)
 
 ### Features
 * Support to assign customized file extension. Which default is .pye https://github.com/Falldog/pyconcrete/pull/115
@@ -15,6 +15,10 @@
 * Fix building dependency issue for secret_key.h https://github.com/Falldog/pyconcrete/pull/117
 * Fix windows installation will cause pip failure https://github.com/Falldog/pyconcrete/issues/116
 
+### Breaking Changes
+* pyconcrete exe & cli building as standalone
+* installation default will not install pyconcrete lib
+* `pyecli` building as executable file rather than python file
 
 
 ## 1.0.0 (2025-02-23)
