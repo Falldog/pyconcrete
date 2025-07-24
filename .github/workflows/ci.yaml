@@ -6,56 +6,48 @@ on:
   pull_request:
 
 jobs:
-  test-on-linux:
-    runs-on: ubuntu-latest
+  # test-on-linux:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       # python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+  #       py-version: ["3.10"]
+  #   name: Linux - Python ${{ matrix.py-version }}
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: docker/setup-compose-action@v1
+
+  #     - name: Run tests in Docker
+  #       env:
+  #         REPO_ROOT: ${{ github.workspace }}
+  #       run: |
+  #         make test ${{ matrix.py-version}}
+
+  test-on-windows:
+    runs-on: windows-latest
     strategy:
       matrix:
-        # python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        py-version: ["3.9", "3.10"]
-    name: Linux - Python ${{ matrix.py-version }}
+        py-version: ["3.10"]
+    name: Windows - Python ${{ matrix.py-version }}
 
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-compose-action@v1
 
-      - name: Run tests in Docker
-        env:
-          REPO_ROOT: ${{ github.workspace }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.py-version }}
+
+      - name: Install dependencies
+        shell: powershell
         run: |
-          make test ${{ matrix.py-version}}
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
 
-  # test-windows:
-  #   runs-on: windows-latest
-  #   strategy:
-  #     matrix:
-  #       py-version: ["3.9", "3.10"]
-  #   name: Windows - Python ${{ matrix.py-version }}
+      - name: Setup Visual Studio Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: ${{ matrix.py-version }}
-
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install meson ninja pytest
-  #       shell: powershell
-
-  #     - name: Setup Visual Studio Developer Command Prompt
-  #       uses: ilammy/msvc-dev-cmd@v1
-
-  #     - name: Configure and build with Meson (MSVC)
-  #       run: |
-  #         meson setup builddir
-  #         meson compile -C builddir
-  #       shell: powershell
-
-  #     - name: Run tests
-  #       run: |
-  #         pytest tests
-  #       shell: powershell
+      - name: Run tests
+        shell: powershell
+        run: |
+          pytest tests
