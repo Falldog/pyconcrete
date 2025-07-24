@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import platform
 import subprocess
 import sys
 from os.path import abspath, dirname, join
@@ -34,8 +35,12 @@ class Venv:
 
     def create(self):
         subprocess.check_call([sys.executable, '-m', 'virtualenv', self.env_dir])
-        self.bin_dir = join(self.env_dir, 'bin')
-        self.executable = join(self.bin_dir, 'python')
+        if platform.system() == 'Windows':
+            self.bin_dir = join(self.env_dir, 'Scripts')
+            self.executable = join(self.bin_dir, 'python.exe')
+        else:
+            self.bin_dir = join(self.env_dir, 'bin')
+            self.executable = join(self.bin_dir, 'python')
         self._ensure_pyconcrete_exist()
 
     def python(self, *args: [str], shell=False):

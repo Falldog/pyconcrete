@@ -19,8 +19,6 @@ jobs:
   #     - uses: docker/setup-compose-action@v1
 
   #     - name: Run tests in Docker
-  #       env:
-  #         REPO_ROOT: ${{ github.workspace }}
   #       run: |
   #         make test ${{ matrix.py-version}}
 
