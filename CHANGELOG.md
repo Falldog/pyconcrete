@@ -8,10 +8,12 @@
   * https://github.com/Falldog/pyconcrete/pull/119
   * Installation support to assign `mode` as `exe` or `lib`
   * Installation support to determine `install-cli` or not
+* Support limited Windows platform https://github.com/Falldog/pyconcrete/pull/120
 
 ### Bug fixes
 * Fix return code should not be 0 when python script is exception https://github.com/Falldog/pyconcrete/pull/114
 * Fix building dependency issue for secret_key.h https://github.com/Falldog/pyconcrete/pull/117
+* Fix windows installation will cause pip failure https://github.com/Falldog/pyconcrete/issues/116
 
 
 

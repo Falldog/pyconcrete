@@ -47,7 +47,8 @@ For unix base
 
 For windows base
 * Limited, only tested for partial environment
-* Visual Studio (w/ Windows SDK)
+  * Windows 11
+* Visual Studio 2022 (w/ Windows 11 SDK)
 * pip: 23.1+
 
 
