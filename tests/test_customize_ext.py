@@ -52,4 +52,4 @@ def test_customize_ext(tmp_path_factory, tmpdir, sample_import_sub_module_path, 
     output = venv.pyconcrete(main_encrypted)
 
     # verification (after)
-    assert output == f'bar{os.linespe}'
+    assert output == f'bar{os.linesep}'
