@@ -11,25 +11,18 @@ jobs:
     strategy:
       matrix:
         # python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        py-version: ["3.10"]
+        py-version: ["3.9", "3.10"]
     name: Linux - Python ${{ matrix.py-version }}
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-
-      - name: Set up Docker cache dirs
-        run: |
-          mkdir -p ~/.cache/pip
+      - uses: docker/setup-compose-action@v1
 
       - name: Run tests in Docker
+        env:
+          REPO_ROOT: ${{ github.workspace }}
         run: |
           make test ${{ matrix.py-version}}
-        env:
-          PIP_CACHE: ~/.cache/pip
-          REPO_ROOT: ${{ github.workspace }}
 
   # test-windows:
   #   runs-on: windows-latest

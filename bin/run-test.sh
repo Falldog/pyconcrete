@@ -7,7 +7,7 @@ TEST_VERBOSE=${TEST_VERBOSE:=""}
 
 
 declare -xr REPO_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
-declare -xr PIP_CACHE=${REPO_ROOT}/.pip-cache
+declare -xr PIP_CACHE=${REPO_ROOT}/.cache/pip
 
 mkdir -p ${PIP_CACHE}
 cd "${REPO_ROOT}"
