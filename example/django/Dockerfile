@@ -2,6 +2,8 @@ FROM ubuntu:22.04
 LABEL maintainer=falldog
 
 ARG PY_VER=3.10
+ARG NAME=admin
+ARG PW=1234
 ARG PASSPHRASE=TEST_FOR_DJANGO
 
 RUN set -ex \
@@ -60,5 +62,13 @@ RUN set -ex \
         -i wsgi.py manage.py
 
 WORKDIR /code
+
+# manipulate django with encrypted pye files
+RUN set -ex \
+    && python manage.py migrate \
+    && DJANGO_SUPERUSER_PASSWORD=${PW} python manage.py createsuperuser \
+        --username=${NAME} \
+        --noinput \
+        --email=admin@pyconcrete.test
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]

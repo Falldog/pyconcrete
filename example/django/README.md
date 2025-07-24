@@ -9,6 +9,9 @@ Environment setup
     $ ./bin/run-example-django.sh
     ```
 * access `http://127.0.0.1:5151` by browser
+* access admin page `http://127.0.0.1:5151/admin`
+  * user name: `admin`
+  * password: `1234`
 
 
 Environment
