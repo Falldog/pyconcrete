@@ -22,9 +22,15 @@ python_ver = python_ins.language_version()
 python_exe_path = python_ins.full_path()
 python_dependency = python_ins.dependency(embed: true)
 
-macro_ext = '-D PYCONCRETE_EXT="@0@"'.format(get_option('ext'))
-macro_version = '-D PYCONCRETE_VERSION=@0@'.format(version)
-
+macro_ext = '-D' + 'PYCONCRETE_EXT="@0@"'.format(get_option('ext'))
+macro_version = '-D' + 'PYCONCRETE_VERSION=@0@'.format(version)
+c_args = [
+    macro_ext,
+    macro_version,
+]
+if host_machine.system() == 'windows'
+    c_args += ['-D' + 'WIN32']
+endif
 
 #----------------------------
 # secret_key.h
@@ -63,7 +69,7 @@ if get_option('mode') == 'lib'
     python_ins.extension_module(
         '_pyconcrete',
         ext_srcs,
-        c_args: [macro_ext],
+        c_args: c_args,
         subdir: INSTALL_DIR,
         install: true,
         include_directories: ext_includes,
@@ -113,10 +119,7 @@ if get_option('mode') == 'exe'
     executable(
         PYCONCRETE_EXE_NAME,
         exe_srcs,
-        c_args: [
-            macro_ext,
-            macro_version,
-        ],
+        c_args: c_args,
         include_directories: exe_includes,
         dependencies: python_dependency,
         install: true,
@@ -157,10 +160,7 @@ if get_option('install-cli')
     executable(
         PYECLI_EXE_NAME,
         cli_srcs,
-        c_args: [
-            macro_ext,
-            macro_version,
-        ],
+        c_args: c_args,
         include_directories: cli_includes,
         dependencies: python_dependency,
         install: true,

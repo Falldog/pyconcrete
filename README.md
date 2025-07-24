@@ -45,6 +45,11 @@ For unix base
 * apt: pkg-config, build-essential, python{version}-dev
 * pip: 23.1+
 
+For windows base
+* Limited, only tested for partial environment
+* Visual Studio (w/ Windows SDK)
+* pip: 23.1+
+
 
 Installation
 --------------
@@ -138,9 +143,22 @@ Example
 [Django with pyconcrete](example/django)
 
 
-### Reference
-https://matthew-brett.github.io/pydagogue/python_msvc.html
-https://github.com/cython/cython/wiki/CythonExtensionsOnWindows
+TroubleShooting
+--------------
+
+### Windows
+Example environment: Windows 11, Visual Studio 2022
+* Error: `..\meson.build:1:0: ERROR: Unknown compiler(s): [['icl'], ['cl'], ['cc'], ['gcc'], ['clang'], ['clang-cl'], ['pgcc']]`
+  * Need to install Visual Studio
+    * Choose "Desktop development with C++"
+    * Must include "Windows 11 SDK"
+* Error: `..\meson.build:23:31: ERROR: Python dependency not found`
+  * Make sure your python arch same with your platform (such as Arm64 or Amd64 or x86)
+
+
+Reference
+--------------
+https://mesonbuild.com/SimpleStart.html
 
 
 Announcement
