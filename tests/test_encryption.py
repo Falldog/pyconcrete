@@ -65,7 +65,7 @@ print(pyconcrete.decrypt_buffer(data).decode('utf-8'))
         # 1 AES block (16)
         "1234567890ABCDEF",
         # more than 1 AES block (16)
-        f"1234567890ABCDEF,{os.linesep}" * 10,
+        "1234567890ABCDEF#$%^&" * 10,
     ],
 )
 def test_encryption__aes_block_testing(venv_lib, pye_cli, tmpdir, plain_buffer):

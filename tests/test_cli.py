@@ -66,9 +66,9 @@ _f_ri__util = join('relative_import', 'util.pye')
     [
         (None, {_f_main: YES, _f_ri__main: YES, _f_ri__util: YES}),
         ("main.py", {_f_main: NO, _f_ri__main: NO, _f_ri__util: YES}),
-        ("relative_import/*", {_f_main: YES, _f_ri__main: NO, _f_ri__util: NO}),
-        ("relative_import/util.py", {_f_main: YES, _f_ri__main: YES, _f_ri__util: NO}),
-        ("relative_import/main.py", {_f_main: YES, _f_ri__main: NO, _f_ri__util: YES}),
+        (join("relative_import", "*"), {_f_main: YES, _f_ri__main: NO, _f_ri__util: NO}),
+        (join("relative_import", "util.py"), {_f_main: YES, _f_ri__main: YES, _f_ri__util: NO}),
+        (join("relative_import", "main.py"), {_f_main: YES, _f_ri__main: NO, _f_ri__util: YES}),
         ("main.py util.py", {_f_main: NO, _f_ri__main: NO, _f_ri__util: NO}),
     ],
 )

@@ -17,11 +17,12 @@ import pytest
 @pytest.mark.parametrize("text", ["早安", "¡Buenos días!", "おはようございます"])
 def test_encoding(venv_exe, pye_cli, tmpdir, text):
     # prepare
-    pye_path = pye_cli.setup(tmpdir, 'test_encoding').source_code(f"print('{text}')").get_encrypt_path()
+    pye_path = pye_cli.setup(tmpdir, 'test_encoding').source_code(f"print('{text}'.encode('utf-8'))").get_encrypt_path()
 
     # execution
     output = venv_exe.pyconcrete(pye_path)
     output = output.strip()
+    output = output.decode('utf-8')
 
     # verification
     assert output == text
