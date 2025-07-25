@@ -111,7 +111,7 @@ _f_b_test = join('b_test.pye')
             {_f_foo: YES, _f_test1: YES, _f_test2: YES, _f_test3: YES, _f_test: YES, _f_a_test: YES, _f_b_test: YES},
         ),
         (
-            "*/test.py".replace('/', os.linesep),
+            "*/test.py".replace('/', os.path.sep),
             {_f_foo: YES, _f_test1: YES, _f_test2: YES, _f_test3: YES, _f_test: NO, _f_a_test: YES, _f_b_test: YES},
         ),
         # (
