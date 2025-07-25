@@ -22,6 +22,12 @@ ROOT_DIR = abspath(join(dirname(__file__), '..'))
 PASSPHRASE = 'TestPyconcrete'
 
 
+def exe_name(name):
+    if platform.system() == 'Windows':
+        return f'{name}.exe'
+    return name
+
+
 class Venv:
     def __init__(self, env_dir, pyconcrete_ext=None, install_mode='exe', install_cli=False):
         assert install_mode in ('lib', 'exe')
@@ -37,10 +43,9 @@ class Venv:
         subprocess.check_call([sys.executable, '-m', 'virtualenv', self.env_dir])
         if platform.system() == 'Windows':
             self.bin_dir = join(self.env_dir, 'Scripts')
-            self.executable = join(self.bin_dir, 'python.exe')
         else:
             self.bin_dir = join(self.env_dir, 'bin')
-            self.executable = join(self.bin_dir, 'python')
+        self.executable = join(self.bin_dir, exe_name('python'))
         self._ensure_pyconcrete_exist()
 
     def python(self, *args: [str], shell=False):
@@ -55,7 +60,7 @@ class Venv:
     @property
     def pyconcrete_exe(self):
         self._ensure_pyconcrete_exist()
-        return join(self.bin_dir, 'pyconcrete')
+        return join(self.bin_dir, exe_name('pyconcrete'))
 
     def pyconcrete(self, *args: [str]):
         self._ensure_pyconcrete_exist()
@@ -63,7 +68,7 @@ class Venv:
 
     def pyconcrete_cli(self, *args: [str]):
         self._ensure_pyconcrete_exist()
-        cli = join(self.bin_dir, 'pyecli')
+        cli = join(self.bin_dir, exe_name('pyecli'))
         return subprocess.check_output([cli, *args]).decode()
 
     def _ensure_pyconcrete_exist(self):

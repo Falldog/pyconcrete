@@ -22,7 +22,6 @@ def test_encoding(venv_exe, pye_cli, tmpdir, text):
     # execution
     output = venv_exe.pyconcrete(pye_path)
     output = output.strip()
-    output = output.decode('utf-8')
 
     # verification
     assert output == text
