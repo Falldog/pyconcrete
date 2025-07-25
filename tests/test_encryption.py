@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 from os.path import join
 from subprocess import PIPE, Popen
 
@@ -74,5 +73,7 @@ def test_encryption__aes_block_testing(venv_lib, pye_cli, tmpdir, plain_buffer):
 
     # verification
     assert output == (
-        plain_buffer + os.linesep
+        plain_buffer
+        + '\n'
+        # TODO
     )  # without output.strip() to make sure the output is exactly what we want
