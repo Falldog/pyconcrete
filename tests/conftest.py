@@ -72,7 +72,11 @@ class Venv:
         return subprocess.check_output([cli, *args]).decode()
 
     def _ensure_pyconcrete_exist(self):
-        proc = subprocess.run(f'{self.executable} -m pip list | grep -c pyconcrete', shell=True)
+        if platform.system() == 'Windows':
+            cmd = f'{self.executable} -m pip list | findstr pyconcrete'
+        else:
+            cmd = f'{self.executable} -m pip list | grep -c pyconcrete'
+        proc = subprocess.run(cmd, shell=True)
         pyconcrete_exist = bool(proc.returncode == 0)
         if not pyconcrete_exist:
             args = [
