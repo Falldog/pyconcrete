@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import platform
 from os.path import join
 from subprocess import CalledProcessError
 
@@ -25,7 +26,8 @@ def test_install__without_cli(tmp_path_factory):
         env_dir=tmp_path_factory.mktemp('venv_test_wo_cli'),
         install_cli=False,
     )
-    cli_path = join(venv.bin_dir, 'pyecli')
+    pyecli_name = 'pyecli' if platform.system() != 'Windows' else 'pyecli.exe'
+    cli_path = join(venv.bin_dir, pyecli_name)
     assert not os.path.exists(cli_path)
 
 
