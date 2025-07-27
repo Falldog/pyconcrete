@@ -105,7 +105,7 @@ class PyeCli:
 
         py_module_path = join(self._tmp_dir, f'{self._module_name}.py')
         pye_module_path = join(self._tmp_dir, f'{self._module_name}.pye')
-        with open(py_module_path, 'w') as f:
+        with open(py_module_path, 'w', encoding='utf-8') as f:
             f.write(self._source_code)
 
         self._venv.pyconcrete_cli('compile', '--remove-py', '--pye', '-s', py_module_path)
