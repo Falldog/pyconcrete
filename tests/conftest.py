@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import platform
 import subprocess
 import sys
 from os.path import abspath, dirname, join
@@ -19,6 +20,12 @@ import pytest
 
 ROOT_DIR = abspath(join(dirname(__file__), '..'))
 PASSPHRASE = 'TestPyconcrete'
+
+
+def exe_name(name):
+    if platform.system() == 'Windows':
+        return f'{name}.exe'
+    return name
 
 
 class Venv:
@@ -34,8 +41,11 @@ class Venv:
 
     def create(self):
         subprocess.check_call([sys.executable, '-m', 'virtualenv', self.env_dir])
-        self.bin_dir = join(self.env_dir, 'bin')
-        self.executable = join(self.bin_dir, 'python')
+        if platform.system() == 'Windows':
+            self.bin_dir = join(self.env_dir, 'Scripts')
+        else:
+            self.bin_dir = join(self.env_dir, 'bin')
+        self.executable = join(self.bin_dir, exe_name('python'))
         self._ensure_pyconcrete_exist()
 
     def python(self, *args: [str], shell=False):
@@ -50,7 +60,7 @@ class Venv:
     @property
     def pyconcrete_exe(self):
         self._ensure_pyconcrete_exist()
-        return join(self.bin_dir, 'pyconcrete')
+        return join(self.bin_dir, exe_name('pyconcrete'))
 
     def pyconcrete(self, *args: [str]):
         self._ensure_pyconcrete_exist()
@@ -58,11 +68,15 @@ class Venv:
 
     def pyconcrete_cli(self, *args: [str]):
         self._ensure_pyconcrete_exist()
-        cli = join(self.bin_dir, 'pyecli')
+        cli = join(self.bin_dir, exe_name('pyecli'))
         return subprocess.check_output([cli, *args]).decode()
 
     def _ensure_pyconcrete_exist(self):
-        proc = subprocess.run(f'{self.executable} -m pip list | grep -c pyconcrete', shell=True)
+        if platform.system() == 'Windows':
+            cmd = f'{self.executable} -m pip list | findstr pyconcrete'
+        else:
+            cmd = f'{self.executable} -m pip list | grep -c pyconcrete'
+        proc = subprocess.run(cmd, shell=True)
         pyconcrete_exist = bool(proc.returncode == 0)
         if not pyconcrete_exist:
             args = [

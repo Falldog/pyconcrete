@@ -17,7 +17,7 @@ from subprocess import CalledProcessError
 
 import pytest
 
-from .conftest import Venv
+from .conftest import Venv, exe_name
 
 
 def test_install__without_cli(tmp_path_factory):
@@ -25,7 +25,7 @@ def test_install__without_cli(tmp_path_factory):
         env_dir=tmp_path_factory.mktemp('venv_test_wo_cli'),
         install_cli=False,
     )
-    cli_path = join(venv.bin_dir, 'pyecli')
+    cli_path = join(venv.bin_dir, exe_name('pyecli'))
     assert not os.path.exists(cli_path)
 
 
