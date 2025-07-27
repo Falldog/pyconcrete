@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import shutil
 from os.path import exists, join
 
@@ -51,4 +52,4 @@ def test_customize_ext(tmp_path_factory, tmpdir, sample_import_sub_module_path, 
     output = venv.pyconcrete(main_encrypted)
 
     # verification (after)
-    assert output == 'bar\n'
+    assert output == f'bar{os.linesep}'

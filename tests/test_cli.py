@@ -66,9 +66,9 @@ _f_ri__util = join('relative_import', 'util.pye')
     [
         (None, {_f_main: YES, _f_ri__main: YES, _f_ri__util: YES}),
         ("main.py", {_f_main: NO, _f_ri__main: NO, _f_ri__util: YES}),
-        ("relative_import/*", {_f_main: YES, _f_ri__main: NO, _f_ri__util: NO}),
-        ("relative_import/util.py", {_f_main: YES, _f_ri__main: YES, _f_ri__util: NO}),
-        ("relative_import/main.py", {_f_main: YES, _f_ri__main: NO, _f_ri__util: YES}),
+        (join("relative_import", "*"), {_f_main: YES, _f_ri__main: NO, _f_ri__util: NO}),
+        (join("relative_import", "util.py"), {_f_main: YES, _f_ri__main: YES, _f_ri__util: NO}),
+        (join("relative_import", "main.py"), {_f_main: YES, _f_ri__main: NO, _f_ri__util: YES}),
         ("main.py util.py", {_f_main: NO, _f_ri__main: NO, _f_ri__util: NO}),
     ],
 )
@@ -111,11 +111,7 @@ _f_b_test = join('b_test.pye')
             {_f_foo: YES, _f_test1: YES, _f_test2: YES, _f_test3: YES, _f_test: YES, _f_a_test: YES, _f_b_test: YES},
         ),
         (
-            "*/test.py",
-            {_f_foo: YES, _f_test1: YES, _f_test2: YES, _f_test3: YES, _f_test: NO, _f_a_test: YES, _f_b_test: YES},
-        ),
-        (
-            "/test.py",
+            "*/test.py".replace('/', os.path.sep),
             {_f_foo: YES, _f_test1: YES, _f_test2: YES, _f_test3: YES, _f_test: NO, _f_a_test: YES, _f_b_test: YES},
         ),
         (

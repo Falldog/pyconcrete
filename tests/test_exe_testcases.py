@@ -68,7 +68,7 @@ def _read_expected_yaml(expected_yaml: str) -> ExpectedConfig:
     expected = data['expected']
     config = ExpectedConfig(
         return_code=expected.get('return_code', 0),
-        stdout=expected.get('stdout', ''),
+        stdout=expected.get('stdout', '').replace('\n', os.linesep),
         is_ignore_stdout=expected.get('is_ignore_stdout', False),
     )
     return config
