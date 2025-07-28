@@ -40,7 +40,7 @@ class Venv:
         self.create()
 
     def create(self):
-        subprocess.check_call([sys.executable, '-m', 'virtualenv', self.env_dir])
+        subprocess.check_call([sys.executable, '-m', 'virtualenv', str(self.env_dir)])
         if platform.system() == 'Windows':
             self.bin_dir = join(self.env_dir, 'Scripts')
         else:
