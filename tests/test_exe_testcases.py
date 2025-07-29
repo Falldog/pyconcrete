@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import platform
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -34,6 +35,12 @@ class ExpectedConfig:
     return_code: int
     stdout: str
     is_ignore_stdout: bool
+
+
+@dataclass(frozen=True)
+class Config:
+    platform: [str]  # linux, darwin, windows, empty as default all
+    expected: ExpectedConfig
 
 
 def _is_valid_testcase_folder(sub_test_case_dir):
@@ -61,15 +68,19 @@ def _discover_exe_testcases_folder() -> list:
     return sorted(test_cases)
 
 
-def _read_expected_yaml(expected_yaml: str) -> ExpectedConfig:
+def _read_expected_yaml(expected_yaml: str) -> Config:
     with open(join(expected_yaml), 'r') as f:
         data = yaml.safe_load(f)
 
     expected = data['expected']
-    config = ExpectedConfig(
+    expected_config = ExpectedConfig(
         return_code=expected.get('return_code', 0),
-        stdout=expected.get('stdout', ''),
+        stdout=expected.get('stdout', '').replace('\n', os.linesep),
         is_ignore_stdout=expected.get('is_ignore_stdout', False),
+    )
+    config = Config(
+        platform=data.get('platform', ['all']),
+        expected=expected_config,
     )
     return config
 
@@ -93,6 +104,14 @@ def test_exe__testcases(venv_cli, venv_exe, tmpdir, sub_test_case_folder: str):
     shutil.copytree(sub_test_case_folder, dest_dir)
     venv_cli.pyconcrete_cli('compile', f'--source={dest_dir}', '--pye', '--remove-py', '--remove-pyc')
 
+    config = _read_expected_yaml(join(dest_dir, EXPECTED_YAML))
+    if 'all' not in config.platform:
+        _platform = platform.system().lower()
+        if _platform not in config.platform:
+            print(f'* platform not match, skip testing. {_platform} not in expected ({config.platform})')
+            return
+    expected = config.expected
+
     # execution
     main_pye = join(dest_dir, MAIN_PYE)
     p = subprocess.Popen(
@@ -106,8 +125,6 @@ def test_exe__testcases(venv_cli, venv_exe, tmpdir, sub_test_case_folder: str):
     return_code = p.returncode
 
     # verification
-    expected = _read_expected_yaml(join(dest_dir, EXPECTED_YAML))
-
     assert type(expected.return_code) is int, f"type of `return_code` ({type(expected.return_code)}) is not int"
     assert expected.return_code == return_code
 

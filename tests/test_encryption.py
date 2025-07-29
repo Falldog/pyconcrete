@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 from os.path import join
-from subprocess import PIPE, Popen
 
 import pytest
 
@@ -46,10 +46,8 @@ print(pyconcrete.decrypt_buffer(data).decode('utf-8'))
         f.write(plain_buffer)
 
     # run executor py file to encrypt as file and decrypt via buffer
-    cmds = [venv_lib.executable, executor_py, plain_file, encrypted_file]
-    p = Popen(cmds, stdout=PIPE, stdin=PIPE, stderr=PIPE, text=True)
-    stdout, stderr = p.communicate(input=plain_buffer)
-    return stdout
+    output = venv_lib.python(executor_py, plain_file, encrypted_file)
+    return output
 
 
 @pytest.mark.parametrize(
@@ -64,7 +62,7 @@ print(pyconcrete.decrypt_buffer(data).decode('utf-8'))
         # 1 AES block (16)
         "1234567890ABCDEF",
         # more than 1 AES block (16)
-        "1234567890ABCDEF,\n" * 10,
+        "1234567890ABCDEF#$%^&" * 10,
     ],
 )
 def test_encryption__aes_block_testing(venv_lib, pye_cli, tmpdir, plain_buffer):
@@ -72,4 +70,4 @@ def test_encryption__aes_block_testing(venv_lib, pye_cli, tmpdir, plain_buffer):
     output = _encrypt_plain_buffer_and_decrypt(venv_lib, tmpdir, plain_buffer)
 
     # verification
-    assert output == (plain_buffer + '\n')  # without output.strip() to make sure the output is exactly what we want
+    assert output == (plain_buffer + os.linesep)

@@ -1,7 +1,7 @@
 pyconcrete
 ==============
-[![Travis](https://img.shields.io/travis/Falldog/pyconcrete.svg?label=travis)](https://travis-ci.org/Falldog/pyconcrete)
-[![AppVeyor](https://img.shields.io/appveyor/ci/Falldog/pyconcrete.svg?label=appveyor)](https://ci.appveyor.com/project/Falldog/pyconcrete)
+[![Unit Tests](https://github.com/Falldog/pyconcrete/actions/workflows/unit-tests.yaml/badge.svg)](https://github.com/Falldog/pyconcrete/actions/workflows/unit-tests.yaml)
+[![PyPI Downloads](https://static.pepy.tech/badge/pyconcrete)](https://pepy.tech/projects/pyconcrete)
 [![PyPI Version](https://img.shields.io/pypi/v/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
 [![PyPI PyVersion](https://img.shields.io/pypi/pyversions/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
 [![PyPI License](https://img.shields.io/pypi/l/pyconcrete.svg)](https://pypi.python.org/pypi/pyconcrete)
