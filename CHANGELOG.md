@@ -1,5 +1,12 @@
 # Pyconcrete Changelog
 
+## 1.1.? (????)
+
+### Bug fixes
+* Add `__file__` for entry pye script https://github.com/Falldog/pyconcrete/issues/123
+* Fix `sys.argv` doesn't support unicode https://github.com/Falldog/pyconcrete/issues/124
+
+
 ## 1.1.0 (2025-07-24)
 
 ### Features
