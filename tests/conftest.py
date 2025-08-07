@@ -62,9 +62,9 @@ class Venv:
         self._ensure_pyconcrete_exist()
         return join(self.bin_dir, exe_name('pyconcrete'))
 
-    def pyconcrete(self, *args: [str]):
+    def pyconcrete(self, *args: [str], cwd=None):
         self._ensure_pyconcrete_exist()
-        return subprocess.check_output([self.pyconcrete_exe, *args]).decode()
+        return subprocess.check_output([self.pyconcrete_exe, *args], cwd=cwd).decode()
 
     def pyconcrete_cli(self, *args: [str]):
         self._ensure_pyconcrete_exist()
