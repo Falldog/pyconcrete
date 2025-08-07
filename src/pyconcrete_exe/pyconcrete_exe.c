@@ -27,6 +27,10 @@ PyObject* getFullPath(const char* filepath);
 
 int main(int argc, char *argv[])
 {
+
+// https://docs.python.org/3/c-api/init_config.html#init-config
+// Since Python 3.8, it's recommended to use PyConfig to do initialization
+// But for support Python 3.7, we will apply it in future
 #if PY_MAJOR_VERSION >= 3
     int i, len;
     int ret = RET_OK;
@@ -34,10 +38,11 @@ int main(int argc, char *argv[])
     argv_ex = (wchar_t**) malloc(sizeof(wchar_t*) * argc);
     for(i=0 ; i<argc ; ++i)
     {
-        len = mbstowcs(NULL, argv[i], 0);
-        argv_ex[i] = (wchar_t*) malloc(sizeof(wchar_t) * (len+1));
-        mbstowcs(argv_ex[i], argv[i], len);
-        argv_ex[i][len] = 0;
+        argv_ex[i] = Py_DecodeLocale(argv[i], NULL);
+        if (!argv_ex[i]) {
+            fprintf(stderr, "Error, cannot decode argv[%d]\n", i);
+            return RET_FAIL;
+        }
     }
 #else
     char** argv_ex = argv;
@@ -95,7 +100,7 @@ int main(int argc, char *argv[])
 #if PY_MAJOR_VERSION >= 3
     for(i=0 ; i<argc ; ++i)
     {
-        free(argv_ex[i]);
+        PyMem_RawFree(argv_ex[i]);
     }
     free(argv_ex);
 #endif
