@@ -20,8 +20,9 @@
 
 
 int createAndInitPyconcreteModule();
-int execPycContent(PyObject* pyc_content);
+int execPycContent(PyObject* pyc_content, const char* filepath);
 int runFile(const char* filepath);
+PyObject* getFullPath(const char* filepath);
 
 
 int main(int argc, char *argv[])
@@ -136,7 +137,7 @@ ERROR:
     return ret;
 }
 
-int execPycContent(PyObject* pyc_content)
+int execPycContent(PyObject* pyc_content, const char* filepath)
 {
     int ret = RET_OK;
     PyObject* py_marshal = NULL;
@@ -169,11 +170,14 @@ int execPycContent(PyObject* pyc_content)
     }
 
     // setup global and exec loaded py_code
+    PyObject* py_full_filepath = getFullPath(filepath);
     PyDict_SetItemString(global, "__name__", main_name);
+    PyDict_SetItemString(global, "__file__", py_full_filepath);
     PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
     PyEval_EvalCode(py_code, global, global);
 
 ERROR:
+    Py_XDECREF(py_full_filepath);
     Py_XDECREF(py_code);
     Py_XDECREF(global);
     Py_XDECREF(pyc_content_wo_magic);
@@ -220,8 +224,23 @@ int runFile(const char* filepath)
     }
     fclose(src);
 
-    ret = execPycContent(py_plaint_content);
+    ret = execPycContent(py_plaint_content, filepath);
 
     Py_DECREF(py_plaint_content);
     return ret;
+}
+
+PyObject* getFullPath(const char* filepath)
+{
+    // import os.path
+    // return os.path.abspath(filepath)
+    PyObject* path_module = PyImport_ImportModule("os.path");
+    PyObject* abspath_func = PyObject_GetAttrString(path_module, "abspath");
+    PyObject* args = Py_BuildValue("(s)", filepath);
+    PyObject* obj = PyObject_CallObject(abspath_func, args);
+
+    Py_XDECREF(path_module);
+    Py_XDECREF(abspath_func);
+    Py_XDECREF(args);
+    return obj;
 }

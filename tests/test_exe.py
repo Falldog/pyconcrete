@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os.path
 import subprocess
 
 
@@ -108,3 +109,33 @@ print(getattr(pyconcrete, '__file__', 'None'))
 
     # verification
     assert pyconcrete__file__ == 'None'
+
+
+def test_exe__validate_main__file__full_path(venv_exe, pye_cli, tmpdir):
+    # prepare
+    pye_path = pye_cli.setup(tmpdir, 'test__file__').source_code("print(__file__)").get_encrypt_path()
+
+    # execution
+    output = venv_exe.pyconcrete(pye_path)
+    output = output.strip()
+    pye__file__ = output
+
+    # verification
+    assert pye__file__ == pye_path
+
+
+def test_exe__validate_main__file__relative_path(venv_exe, pye_cli, tmpdir):
+    # prepare
+    # simulate cmd as: `pyconcrete ../foo.pye`
+    # print(__file__) get correct full path
+    pye_full_path = pye_cli.setup(tmpdir, 'test__file__').source_code("print(__file__)").get_encrypt_path()
+    cwd = venv_exe.env_dir
+    pye_relative_path = os.path.relpath(pye_full_path, cwd)
+
+    # execution
+    output = venv_exe.pyconcrete(pye_relative_path, cwd=cwd)
+    output = output.strip()
+    pye__file__ = output
+
+    # verification
+    assert pye__file__ == pye_full_path
