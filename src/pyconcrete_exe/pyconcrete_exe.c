@@ -82,7 +82,34 @@ int main(int argc, char *argv[])
         }
         else
         {
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+    #if defined(WIN32)
+            PySys_SetArgv(argc-1, argv+1);
+    #else
+            int i, len;
+            wchar_t** argv_ex = NULL;
+            argv_ex = (wchar_t**) malloc(sizeof(wchar_t*) * argc);
+            // setup
+            for(i=0 ; i<argc ; ++i)
+            {
+                len = mbstowcs(NULL, argv[i], 0);
+                argv_ex[i] = (wchar_t*) malloc(sizeof(wchar_t) * (len+1));
+                mbstowcs(argv_ex[i], argv[i], len);
+                argv_ex[i][len] = 0;
+            }
+
+            // set argv
+            PySys_SetArgv(argc-1, argv_ex+1);
+
+            // release
+            for(i=0 ; i<argc ; ++i)
+            {
+                free(argv_ex[i]);
+            }
+    #endif
+#else
             prependSysPath0(argv[1]);
+#endif // PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
             ret = runFile(argv[1]);
         }
     }
@@ -110,6 +137,17 @@ int main(int argc, char *argv[])
 
 
 void initPython(int argc, _CHAR *argv[]) {
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+    #if defined(WIN32)
+        Py_SetProgramName(argv[0]);
+    #else
+        int len = mbstowcs(NULL, argv[0], 0);
+        wchar_t* arg0 = (wchar_t*) malloc(sizeof(wchar_t) * (len+1));
+        mbstowcs(arg0, argv[0], len);
+        arg0[len] = 0;
+        Py_SetProgramName(arg0);
+    #endif
+#else
     PyStatus status;
 
     // ----------
@@ -163,6 +201,7 @@ INIT_EXCEPTION:
     }
     // Display the error message and exit the process with non-zero exit code
     Py_ExitStatusException(status);
+#endif // ifdef PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
 }
 
 
