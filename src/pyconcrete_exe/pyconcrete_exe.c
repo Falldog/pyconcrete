@@ -18,43 +18,51 @@
     #define MAGIC_OFFSET 8
 #endif
 
-
-int createAndInitPyconcreteModule();
-int execPycContent(PyObject* pyc_content, const char* filepath);
-int runFile(const char* filepath);
-PyObject* getFullPath(const char* filepath);
-
-
-int main(int argc, char *argv[])
-{
-
-// https://docs.python.org/3/c-api/init_config.html#init-config
-// Since Python 3.8, it's recommended to use PyConfig to do initialization
-// But for support Python 3.7, we will apply it in future
-#if PY_MAJOR_VERSION >= 3
-    int i, len;
-    int ret = RET_OK;
-    wchar_t** argv_ex = NULL;
-    argv_ex = (wchar_t**) malloc(sizeof(wchar_t*) * argc);
-    for(i=0 ; i<argc ; ++i)
-    {
-        argv_ex[i] = Py_DecodeLocale(argv[i], NULL);
-        if (!argv_ex[i]) {
-            fprintf(stderr, "Error, cannot decode argv[%d]\n", i);
-            return RET_FAIL;
-        }
-    }
+// WIN32 platform use wmain, all string related functions should change to wchar_t version
+#ifdef WIN32
+    #define _CHAR                                       wchar_t
+    #define _T(s)                                       L##s
+    #define _fopen                                      _wfopen
+    #define _strncmp                                    wcsncmp
+    #define _strlen                                     wcslen
+    #define _PyConfig_SetArgv                           PyConfig_SetArgv
+    #define _PyConfig_SetString                         PyConfig_SetString
+    #define _PyUnicode_FromStringAndSize                PyUnicode_FromWideChar
 #else
-    char** argv_ex = argv;
+    #define _CHAR                                       char
+    #define _T(s)                                       s
+    #define _fopen                                      fopen
+    #define _strncmp                                    strncmp
+    #define _strlen                                     strlen
+    #define _PyConfig_SetArgv                           PyConfig_SetBytesArgv
+    #define _PyConfig_SetString                         PyConfig_SetBytesString
+    #define _PyUnicode_FromStringAndSize                PyUnicode_FromStringAndSize
 #endif
 
-    Py_SetProgramName(argv_ex[0]);  /* optional but recommended */
+
+int createAndInitPyconcreteModule();
+int execPycContent(PyObject* pyc_content, const _CHAR* filepath);
+int runFile(const _CHAR* filepath);
+void initPython(int argc, _CHAR *argv[]);
+PyObject* getFullPath(const _CHAR* filepath);
+
+
+#ifdef WIN32
+int wmain(int argc, wchar_t *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+    int ret = RET_OK;
+
     // PyImport_AppendInittab must set up before Py_Initialize
     if (PyImport_AppendInittab("_pyconcrete", PyInit__pyconcrete) == -1)
     {
         fprintf(stderr, "Error, can't load embedded _pyconcrete correctly!\n");
         return RET_FAIL;
     }
+
+    initPython(argc, argv);
     Py_Initialize();
     PyGILState_Ensure();
 
@@ -67,13 +75,12 @@ int main(int argc, char *argv[])
 
     if(argc >= 2)
     {
-        if(argc == 2 && (strncmp(argv[1], "-v", 3)==0 || strncmp(argv[1], "--version", 10)==0))
+        if(argc == 2 && (_strncmp(argv[1], _T("-v"), 3)==0 || _strncmp(argv[1], _T("--version"), 10)==0))
         {
             printf("pyconcrete %s [Python %s]\n", TOSTRING(PYCONCRETE_VERSION), TOSTRING(PY_VERSION));  // defined by build-backend
         }
         else
         {
-            PySys_SetArgv(argc-1, argv_ex+1);
             ret = runFile(argv[1]);
         }
     }
@@ -96,16 +103,66 @@ int main(int argc, char *argv[])
     }
 
     Py_Finalize();
-
-#if PY_MAJOR_VERSION >= 3
-    for(i=0 ; i<argc ; ++i)
-    {
-        PyMem_RawFree(argv_ex[i]);
-    }
-    free(argv_ex);
-#endif
     return ret;
 }
+
+
+void initPython(int argc, _CHAR *argv[]) {
+    PyStatus status;
+
+    // ----------
+    // PyPreConfig
+    // ----------
+    // On Windows platform invoke pyconcrete by subprocess may changed the console encoding to cp1252
+    // force to set utf8 mode to avoid the issue.
+    PyPreConfig preconfig;
+    PyPreConfig_InitPythonConfig(&preconfig);
+    preconfig.utf8_mode = 1;
+
+    status = Py_PreInitialize(&preconfig);
+    if (PyStatus_Exception(status)) {
+        goto INIT_EXCEPTION;
+    }
+
+    // ----------
+    // PyConfig
+    // ----------
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+    config.parse_argv = 0;
+    config.isolated = 1;
+
+    // Set program_name as pyconcrete. (Implicitly preinitialize Python)
+    status = _PyConfig_SetString(&config, &config.program_name, argv[0]);
+    if (PyStatus_Exception(status)) {
+        goto INIT_EXCEPTION;
+    }
+
+    // Decode command line arguments. (Implicitly preinitialize Python)
+    status = _PyConfig_SetArgv(&config, argc-1, argv+1);
+    if (PyStatus_Exception(status))
+    {
+        goto INIT_EXCEPTION;
+    }
+
+    status = Py_InitializeFromConfig(&config);
+    if (PyStatus_Exception(status))
+    {
+        goto INIT_EXCEPTION;
+    }
+    PyConfig_Clear(&config);
+    return;
+
+INIT_EXCEPTION:
+    PyConfig_Clear(&config);
+    if (PyStatus_IsExit(status))
+    {
+        return status.exitcode;
+    }
+    // Display the error message and exit the process with non-zero exit code
+    Py_ExitStatusException(status);
+}
+
 
 int createAndInitPyconcreteModule()
 {
@@ -142,7 +199,8 @@ ERROR:
     return ret;
 }
 
-int execPycContent(PyObject* pyc_content, const char* filepath)
+
+int execPycContent(PyObject* pyc_content, const _CHAR* filepath)
 {
     int ret = RET_OK;
     PyObject* py_marshal = NULL;
@@ -191,7 +249,8 @@ ERROR:
     return ret;
 }
 
-int runFile(const char* filepath)
+
+int runFile(const _CHAR* filepath)
 {
     FILE* src = NULL;
     char* content = NULL;
@@ -201,7 +260,7 @@ int runFile(const char* filepath)
     PyObject* py_plaint_content = NULL;
     PyObject* py_args = NULL;
 
-    src = fopen(filepath, "rb");
+    src = _fopen(filepath, _T("rb"));
     if(src == NULL)
     {
         return RET_FAIL;
@@ -235,17 +294,18 @@ int runFile(const char* filepath)
     return ret;
 }
 
-PyObject* getFullPath(const char* filepath)
+
+PyObject* getFullPath(const _CHAR* filepath)
 {
     // import os.path
     // return os.path.abspath(filepath)
     PyObject* path_module = PyImport_ImportModule("os.path");
     PyObject* abspath_func = PyObject_GetAttrString(path_module, "abspath");
-    PyObject* args = Py_BuildValue("(s)", filepath);
-    PyObject* obj = PyObject_CallObject(abspath_func, args);
+    PyObject* py_filepath = _PyUnicode_FromStringAndSize(filepath, _strlen(filepath));
+    PyObject* py_file_abspath = PyObject_CallOneArg(abspath_func, py_filepath);
 
     Py_XDECREF(path_module);
     Py_XDECREF(abspath_func);
-    Py_XDECREF(args);
-    return obj;
+    Py_XDECREF(py_filepath);
+    return py_file_abspath;
 }
