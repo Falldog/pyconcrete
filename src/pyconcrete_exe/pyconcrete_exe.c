@@ -311,7 +311,8 @@ int prependSysPath0(const _CHAR* script_path)
     PyObject* py_script_path = getFullPath(script_path);
     PyObject* path_module = PyImport_ImportModule("os.path");
     PyObject* dirname_func = PyObject_GetAttrString(path_module, "dirname");
-    PyObject* script_dir = PyObject_CallOneArg(dirname_func, py_script_path);
+    PyObject* args = Py_BuildValue("(O)", py_script_path);
+    PyObject* script_dir = PyObject_CallObject(dirname_func, args);
 
     PyObject* sys_path = PySys_GetObject("path");
     if (PyList_Insert(sys_path, 0, script_dir) < 0) {
@@ -321,6 +322,7 @@ int prependSysPath0(const _CHAR* script_path)
     Py_XDECREF(py_script_path);
     Py_XDECREF(path_module);
     Py_XDECREF(dirname_func);
+    Py_XDECREF(args);
     Py_XDECREF(script_dir);
     return ret;
 }
@@ -333,10 +335,12 @@ PyObject* getFullPath(const _CHAR* filepath)
     PyObject* path_module = PyImport_ImportModule("os.path");
     PyObject* abspath_func = PyObject_GetAttrString(path_module, "abspath");
     PyObject* py_filepath = _PyUnicode_FromStringAndSize(filepath, _strlen(filepath));
-    PyObject* py_file_abspath = PyObject_CallOneArg(abspath_func, py_filepath);
+    PyObject* args = Py_BuildValue("(O)", py_filepath);
+    PyObject* py_file_abspath = PyObject_CallObject(abspath_func, args);
 
     Py_XDECREF(path_module);
     Py_XDECREF(abspath_func);
     Py_XDECREF(py_filepath);
+    Py_XDECREF(args);
     return py_file_abspath;
 }
