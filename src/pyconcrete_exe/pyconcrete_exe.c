@@ -43,6 +43,7 @@
 int createAndInitPyconcreteModule();
 int execPycContent(PyObject* pyc_content, const _CHAR* filepath);
 int runFile(const _CHAR* filepath);
+int prependSysPath0(const _CHAR* script_path);
 void initPython(int argc, _CHAR *argv[]);
 PyObject* getFullPath(const _CHAR* filepath);
 
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
         }
         else
         {
+            prependSysPath0(argv[1]);
             ret = runFile(argv[1]);
         }
     }
@@ -291,6 +293,35 @@ int runFile(const _CHAR* filepath)
     ret = execPycContent(py_plaint_content, filepath);
 
     Py_DECREF(py_plaint_content);
+    return ret;
+}
+
+
+/*
+    PySys_SetArgv is deprecated since python 3.11. It's original behavior will insert script's directory into sys.path.
+    It's replace by PyConfig, but PyConfig only update sys.path when executing Py_Main or Py_RunMain.
+    So it's better to update sys.path by pyconcrete.
+ */
+int prependSysPath0(const _CHAR* script_path)
+{
+    // script_dir = os.path.dirname(script_path)
+    // sys.path.insert(0, script_dir)
+    int ret = RET_OK;
+
+    PyObject* py_script_path = getFullPath(script_path);
+    PyObject* path_module = PyImport_ImportModule("os.path");
+    PyObject* dirname_func = PyObject_GetAttrString(path_module, "dirname");
+    PyObject* script_dir = PyObject_CallOneArg(dirname_func, py_script_path);
+
+    PyObject* sys_path = PySys_GetObject("path");
+    if (PyList_Insert(sys_path, 0, script_dir) < 0) {
+        ret = RET_FAIL;
+    }
+
+    Py_XDECREF(py_script_path);
+    Py_XDECREF(path_module);
+    Py_XDECREF(dirname_func);
+    Py_XDECREF(script_dir);
     return ret;
 }
 
