@@ -1,5 +1,16 @@
 # Pyconcrete Changelog
 
+## 1.1.? (????)
+
+### Bug fixes
+* Add `__file__` for entry pye script https://github.com/Falldog/pyconcrete/issues/123
+* Fix `sys.argv` to support unicode https://github.com/Falldog/pyconcrete/issues/124
+  * Python 3.7 on Windows is not support
+
+### Breaking Changes
+* Default enable Python utf8 mode, ref doc: https://docs.python.org/3/library/os.html#utf8-mode
+
+
 ## 1.1.0 (2025-07-24)
 
 ### Features

@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os.path
+import platform
 import subprocess
+import sys
+
+import pytest
 
 
 def test_exe__execute_an_non_exist_file(venv_exe):
@@ -83,6 +87,28 @@ print(" ".join(sys.argv))
 
     # verification
     assert output == f'{pye_path} -a -b -c'
+
+
+@pytest.mark.skipif(platform.system() == 'Windows' and sys.version_info < (3, 8), reason="Windows requires python3.8")
+def test_exe__sys_argv__in_unicode(venv_exe, pye_cli, tmpdir):
+    # prepare
+    pye_path = (
+        pye_cli.setup(tmpdir, 'test_sys_argv')
+        .source_code(
+            """
+import sys
+print(" ".join(sys.argv))
+            """.strip()
+        )
+        .get_encrypt_path()
+    )
+
+    # execution
+    output = venv_exe.pyconcrete(pye_path, '早安', '=', 'おはようございます')
+    output = output.strip()
+
+    # verification
+    assert output == f'{pye_path} 早安 = おはようございます'
 
 
 def test_exe__import_pyconcrete__venv_exe__validate__file__(venv_exe, pye_cli, tmpdir):
