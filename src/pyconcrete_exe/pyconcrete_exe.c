@@ -18,6 +18,12 @@
     #define MAGIC_OFFSET 8
 #endif
 
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+    #define SETUP_ARGV_BY_LEGACY
+#else
+    #define SETUP_ARGV_BY_PYCONFIG
+#endif
+
 // WIN32 platform use wmain, all string related functions should change to wchar_t version
 #ifdef WIN32
     #define _CHAR                                       wchar_t
@@ -82,7 +88,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+#if defined(SETUP_ARGV_BY_LEGACY)
     #if defined(WIN32)
             PySys_SetArgv(argc-1, argv+1);
     #else
@@ -109,7 +115,7 @@ int main(int argc, char *argv[])
     #endif
 #else
             prependSysPath0(argv[1]);
-#endif // PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+#endif // SETUP_ARGV_BY_LEGACY
             ret = runFile(argv[1]);
         }
     }
@@ -137,7 +143,7 @@ int main(int argc, char *argv[])
 
 
 void initPython(int argc, _CHAR *argv[]) {
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+#if defined(SETUP_ARGV_BY_LEGACY)
     #if defined(WIN32)
         Py_SetProgramName(argv[0]);
     #else
@@ -201,7 +207,7 @@ INIT_EXCEPTION:
     }
     // Display the error message and exit the process with non-zero exit code
     Py_ExitStatusException(status);
-#endif // ifdef PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <=7
+#endif // SETUP_ARGV_BY_LEGACY
 }
 
 
