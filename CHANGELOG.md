@@ -1,6 +1,6 @@
 # Pyconcrete Changelog
 
-## 1.1.? (????)
+## 1.2.0 (2025-09-01)
 
 ### Bug fixes
 * Add `__file__` for entry pye script https://github.com/Falldog/pyconcrete/issues/123
